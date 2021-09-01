@@ -11,6 +11,8 @@ public:
 	bool Init();
 	void RunLoop();
 
+	qjs::Value Excute(const char* input, const char* filename);
+
 private:
 	qjs::Runtime* runtime_;
 	qjs::Context* context_;

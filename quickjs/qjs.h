@@ -294,7 +294,10 @@ public:
 	}
 
 	const char* str() {
-		return str_;
+		if (str_)
+			return str_;
+		else
+			return "";
 	}
 
 	size_t len() {
@@ -877,6 +880,36 @@ public:
 		module_->Export(class_name_, constructor);
 	}
 
+	template<T* ctor(Context& context,Value& this_obj, ArgList& args)>
+	void AddCtor2() {
+		JSValue constructor = JS_NewCFunction2(context_, [](JSContext* ctx,
+			JSValueConst new_target,
+			int argc, JSValueConst* argv) {
+
+			Value proto(ctx, JS_GetPropertyStr(ctx, new_target, "prototype"));
+			if (proto.IsException()) {
+				return JS_EXCEPTION;
+			}
+			Context* context = Context::get(ctx);
+			ArgList arg_list(ctx, argc, argv);
+
+			Value obj(ctx, JS_NewObjectProtoClass(ctx, proto, class_id_));
+
+			if (obj.IsException()) {
+				return JS_EXCEPTION;
+			}
+
+			T* pThis = ctor(*context, obj, arg_list);
+			if (!pThis) {
+				return JS_ThrowInternalError(ctx, "ctor error");
+			}
+			obj.SetOpaque(pThis);
+			return obj.Release();
+		}, class_name_, 0, JS_CFUNC_constructor, 0);
+		JS_SetConstructor(context_, constructor, prototype_);
+		module_->Export(class_name_, constructor);
+	}
+
 	template<Value func(T* pThis,Context& context,ArgList& args)>
 	void AddFunc(const char* name) {
 		JS_DefinePropertyValueStr(context_, prototype_, name, 
@@ -892,6 +925,21 @@ public:
 		}, name,0),0);
 	}
 
+	template<Value func(T* pThis, Context& context, ArgList& args)>
+	void AddReleaseFunc(const char* name) {
+		JS_DefinePropertyValueStr(context_, prototype_, name,
+			JS_NewCFunction(context_,
+				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			if (!pThis) {
+				return JS_ThrowTypeError(ctx, "no this pointer exist");
+			}
+			JS_SetOpaque(this_val, nullptr);
+			Context* context = Context::get(ctx);
+			ArgList arg_list(ctx, argc, argv);
+			return func(pThis, *context, arg_list).Release();
+		}, name, 0), 0);
+	}
 
 	template<JSCFunction func>
 	void AddCFunc(const char* name) {
