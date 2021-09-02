@@ -121,6 +121,38 @@ static Value showWindow(JsWindow* pThis, Context& context, ArgList& args) {
 }
 
 
+static Value centerWindow(JsWindow* pThis, Context& context, ArgList& args) {
+
+	pThis->CenterWindow();
+	return undefined_value;
+}
+
+static Value showModal(JsWindow* pThis, Context& context, ArgList& args) {
+	UINT rslt = pThis->ShowModal();
+	return context.NewUint32(rslt);
+}
+
+static Value setIcon(JsWindow* pThis, Context& context, ArgList& args) {
+	pThis->SetIcon(args[0].ToUint32());
+	return undefined_value;
+}
+
+
+static Value resizeClient(JsWindow* pThis, Context& context, ArgList& args) {
+	pThis->ResizeClient(args[0].ToInt32(), args[1].ToInt32());
+	return undefined_value;
+}
+
+static Value sendMessage(JsWindow* pThis, Context& context, ArgList& args) {
+	LRESULT result = pThis->SendMessage(args[0].ToInt32(), args[1].ToInt32(), args[2].ToInt32());
+	return context.NewInt64(result);
+}
+
+static Value postMessage(JsWindow* pThis, Context& context, ArgList& args) {
+	LRESULT result = pThis->PostMessage(args[0].ToInt32(), args[1].ToInt32(), args[2].ToInt32());
+	return context.NewInt64(result);
+}
+
 static Value manager(JsWindow* pThis, Context& context) {
 	return pThis->js_manager();
 }
@@ -133,6 +165,12 @@ void RegisterWindow(qjs::Module* module) {
 	window.AddFunc<createWindow>("create");
 	window.AddReleaseFunc<closeWindow>("close");
 	window.AddFunc<showWindow>("showWindow");
+	window.AddFunc<centerWindow>("centerWindow");
+	window.AddFunc<showModal>("showModal");
+	window.AddFunc<setIcon>("setIcon");
+	window.AddFunc<resizeClient>("resizeClient");
+	window.AddFunc<sendMessage>("sendMessage");
+	window.AddFunc<postMessage>("postMessage");
 	window.AddGet<manager>("manager");
 
 

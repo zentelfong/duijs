@@ -7,6 +7,7 @@ using namespace DuiLib;
 
 extern void RegisterPaintManager(Module* module);
 extern void RegisterWindow(qjs::Module* module);
+extern void RegisterControl(qjs::Module* module);
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -27,7 +28,7 @@ bool JsEngine::Init() {
 	auto module = context_->NewModule("DuiLib");
 	RegisterWindow(module);
 	RegisterPaintManager(module);
-
+	RegisterControl(module);
 	return true;
 }
 
