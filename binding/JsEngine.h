@@ -12,7 +12,7 @@ public:
 	void RunLoop();
 
 	qjs::Value Excute(const char* input, const char* filename);
-
+	void DumpError() { context_->DumpError(); }
 private:
 	qjs::Runtime* runtime_;
 	qjs::Context* context_;

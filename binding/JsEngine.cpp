@@ -1,10 +1,12 @@
 #include "StdAfx.h"
 #include "JsEngine.h"
-#include "JsWindow.h"
 
 namespace duijs {
-
+using namespace qjs;
 using namespace DuiLib;
+
+extern void RegisterPaintManager(Module* module);
+extern void RegisterWindow(qjs::Module* module);
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -24,16 +26,18 @@ bool JsEngine::Init() {
 
 	auto module = context_->NewModule("DuiLib");
 	RegisterWindow(module);
+	RegisterPaintManager(module);
 
 	return true;
 }
 
 qjs::Value JsEngine::Excute(const char* input, const char* filename) {
+	assert(context_);
 	return context_->Excute(input, strlen(input), filename);
 }
 
 void JsEngine::RunLoop() {
-
+	assert(context_);
 	MSG msg = { 0 };
 	while (::GetMessage(&msg, NULL, 0, 0)) {
 		if (!CPaintManagerUI::TranslateMessage(&msg)) {

@@ -1,4 +1,6 @@
 #include "JsWindow.h"
+#include "Util.h"
+
 
 namespace duijs {
 using namespace qjs;
@@ -6,7 +8,7 @@ using namespace qjs;
 JsWindow::JsWindow(Context* context, Value& this_obj)
 	:context_(context),this_(this_obj)
 {
-
+	paint_manager_ = Class<CPaintManagerUI>::ToJs(*context, &m_pm);
 }
 
 JsWindow::~JsWindow() {
@@ -14,7 +16,7 @@ JsWindow::~JsWindow() {
 
 
 void JsWindow::Mark(JS_MarkFunc* mark_func) {
-
+	paint_manager_.Mark(mark_func);
 }
 
 
@@ -50,13 +52,25 @@ void JsWindow::InitWindow() {
 }
 
 void JsWindow::OnFinalMessage(HWND hWnd) {
-
-	this_ = undefined_value;
+	delete this;
 }
 
 void JsWindow::Notify(TNotifyUI& msg) {
-
-
+	//处理事件
+	LPCTSTR funcName = msg.pSender->GetCustomAttribute(msg.sType);
+	if (funcName) {
+		std::string name = Wide2UTF8(funcName);
+		if (this_.HasProperty(name.c_str())) {
+			Value result = this_.Invoke(name.c_str());
+			if (result.IsException()) {
+				context_->DumpError();
+			}
+			return;
+		} else {
+			printf("no func %s", name.c_str());
+		}
+	}
+	WindowImplBase::Notify(msg);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,7 +80,6 @@ static JsWindow* newWindow(Context& context,Value& this_obj, ArgList& args) {
 }
 
 static void deleteWindow(JsWindow* w) {
-	delete w;
 }
 
 static void markWindow(JsWindow* pThis, JS_MarkFunc* mark_func) {
@@ -74,10 +87,18 @@ static void markWindow(JsWindow* pThis, JS_MarkFunc* mark_func) {
 }
 
 static Value createWindow(JsWindow* pThis, Context& context, ArgList& args) {
-	JsWindow* parent = Class<JsWindow>::ToC(args[0]);
-	auto name = args[1].ToString();
-	HWND hWnd = pThis->CreateDuiWindow(parent? parent->GetHWND():NULL,
-		CDuiString(name.str(),name.len()), args[2].ToUint32(),args[3].ToUint32());
+	HWND hWnd = NULL;
+	if (args[0].IsObject()) {
+		JsWindow* parent = Class<JsWindow>::ToC(args[0]);
+		auto name = args[1].ToString();
+		hWnd = pThis->CreateDuiWindow(parent ? parent->GetHWND() : NULL,
+			CDuiString(name.str(), name.len()), args[2].ToUint32(), args[3].ToUint32());
+	}
+	else {
+		auto name = args[0].ToString();
+		hWnd = pThis->CreateDuiWindow(NULL,
+			CDuiString(name.str(), name.len()), args[1].ToUint32(), args[2].ToUint32());
+	}
 	return context.NewBool(hWnd != NULL);
 }
 
@@ -89,13 +110,89 @@ static Value closeWindow(JsWindow* pThis, Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value showWindow(JsWindow* pThis, Context& context, ArgList& args) {
+	if (args.size() == 2)
+		pThis->ShowWindow(args[0].ToBool(), args[1].ToBool());
+	else if (args.size() == 1)
+		pThis->ShowWindow(args[0].ToBool());
+	else
+		pThis->ShowWindow();
+	return undefined_value;
+}
+
+
+static Value manager(JsWindow* pThis, Context& context) {
+	return pThis->js_manager();
+}
+
+
 void RegisterWindow(qjs::Module* module) {
 	auto window = module->ExportClass<JsWindow>("Window");
 	window.Init2<deleteWindow, markWindow>();
 	window.AddCtor2<newWindow>();
 	window.AddFunc<createWindow>("create");
 	window.AddReleaseFunc<closeWindow>("close");
+	window.AddFunc<showWindow>("showWindow");
+	window.AddGet<manager>("manager");
 
+
+	module->ExportUint32("WS_OVERLAPPED", WS_OVERLAPPED);
+	module->ExportUint32("WS_POPUP", WS_POPUP);
+	module->ExportUint32("WS_CHILD", WS_CHILD);
+	module->ExportUint32("WS_MINIMIZE", WS_MINIMIZE);
+	module->ExportUint32("WS_VISIBLE", WS_VISIBLE);
+	module->ExportUint32("WS_DISABLED", WS_DISABLED);
+	module->ExportUint32("WS_CLIPSIBLINGS", WS_CLIPSIBLINGS);
+	module->ExportUint32("WS_CLIPCHILDREN", WS_CLIPCHILDREN);
+	module->ExportUint32("WS_MAXIMIZE", WS_MAXIMIZE);
+	module->ExportUint32("WS_CAPTION", WS_CAPTION);
+	module->ExportUint32("WS_BORDER", WS_BORDER);
+	module->ExportUint32("WS_DLGFRAME", WS_DLGFRAME);
+	module->ExportUint32("WS_VSCROLL", WS_VSCROLL);
+	module->ExportUint32("WS_HSCROLL", WS_HSCROLL);
+	module->ExportUint32("WS_SYSMENU", WS_SYSMENU);
+	module->ExportUint32("WS_THICKFRAME", WS_THICKFRAME);
+	module->ExportUint32("WS_GROUP", WS_GROUP);
+	module->ExportUint32("WS_TABSTOP", WS_TABSTOP);
+	module->ExportUint32("WS_MINIMIZEBOX", WS_MINIMIZEBOX);
+
+	module->ExportUint32("WS_MAXIMIZEBOX", WS_MAXIMIZEBOX);
+	module->ExportUint32("WS_TILED", WS_TILED);
+	module->ExportUint32("WS_ICONIC", WS_ICONIC);
+	module->ExportUint32("WS_SIZEBOX", WS_SIZEBOX);
+	module->ExportUint32("WS_TILEDWINDOW", WS_TILEDWINDOW);
+	module->ExportUint32("WS_OVERLAPPEDWINDOW", WS_OVERLAPPEDWINDOW);
+	module->ExportUint32("WS_POPUPWINDOW", WS_POPUPWINDOW);
+	module->ExportUint32("WS_CHILDWINDOW", WS_CHILDWINDOW);
+
+
+	module->ExportUint32("WS_EX_DLGMODALFRAME", WS_EX_DLGMODALFRAME);
+	module->ExportUint32("WS_EX_NOPARENTNOTIFY", WS_EX_NOPARENTNOTIFY);
+	module->ExportUint32("WS_EX_TOPMOST", WS_EX_TOPMOST);
+	module->ExportUint32("WS_EX_ACCEPTFILES", WS_EX_ACCEPTFILES);
+	module->ExportUint32("WS_EX_TRANSPARENT", WS_EX_TRANSPARENT);
+	module->ExportUint32("WS_EX_MDICHILD", WS_EX_MDICHILD);
+	module->ExportUint32("WS_EX_TOOLWINDOW", WS_EX_TOOLWINDOW);
+	module->ExportUint32("WS_EX_WINDOWEDGE", WS_EX_WINDOWEDGE);
+	module->ExportUint32("WS_EX_CLIENTEDGE", WS_EX_CLIENTEDGE);
+	module->ExportUint32("WS_EX_CONTEXTHELP", WS_EX_CONTEXTHELP);
+	module->ExportUint32("WS_EX_RIGHT", WS_EX_RIGHT);
+	module->ExportUint32("WS_EX_LEFT", WS_EX_LEFT);
+	module->ExportUint32("WS_EX_RTLREADING", WS_EX_RTLREADING);
+	module->ExportUint32("WS_EX_LTRREADING", WS_EX_LTRREADING);
+	module->ExportUint32("WS_EX_LEFTSCROLLBAR", WS_EX_LEFTSCROLLBAR);
+	module->ExportUint32("WS_EX_RIGHTSCROLLBAR", WS_EX_RIGHTSCROLLBAR);
+	module->ExportUint32("WS_EX_CONTROLPARENT", WS_EX_CONTROLPARENT);
+	module->ExportUint32("WS_EX_STATICEDGE", WS_EX_STATICEDGE);
+	module->ExportUint32("WS_EX_APPWINDOW", WS_EX_APPWINDOW);
+	module->ExportUint32("WS_EX_OVERLAPPEDWINDOW", WS_EX_OVERLAPPEDWINDOW);
+
+	module->ExportUint32("WS_EX_PALETTEWINDOW", WS_EX_PALETTEWINDOW);
+	module->ExportUint32("WS_EX_LAYERED", WS_EX_LAYERED);
+	module->ExportUint32("WS_EX_NOINHERITLAYOUT", WS_EX_NOINHERITLAYOUT);
+	module->ExportUint32("WS_EX_LAYOUTRTL", WS_EX_LAYOUTRTL);
+	module->ExportUint32("WS_EX_COMPOSITED", WS_EX_COMPOSITED);
+	module->ExportUint32("WS_EX_NOACTIVATE", WS_EX_NOACTIVATE);
 }
 
 }//namespace

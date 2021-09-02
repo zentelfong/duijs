@@ -75,8 +75,17 @@ public:
 		return Export(name, JS_NewInt32(context_, value));
 	}
 
+	bool ExportUint32(const char* name, uint32_t value) {
+		return Export(name, JS_NewUint32(context_, value));
+	}
+
 	bool ExportInt64(const char* name, int64_t value) {
 		return Export(name, JS_NewInt64(context_, value));
+	}
+
+
+	bool ExportUint64(const char* name, uint64_t value) {
+		return Export(name, JS_NewBigUint64(context_, value));
 	}
 
 	bool ExportFloat32(const char* name, float value) {
