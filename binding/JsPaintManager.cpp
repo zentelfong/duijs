@@ -195,6 +195,70 @@ static Value setGdiplusTextRenderingHint(CPaintManagerUI* pThis, Context& contex
 }
 
 
+
+static Value getInstancePath(Context& context, ArgList& args) {
+	return toValue(context,CPaintManagerUI::GetInstancePath());
+}
+
+static Value getCurrentPath(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::GetCurrentPath());
+}
+
+static Value getResourcePath(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::GetResourcePath());
+}
+
+static Value getResourceZip(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::GetResourceZip());
+}
+
+static Value getResourceZipPwd(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::GetResourceZipPwd());
+}
+
+static Value isCachedResourceZip(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::IsCachedResourceZip());
+}
+
+static Value setCurrentPath(Context& context, ArgList& args) {
+	auto path = args[0].ToString();
+	CPaintManagerUI::SetCurrentPath(CDuiString(path.str(),path.len()));
+	return undefined_value;
+}
+
+static Value setResourcePath(Context& context, ArgList& args) {
+	auto path = args[0].ToString();
+	CPaintManagerUI::SetResourcePath(CDuiString(path.str(), path.len()));
+	return undefined_value;
+}
+
+static Value setResourceZip(Context& context, ArgList& args) {
+	auto path = args[0].ToString();
+	CPaintManagerUI::SetResourceZip(CDuiString(path.str(), path.len()));
+	return undefined_value;
+}
+
+static Value setResourceType(Context& context, ArgList& args) {
+	CPaintManagerUI::SetResourceType(args[0].ToInt32());
+	return undefined_value;
+}
+
+static Value getResourceType(Context& context, ArgList& args) {
+	return toValue(context, CPaintManagerUI::GetResourceType());
+}
+
+static Value reloadSkin(Context& context, ArgList& args) {
+	CPaintManagerUI::ReloadSkin();
+	return undefined_value;
+}
+
+static Value loadPlugin(Context& context, ArgList& args) {
+	auto path = args[0].ToString();
+	bool rslt = CPaintManagerUI::LoadPlugin(CDuiString(path.str(), path.len()));
+	return context.NewBool(rslt);
+}
+
+
 void RegisterPaintManager(Module* module) {
 	auto mgr = module->ExportClass<CPaintManagerUI>("PaintManager");
 	mgr.Init<deletePaintManager>();
@@ -237,6 +301,21 @@ void RegisterPaintManager(Module* module) {
 
 	mgr.AddFunc<getGdiplusTextRenderingHint>("getGdiplusTextRenderingHint");
 	mgr.AddFunc<setGdiplusTextRenderingHint>("setGdiplusTextRenderingHint");
+
+
+	module->ExportFunc<getInstancePath>("getInstancePath");
+	module->ExportFunc<getCurrentPath>("getCurrentPath");
+	module->ExportFunc<getResourcePath>("getResourcePath");
+	module->ExportFunc<getResourceZip>("getResourceZip");
+	module->ExportFunc<getResourceZipPwd>("getResourceZipPwd");
+	module->ExportFunc<isCachedResourceZip>("isCachedResourceZip");
+	module->ExportFunc<setCurrentPath>("setCurrentPath");
+	module->ExportFunc<setResourcePath>("setResourcePath");
+	module->ExportFunc<setResourceZip>("setResourceZip");
+	module->ExportFunc<setResourceType>("setResourceType");
+	module->ExportFunc<getResourceType>("getResourceType");
+	module->ExportFunc<reloadSkin>("reloadSkin");
+	module->ExportFunc<loadPlugin>("loadPlugin");
 }
 
 

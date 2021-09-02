@@ -1,4 +1,6 @@
-import {Window} from "DuiLib"
+import {Window,setResourcePath} from "DuiLib"
+
+setResourcePath("../skin/");
 
 class TestWindow extends Window{
 	
@@ -17,7 +19,6 @@ class TestWindow extends Window{
 		this.close();
 	}
 }
-
 
 let testWindow = new TestWindow();
 
