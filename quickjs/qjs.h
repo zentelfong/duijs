@@ -75,8 +75,17 @@ public:
 		return Export(name, JS_NewInt32(context_, value));
 	}
 
+	bool ExportUint32(const char* name, uint32_t value) {
+		return Export(name, JS_NewUint32(context_, value));
+	}
+
 	bool ExportInt64(const char* name, int64_t value) {
 		return Export(name, JS_NewInt64(context_, value));
+	}
+
+
+	bool ExportUint64(const char* name, uint64_t value) {
+		return Export(name, JS_NewBigUint64(context_, value));
 	}
 
 	bool ExportFloat32(const char* name, float value) {
@@ -640,18 +649,18 @@ public:
 	}
 
 	//执行普通函数，this_obj为JS_UNDEFINED
-	Value Call() {
+	Value Call() const {
 		return Value(context_,JS_Call(context_, value_, JS_UNDEFINED, 0, nullptr));
 	}
 
 	template<typename ...Args>
-	Value Call(Args&&... args) {
+	Value Call(Args&&... args) const  {
 		JSValue params[] = { std::forward<Args>(args)... };
 		return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, sizeof...(args), params));
 	}
 
 	//执行对象的函数
-	Value Invoke(const char* func_name) {
+	Value Invoke(const char* func_name) const {
 		auto atom = JS_NewAtom(context_, func_name);
 		JSValue rslt = JS_Invoke(context_, value_, atom, 0, nullptr);
 		JS_FreeAtom(context_,atom);
@@ -659,7 +668,7 @@ public:
 	}
 
 	template<typename ...Args>
-	Value Invoke(const char* func_name,Args&&... args) {
+	Value Invoke(const char* func_name,Args&&... args) const {
 		JSValue params[] = { std::forward<Args>(args)... };
 		auto atom = JS_NewAtom(context_, func_name);
 		JSValue rslt = JS_Invoke(context_, value_, atom, sizeof...(args), params);
