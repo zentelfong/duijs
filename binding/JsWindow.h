@@ -13,17 +13,43 @@ public:
 
 	void Mark(JS_MarkFunc* mark_func);
 
+	qjs::Value js_this() { return this_; }
+	qjs::Value js_manager() { return paint_manager_; }
+
 protected:
-	virtual LPCTSTR GetWindowClassName(void) const;
-	virtual CDuiString GetSkinFile();
-	virtual void InitResource();
-	virtual void InitWindow();
-	virtual void OnFinalMessage(HWND hWnd);
-	virtual void Notify(TNotifyUI& msg);
+	LPCTSTR GetWindowClassName(void) const override;
+	void InitResource() override;
+	void InitWindow() override;
+	void OnFinalMessage(HWND hWnd) override;
+	void Notify(TNotifyUI& msg) override;
+	CDuiString GetSkinFile() override;
+
+	CDuiString GetSkinType() override;
+	LPCTSTR GetManagerName() override;
+
+	CControlUI* CreateControl(LPCTSTR pstrClass) override;
+	LPCTSTR QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) override;
+
+	LRESULT OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+	LRESULT OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+
+	LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+
+	LRESULT OnKillFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+	LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+
+	LRESULT OnLButtonDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+	LRESULT OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+	LRESULT OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
+	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 
 private:
 	qjs::Context* context_;
 	qjs::Value this_;
+	qjs::Value paint_manager_;
 };
 
 
