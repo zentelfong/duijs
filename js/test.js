@@ -13,6 +13,10 @@ class TestWindow extends Window{
 	getSkinFile(){
 		return "popup.xml";
 	}
+
+	onMouseMove(x,y,wparam){
+		print("mouse pos:",x,"x",y);
+	}
 	
 	gotoWeb(){
 		print("goto web");

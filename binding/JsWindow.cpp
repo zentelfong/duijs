@@ -131,8 +131,11 @@ LRESULT JsWindow::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 
 LRESULT JsWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (this_.HasProperty("onSize")) {
-		Value result = this_.Invoke("onSize",context_->NewUint32(uMsg), 
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		UINT width = LOWORD(lParam);
+		UINT height = HIWORD(lParam);
+
+		Value result = this_.Invoke("onSize",context_->NewUint32(width),
+			context_->NewUint32(height));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -144,8 +147,9 @@ LRESULT JsWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 LRESULT JsWindow::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	if (this_.HasProperty("onChar")) {
-		Value result = this_.Invoke("onChar", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		Value result = this_.Invoke("onChar",
+			context_->NewUint32(wParam),
+			context_->NewUint32(lParam));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -155,8 +159,25 @@ LRESULT JsWindow::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 
 LRESULT JsWindow::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (this_.HasProperty("onKeyDown")) {
-		Value result = this_.Invoke("onKeyDown", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+
+		WORD vkCode = LOWORD(wParam);
+		Value result = this_.Invoke("onKeyDown", 
+			context_->NewUint32(vkCode),
+			context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnKeyDown(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnKeyUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onKeyUp")) {
+
+		WORD vkCode = LOWORD(wParam);
+		Value result = this_.Invoke("onKeyUp",
+			context_->NewUint32(vkCode),
+			context_->NewUint32(lParam));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -167,8 +188,7 @@ LRESULT JsWindow::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 LRESULT JsWindow::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	if (this_.HasProperty("onKillFocus")) {
-		Value result = this_.Invoke("onKillFocus", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		Value result = this_.Invoke("onKillFocus");
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -178,8 +198,7 @@ LRESULT JsWindow::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 LRESULT JsWindow::OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	if (this_.HasProperty("onSetFocus")) {
-		Value result = this_.Invoke("onSetFocus", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		Value result = this_.Invoke("onSetFocus");
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -190,8 +209,13 @@ LRESULT JsWindow::OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 LRESULT JsWindow::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (this_.HasProperty("onLButtonDown")) {
-		Value result = this_.Invoke("onLButtonDown", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+
+		Value result = this_.Invoke("onLButtonDown",
+			context_->NewUint32(xPos), context_->NewUint32(yPos), 
+			context_->NewUint32(wParam));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -202,8 +226,12 @@ LRESULT JsWindow::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 LRESULT JsWindow::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	if (this_.HasProperty("onLButtonUp")) {
-		Value result = this_.Invoke("onLButtonUp", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+
+		Value result = this_.Invoke("onLButtonUp",
+			context_->NewUint32(xPos), context_->NewUint32(yPos),
+			context_->NewUint32(wParam));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
@@ -214,14 +242,52 @@ LRESULT JsWindow::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 LRESULT JsWindow::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 
 	if (this_.HasProperty("onMouseMove")) {
-		Value result = this_.Invoke("onMouseMove", context_->NewUint32(uMsg),
-			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+
+		Value result = this_.Invoke("onMouseMove",
+			context_->NewUint32(xPos), context_->NewUint32(yPos),
+			context_->NewUint32(wParam));
 		if (result.IsException()) {
 			context_->DumpError();
 		}
 	}
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 }
+
+#if defined(WIN32) && !defined(UNDER_CE)
+
+LRESULT JsWindow::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onMouseWheel")) {
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+		int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+		Value result = this_.Invoke("onMouseWheel",
+			context_->NewUint32(xPos), context_->NewUint32(yPos),
+			context_->NewUint32(zDelta),
+			context_->NewUint32(GET_KEYSTATE_WPARAM(wParam)));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnMouseWheel(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnMouseHover(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onMouseHover")) {
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+		
+		Value result = this_.Invoke("onMouseHover",
+			context_->NewUint32(xPos), context_->NewUint32(yPos),
+			context_->NewUint32(wParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnMouseHover(uMsg, wParam, lParam, bHandled);
+}
+#endif
 
 LRESULT JsWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (this_.HasProperty("handleCustomMessage")) {
@@ -393,6 +459,14 @@ void RegisterWindow(qjs::Module* module) {
 	module->ExportUint32("WS_EX_LAYOUTRTL", WS_EX_LAYOUTRTL);
 	module->ExportUint32("WS_EX_COMPOSITED", WS_EX_COMPOSITED);
 	module->ExportUint32("WS_EX_NOACTIVATE", WS_EX_NOACTIVATE);
+
+	module->ExportUint32("MK_CONTROL", MK_CONTROL);
+	module->ExportUint32("MK_MBUTTON", MK_MBUTTON);
+	module->ExportUint32("MK_RBUTTON", MK_RBUTTON);
+	module->ExportUint32("MK_SHIFT", MK_SHIFT);
+	module->ExportUint32("MK_XBUTTON1", MK_XBUTTON1);
+	module->ExportUint32("MK_XBUTTON2", MK_XBUTTON2);
+
 }
 
 }//namespace
