@@ -73,6 +73,168 @@ void JsWindow::Notify(TNotifyUI& msg) {
 	WindowImplBase::Notify(msg);
 }
 
+
+CDuiString JsWindow::GetSkinType() {
+	if (this_.HasProperty("getSkinType")) {
+		Value result = this_.Invoke("getSkinType");
+		if (result.IsException()) {
+			context_->DumpError();
+		} else {
+			auto str = result.ToString();
+			return CDuiString(str.str(), str.len());
+		}
+	}
+	return _T("");
+}
+
+LPCTSTR JsWindow::GetManagerName() {
+	if (this_.HasProperty("getManagerName")) {
+		Value result = this_.Invoke("getManagerName");
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+		else {
+			auto str = result.ToString();
+			return CDuiString(str.str(), str.len());
+		}
+	}
+	return NULL;
+}
+
+CControlUI* JsWindow::CreateControl(LPCTSTR pstrClass) {
+	return NULL;
+}
+
+LPCTSTR JsWindow::QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) {
+	return NULL;
+}
+
+LRESULT JsWindow::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onClose")) {
+		Value result = this_.Invoke("onClose");
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnClose(uMsg,wParam,lParam,bHandled);
+}
+
+LRESULT JsWindow::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onDestroy")) {
+		Value result = this_.Invoke("onDestroy");
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnDestroy(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onSize")) {
+		Value result = this_.Invoke("onSize",context_->NewUint32(uMsg), 
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
+}
+
+
+LRESULT JsWindow::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	if (this_.HasProperty("onChar")) {
+		Value result = this_.Invoke("onChar", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnChar(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onKeyDown")) {
+		Value result = this_.Invoke("onKeyDown", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnKeyDown(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	if (this_.HasProperty("onKillFocus")) {
+		Value result = this_.Invoke("onKillFocus", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnKillFocus(uMsg, wParam, lParam, bHandled);
+}
+LRESULT JsWindow::OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	if (this_.HasProperty("onSetFocus")) {
+		Value result = this_.Invoke("onSetFocus", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnSetFocus(uMsg, wParam, lParam, bHandled);
+}
+
+
+LRESULT JsWindow::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("onLButtonDown")) {
+		Value result = this_.Invoke("onLButtonDown", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
+
+}
+LRESULT JsWindow::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	if (this_.HasProperty("onLButtonUp")) {
+		Value result = this_.Invoke("onLButtonUp", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+
+	if (this_.HasProperty("onMouseMove")) {
+		Value result = this_.Invoke("onMouseMove", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT JsWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (this_.HasProperty("handleCustomMessage")) {
+		Value result = this_.Invoke("handleCustomMessage", context_->NewUint32(uMsg),
+			context_->NewUint32(wParam), context_->NewUint32(lParam));
+		if (result.IsException()) {
+			context_->DumpError();
+		}
+	}
+	return WindowImplBase::HandleCustomMessage(uMsg, wParam, lParam, bHandled);
+}
+
+
 //////////////////////////////////////////////////////////////////////
 
 static JsWindow* newWindow(Context& context,Value& this_obj, ArgList& args) {

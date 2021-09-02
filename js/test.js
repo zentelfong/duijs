@@ -23,6 +23,7 @@ class TestWindow extends Window{
 let testWindow = new TestWindow();
 
 testWindow.create("test window");
+testWindow.centerWindow();
 testWindow.showWindow();
 
 
