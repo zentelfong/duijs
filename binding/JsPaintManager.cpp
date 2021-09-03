@@ -263,6 +263,56 @@ static Value postQuitMessage(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+
+static Value getRoot(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	return toValue(context, pThis->GetRoot());
+}
+
+static Value findControl(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	if (args[0].IsString()) {
+		auto str = args[0].ToString();
+		return toValue(context, pThis->FindControl(CDuiString(str.str(), str.len())));
+	}
+	return toValue(context, pThis->FindControl(toPoint(args[0])));
+}
+
+static Value findSubControlByPoint(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	return toValue(context, pThis->FindSubControlByPoint(parent,toPoint(args[1])));
+}
+
+static Value findSubControlByName(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+
+	auto str = args[1].ToString();
+	return toValue(context, 
+		pThis->FindSubControlByName(parent, CDuiString(str.str(), str.len())));
+}
+
+static Value findSubControlByClass(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	auto str = args[1].ToString();
+	return toValue(context,
+		pThis->FindSubControlByClass(parent, CDuiString(str.str(), str.len()),args[2].ToInt32()));
+
+}
+
+static Value findSubControlsByClass(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	auto str = args[1].ToString();
+	CStdPtrArray* list = pThis->FindSubControlsByClass(parent, CDuiString(str.str(), str.len()));
+
+	auto js_list = context.NewArray();
+	for (int i = 0; i < list->GetSize(); ++i) {
+		CControlUI* ctrl = (CControlUI*)list->GetAt(i);
+		js_list.SetProperty(i, toValue(context,ctrl));
+	}
+	return js_list;
+}
+
+
+
+
 void RegisterPaintManager(Module* module) {
 	auto mgr = module->ExportClass<CPaintManagerUI>("PaintManager");
 	mgr.Init<deletePaintManager>();
@@ -305,6 +355,14 @@ void RegisterPaintManager(Module* module) {
 
 	mgr.AddFunc<getGdiplusTextRenderingHint>("getGdiplusTextRenderingHint");
 	mgr.AddFunc<setGdiplusTextRenderingHint>("setGdiplusTextRenderingHint");
+
+
+	mgr.AddFunc<getRoot>("getRoot");
+	mgr.AddFunc<findControl>("findControl");
+	mgr.AddFunc<findSubControlByPoint>("findSubControlByPoint");
+	mgr.AddFunc<findSubControlByName>("findSubControlByName");
+	mgr.AddFunc<findSubControlByClass>("findSubControlByClass");
+	mgr.AddFunc<findSubControlsByClass>("findSubControlsByClass");
 
 
 	module->ExportFunc<getInstancePath>("getInstancePath");

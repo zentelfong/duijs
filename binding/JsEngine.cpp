@@ -8,6 +8,8 @@ using namespace DuiLib;
 extern void RegisterPaintManager(Module* module);
 extern void RegisterWindow(qjs::Module* module);
 extern void RegisterControl(qjs::Module* module);
+extern void RegisterLabel(qjs::Module* module);
+
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -29,12 +31,18 @@ bool JsEngine::Init() {
 	RegisterWindow(module);
 	RegisterPaintManager(module);
 	RegisterControl(module);
+	RegisterLabel(module);
 	return true;
 }
 
-qjs::Value JsEngine::Excute(const char* input, const char* filename) {
+bool JsEngine::Excute(const char* input, const char* filename) {
 	assert(context_);
-	return context_->Excute(input, strlen(input), filename);
+	auto value = context_->Excute(input, strlen(input), filename);
+	if (value.IsException()) {
+		context_->DumpError();
+		return false;
+	}
+	return true;
 }
 
 void JsEngine::RunLoop() {

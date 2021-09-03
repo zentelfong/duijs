@@ -7,16 +7,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 #else
 int main(int argc,const char* argv) {
 #endif
-
 	CrashDump crash_dump;
 	CoInitialize(NULL);
 
 	//CPaintManagerUI::SetInstance(hInstance);
 	duijs::JsEngine engine;
 	engine.Init();
-	auto value = engine.Excute("import {} from '../js/test.js'", "<eval>");
-	if (value.IsException()) {
-		engine.DumpError();
+	bool rslt = engine.Excute("import {} from '../js/test.js'", "<eval>");
+	if (!rslt) {
+		return -1;
 	}
 	engine.RunLoop();
 	CoUninitialize();

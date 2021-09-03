@@ -803,6 +803,9 @@ public:
 
 	//创建新的js对象，注意js对象释放时会调用dtor释放ptr
 	static Value ToJs(Context& context,T* ptr) {
+		if (!ptr)
+			return null_value;
+
 		Value obj = context.NewＣlassObject(class_id_);
 		obj.SetOpaque(ptr);
 		return obj;

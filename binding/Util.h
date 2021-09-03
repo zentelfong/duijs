@@ -33,9 +33,10 @@ SIZE toSize(const qjs::Value& value);
 qjs::Value toValue(qjs::Context& ctx, const SIZE& pt);
 
 
-
 qjs::Value toValue(qjs::Context& ctx, const DuiLib::TPercentInfo& b);
 DuiLib::TPercentInfo toPercentInfo(const qjs::Value& value);
 
+
+qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control);
 
 }//namespace
