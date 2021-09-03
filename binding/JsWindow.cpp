@@ -61,7 +61,7 @@ void JsWindow::Notify(TNotifyUI& msg) {
 	if (funcName) {
 		std::string name = Wide2UTF8(funcName);
 		if (this_.HasProperty(name.c_str())) {
-			Value result = this_.Invoke(name.c_str());
+			Value result = this_.Invoke(name.c_str(),toValue(*context_,msg.pSender));
 			if (result.IsException()) {
 				context_->DumpError();
 			}
@@ -102,6 +102,15 @@ LPCTSTR JsWindow::GetManagerName() {
 }
 
 CControlUI* JsWindow::CreateControl(LPCTSTR pstrClass) {
+	if (this_.HasProperty("createControl")) {
+		Value result = this_.Invoke("createControl",toValue(*context_,pstrClass));
+		if (result.IsException()) {
+			context_->DumpError();
+		} else {
+			//TODO:js转C会不会有问题
+			return Class<CControlUI>::ToC(result);
+		}
+	}
 	return NULL;
 }
 
