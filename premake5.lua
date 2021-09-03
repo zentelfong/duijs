@@ -32,7 +32,6 @@ project "duijs"
 	language "C++"
 	kind "ConsoleApp"
 	includedirs{
-		"duilib",
 		"./"
 	}
 	files{
@@ -40,6 +39,8 @@ project "duijs"
 		"quickjs/*.cpp",
 		"binding/*.h",
 		"binding/*.cpp",
+		"utils/*.h",
+		"utils/*.cpp",
 		"test/*.h",
 		"test/*.cpp",
 	}

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "duilib/UIlib.h"
 #include "JsEngine.h"
 
 namespace duijs {

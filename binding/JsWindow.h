@@ -1,6 +1,6 @@
 #pragma once
 #include "quickjs/qjs.h"
-#include "Utils/WinImplBase.h"
+#include "duilib/UIlib.h"
 
 namespace duijs {
 

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "duilib/UIlib.h"
 #include "quickjs/qjs.h"
 #include "Util.h"
 
@@ -258,6 +258,10 @@ static Value loadPlugin(Context& context, ArgList& args) {
 	return context.NewBool(rslt);
 }
 
+static Value postQuitMessage(Context& context, ArgList& args) {
+	PostQuitMessage(args[0].ToInt32());
+	return undefined_value;
+}
 
 void RegisterPaintManager(Module* module) {
 	auto mgr = module->ExportClass<CPaintManagerUI>("PaintManager");
@@ -316,6 +320,8 @@ void RegisterPaintManager(Module* module) {
 	module->ExportFunc<getResourceType>("getResourceType");
 	module->ExportFunc<reloadSkin>("reloadSkin");
 	module->ExportFunc<loadPlugin>("loadPlugin");
+	module->ExportFunc<postQuitMessage>("postQuitMessage");
+	
 }
 
 

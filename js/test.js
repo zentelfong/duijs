@@ -1,4 +1,4 @@
-import {Window,setResourcePath} from "DuiLib"
+import {Window,setResourcePath,postQuitMessage} from "DuiLib"
 
 setResourcePath("../skin/");
 
@@ -13,11 +13,12 @@ class TestWindow extends Window{
 	getSkinFile(){
 		return "popup.xml";
 	}
-
-	onMouseMove(x,y,wparam){
-		print("mouse pos:",x,"x",y);
-	}
 	
+	onDestroy(){
+		postQuitMessage(0);
+	}
+
+
 	gotoWeb(){
 		print("goto web");
 		this.close();

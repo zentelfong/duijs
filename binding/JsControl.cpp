@@ -1,5 +1,5 @@
 #include "JsControl.h"
-#include "StdAfx.h"
+#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
