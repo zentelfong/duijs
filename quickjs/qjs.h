@@ -854,6 +854,19 @@ public:
 		return obj;
 	}
 
+	static Value ToJs2(Context& context, T* ptr,JSClassID cid) {
+		if (!ptr)
+			return null_value;
+
+		if (!cid)
+			cid = class_id_;
+
+		Value obj = context.NewＣlassObject(cid);
+		obj.SetOpaque(ptr);
+		return obj;
+	}
+
+
 	template<void dtor(T*) = nullptr>
 	void Init(JSClassID parent_id = 0) {
 		assert(!class_inited_);

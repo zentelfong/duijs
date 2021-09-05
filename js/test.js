@@ -3,7 +3,6 @@ import {Window,Label,setResourcePath,postQuitMessage} from "DuiLib"
 setResourcePath("../skin/");
 
 class TestWindow extends Window{
-	
 	constructor(){
 		super();
 		
@@ -36,6 +35,8 @@ testWindow.create("test window");
 testWindow.centerWindow();
 testWindow.showWindow();
 
+let label = testWindow.manager.findControl("testLabel");
+label.setTextColor(0xff0000);
 
 
 

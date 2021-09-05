@@ -23,7 +23,7 @@
             <Button name="qqgroup_btn" cursor="hand" text="加入duilib开源项目圈（261675375）" showhtml="true" tooltip="加入duilib开源项目圈" width="220" autocalcwidth="true" valign="vcenter" align="left" textcolor="#FFEEEEEE" hottextcolor="#FFFF00FF" font="1" />
             <Button name="qq_btn" cursor="hand" text="骚扰Troy(QQ：656067418)" width="170" valign="vcenter" align="left" textcolor="#FFEEEEEE" hottextcolor="#FFFF00FF" font="1" tooltip="添加Troy为QQ好友" />
           </HorizontalLayout>	  
-      <Test></Test>
+      <Test name="testLabel"></Test>
       <HorizontalLayout height="24" childpadding="12">
         <Edit name="edit1" tipvalue="普通" style="edit_style" />
         <Edit name="edit2" tipvalue="只读" text="只读控件" style="edit_style" readonly="true"/>

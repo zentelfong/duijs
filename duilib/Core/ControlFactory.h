@@ -24,7 +24,9 @@ namespace DuiLib
 
 #define DECLARE_DUICONTROL(class_name)\
 public:\
-	static CControlUI* CreateControl();
+	static CControlUI* CreateControl(); \
+	virtual UINT GetClassId() const;
+
 
 #define IMPLEMENT_DUICONTROL(class_name)\
 	CControlUI* class_name::CreateControl()\

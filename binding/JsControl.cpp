@@ -2,6 +2,7 @@
 #include "duilib/UIlib.h"
 #include "Util.h"
 
+
 namespace duijs {
 
 using namespace qjs;
@@ -9,7 +10,7 @@ using namespace DuiLib;
 
 
 qjs::Value toValue(qjs::Context& ctx, CControlUI* control) {
-	return qjs::Class<CControlUI>::ToJs(ctx, control);
+	return qjs::Class<CControlUI>::ToJs2(ctx, control,control->GetClassId());
 }
 
 static CControlUI* newControl(Context& context,ArgList& args) {
