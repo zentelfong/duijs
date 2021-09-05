@@ -4,6 +4,7 @@
 #include <utility>
 #include <memory>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <array>
 #include <assert.h>
@@ -779,6 +780,38 @@ private:
 	std::array<Value, MaxArgCount> args_;
 };
 
+
+class ClassIdManager {
+public:
+	ClassIdManager() {
+	}
+
+	~ClassIdManager() {
+	}
+
+	//获取thread_local变量
+	static ClassIdManager* Instance();
+
+	//添加类
+	void AddClass(JSClassID classid, JSClassID parent_classid) {
+		if(parent_classid)
+			class_ids_.insert(std::make_pair(classid, parent_classid));
+	}
+
+	//获取该类的父类
+	JSClassID GetParent(JSClassID classid) {
+		auto find = class_ids_.find(classid);
+		if (find != class_ids_.end()) {
+			return find->second;
+		}
+		return 0;
+	}
+private:
+	//存储classid，及其父classid
+	std::unordered_map<JSClassID, JSClassID> class_ids_;
+};
+
+
 template<class T>
 class Class {
 public:
@@ -798,7 +831,17 @@ public:
 
 	//转为c
 	static T* ToC(const Value& v) {
-		return reinterpret_cast<T*>(v.GetOpaque(class_id_));
+		ClassIdManager* cmgr = ClassIdManager::Instance();
+		JSClassID id = JS_GetClassID(v);
+		JSClassID pid = id;
+		while (pid && pid != class_id_) {
+			pid = cmgr->GetParent(pid);
+		}
+		//如果id或者其父class id与class_id_相同则允许转换
+		if (pid == class_id_)
+			return reinterpret_cast<T*>(v.GetOpaque(id));
+		else
+			return nullptr;
 	}
 
 	//创建新的js对象，注意js对象释放时会调用dtor释放ptr
@@ -817,7 +860,7 @@ public:
 
 		JSClassDef class_def = {
 			class_name_,[](JSRuntime* rt, JSValue val) {
-				T* s = (T*)JS_GetOpaque(val, class_id_);
+				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
 				if (!s) {
 					return;
 				}
@@ -840,7 +883,7 @@ public:
 		JSClassDef class_def = {
 			class_name_,
 			[](JSRuntime* rt, JSValue val) {
-				T* s = (T*)JS_GetOpaque(val, class_id_);
+				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
 				if (!s) {
 					return;
 				}
@@ -851,7 +894,7 @@ public:
 
 			},
 			[](JSRuntime* rt, JSValueConst val, JS_MarkFunc* mark_func) {
-				T* s = (T*)JS_GetOpaque(val, class_id_);
+				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
 				if (s) {
 					mark(s, mark_func);
 				}
@@ -927,7 +970,7 @@ public:
 		JS_DefinePropertyValueStr(context_, prototype_, name, 
 			JS_NewCFunction(context_, 
 				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				return JS_ThrowTypeError(ctx, "no this pointer exist");
 			}
@@ -942,7 +985,7 @@ public:
 		JS_DefinePropertyValueStr(context_, prototype_, name,
 			JS_NewCFunction(context_,
 				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				return JS_ThrowTypeError(ctx, "no this pointer exist");
 			}
@@ -962,7 +1005,7 @@ public:
 	void AddGetSet(const char* name) {
 		JSCFunctionType get_func;
 		get_func.getter = [](JSContext* ctx, JSValueConst this_val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
@@ -977,7 +1020,7 @@ public:
 
 		JSCFunctionType set_func;
 		set_func.setter = [](JSContext* ctx, JSValueConst this_val, JSValueConst val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
@@ -998,7 +1041,7 @@ public:
 	void AddGet(const char* name) {
 		JSCFunctionType get_func;
 		get_func.getter = [](JSContext* ctx, JSValueConst this_val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
@@ -1022,7 +1065,7 @@ public:
 	void AddSet(const char* name) {
 		JSCFunctionType set_func;
 		set_func.setter = [](JSContext* ctx, JSValueConst this_val, JSValueConst val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
@@ -1045,8 +1088,7 @@ public:
 		JSCFunctionType itr_func;
 		itr_func.iterator_next = [](JSContext* ctx, JSValueConst this_val,
 			int argc, JSValueConst* argv, int* pdone, int magic) {
-
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, class_id_);
+			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
 			if (!pThis) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
@@ -1107,6 +1149,8 @@ private:
 		class_inited_ = true;
 
 		if (parent_id) {
+			ClassIdManager::Instance()->AddClass(class_id_, parent_id);
+
 			JSValue parent = JS_GetClassProto(context_, parent_id);
 			if (JS_IsObject(parent)) {
 				JS_SetPrototype(context_, prototype_, parent);

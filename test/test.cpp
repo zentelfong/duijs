@@ -2,6 +2,8 @@
 #include <objbase.h>
 #include "Utils/CrashDump.h"
 
+
+
 #if 0
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow){
 #else

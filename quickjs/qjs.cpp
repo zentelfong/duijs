@@ -210,7 +210,11 @@ uint8_t* Value::ToBuffer(size_t* psize) const {
 	return buf;
 }
 
+thread_local ClassIdManager s_class_id_manager;
 
+ClassIdManager* ClassIdManager::Instance() {
+	return &s_class_id_manager;
+}
 
 
 }//namespace
