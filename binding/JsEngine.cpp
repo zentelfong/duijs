@@ -9,7 +9,7 @@ extern void RegisterPaintManager(Module* module);
 extern void RegisterWindow(qjs::Module* module);
 extern void RegisterControl(qjs::Module* module);
 extern void RegisterLabel(qjs::Module* module);
-
+extern void RegisterDialogBuilder(qjs::Module* module);
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -24,6 +24,8 @@ JsEngine::~JsEngine() {
 }
 
 bool JsEngine::Init() {
+	assert(!runtime_);
+	assert(!context_);
 	runtime_ = new qjs::Runtime();
 	context_ = new qjs::Context(runtime_);
 
@@ -32,6 +34,7 @@ bool JsEngine::Init() {
 	RegisterPaintManager(module);
 	RegisterControl(module);
 	RegisterLabel(module);
+	RegisterDialogBuilder(module);
 	return true;
 }
 

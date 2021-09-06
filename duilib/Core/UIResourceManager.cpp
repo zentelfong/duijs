@@ -224,7 +224,7 @@ namespace DuiLib {
 		CDuiString *lpstrFind = static_cast<CDuiString *>(m_mTextResourceHashMap.Find(lpstrId));
 		if (lpstrFind == NULL && m_pQuerypInterface)
 		{
-			lpstrFind = new CDuiString(m_pQuerypInterface->QueryControlText(lpstrId, lpstrType));
+			lpstrFind = m_pQuerypInterface->QueryControlText(lpstrId, lpstrType);
 			m_mTextResourceHashMap.Insert(lpstrId, (LPVOID)lpstrFind);
 		}
 		return lpstrFind == NULL ? lpstrId : *lpstrFind;
@@ -235,7 +235,7 @@ namespace DuiLib {
 		if(m_pQuerypInterface == NULL) return;
 		//重载文字描述
 		LPCTSTR lpstrId = NULL;
-		LPCTSTR lpstrText;
+		CDuiString* lpstrText;
 		for( int i = 0; i < m_mTextResourceHashMap.GetSize(); i++ )
 		{
 			lpstrId = m_mTextResourceHashMap.GetAt(i);
@@ -243,7 +243,8 @@ namespace DuiLib {
 			lpstrText = m_pQuerypInterface->QueryControlText(lpstrId, NULL);
 			if(lpstrText != NULL) {
 				CDuiString * lpStr = static_cast<CDuiString *>(m_mTextResourceHashMap.Find(lpstrId));
-				lpStr->Assign(lpstrText);
+				lpStr->Assign(*lpstrText);
+				delete lpstrText;
 			}
 		}
 	}

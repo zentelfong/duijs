@@ -831,6 +831,9 @@ public:
 
 	//转为c
 	static T* ToC(const Value& v) {
+		if (!JS_IsObject(v)) {
+			return nullptr;
+		}
 		ClassIdManager* cmgr = ClassIdManager::Instance();
 		JSClassID id = JS_GetClassID(v);
 		JSClassID pid = id;

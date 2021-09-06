@@ -107,14 +107,23 @@ CControlUI* JsWindow::CreateControl(LPCTSTR pstrClass) {
 		if (result.IsException()) {
 			context_->DumpError();
 		} else {
-			//TODO:js转C会不会有问题
-			return Class<CControlUI>::ToC(result);
+			return toControl(result);
 		}
 	}
 	return NULL;
 }
 
-LPCTSTR JsWindow::QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) {
+CDuiString* JsWindow::QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) {
+	if (this_.HasProperty("queryControlText")) {
+		Value result = this_.Invoke("queryControlText", 
+			toValue(*context_, lpstrId), toValue(*context_, lpstrType));
+		if (result.IsException()) {
+			context_->DumpError();
+		} else {
+			auto str = result.ToString();
+			return new CDuiString(str.str(), str.len());
+		}
+	}
 	return NULL;
 }
 

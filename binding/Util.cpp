@@ -56,6 +56,11 @@ qjs::Value toValue(qjs::Context& ctx, LPCTSTR str) {
     return ctx.NewString(utf8.c_str(),utf8.length());
 }
 
+DuiLib::CDuiString toString(const qjs::Value& value) {
+    auto str = value.ToString();
+    return DuiLib::CDuiString(str.str(), str.len());
+}
+
 
 POINT toPoint(const qjs::Value& value) {
     POINT pt = {
@@ -103,6 +108,14 @@ DuiLib::TPercentInfo toPercentInfo(const qjs::Value& value) {
         value.GetProperty("right").ToFloat64(),
         value.GetProperty("bottom").ToFloat64() };
     return rc;
+}
+
+DuiLib::CControlUI* toControl(const qjs::Value& value) {
+    return qjs::Class<DuiLib::CControlUI>::ToC(value);
+}
+
+qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control) {
+    return qjs::Class<DuiLib::CControlUI>::ToJs2(ctx, control, control->GetClassId());
 }
 
 

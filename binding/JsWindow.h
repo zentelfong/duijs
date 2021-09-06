@@ -28,7 +28,7 @@ protected:
 	LPCTSTR GetManagerName() override;
 
 	CControlUI* CreateControl(LPCTSTR pstrClass) override;
-	LPCTSTR QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) override;
+	CDuiString* QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType) override;
 
 	LRESULT OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
@@ -57,8 +57,5 @@ private:
 	qjs::Value this_;
 	qjs::Value paint_manager_;
 };
-
-
-void RegisterWindow(qjs::Module* module);
 
 }//namespace

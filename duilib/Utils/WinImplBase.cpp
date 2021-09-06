@@ -39,7 +39,7 @@ namespace DuiLib
 		return NULL;
 	}
 
-	LPCTSTR WindowImplBase::QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType)
+	CDuiString* WindowImplBase::QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType)
 	{
 		return NULL;
 	}

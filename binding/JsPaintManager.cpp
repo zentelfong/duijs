@@ -277,12 +277,12 @@ static Value findControl(CPaintManagerUI* pThis, Context& context, ArgList& args
 }
 
 static Value findSubControlByPoint(CPaintManagerUI* pThis, Context& context, ArgList& args) {
-	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	CControlUI* parent = toControl(args[0]);
 	return toValue(context, pThis->FindSubControlByPoint(parent,toPoint(args[1])));
 }
 
 static Value findSubControlByName(CPaintManagerUI* pThis, Context& context, ArgList& args) {
-	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	CControlUI* parent = toControl(args[0]);
 
 	auto str = args[1].ToString();
 	return toValue(context, 
@@ -290,7 +290,7 @@ static Value findSubControlByName(CPaintManagerUI* pThis, Context& context, ArgL
 }
 
 static Value findSubControlByClass(CPaintManagerUI* pThis, Context& context, ArgList& args) {
-	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	CControlUI* parent = toControl(args[0]);
 	auto str = args[1].ToString();
 	return toValue(context,
 		pThis->FindSubControlByClass(parent, CDuiString(str.str(), str.len()),args[2].ToInt32()));
@@ -298,7 +298,7 @@ static Value findSubControlByClass(CPaintManagerUI* pThis, Context& context, Arg
 }
 
 static Value findSubControlsByClass(CPaintManagerUI* pThis, Context& context, ArgList& args) {
-	CControlUI* parent = Class<CControlUI>::ToC(args[0]);
+	CControlUI* parent = toControl(args[0]);
 	auto str = args[1].ToString();
 	CStdPtrArray* list = pThis->FindSubControlsByClass(parent, CDuiString(str.str(), str.len()));
 

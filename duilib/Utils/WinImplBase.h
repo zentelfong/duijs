@@ -38,7 +38,7 @@ namespace DuiLib
 	public:
 		virtual UINT GetClassStyle() const;
 		virtual CControlUI* CreateControl(LPCTSTR pstrClass);
-		virtual LPCTSTR QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType);
+		virtual CDuiString* QueryControlText(LPCTSTR lpstrId, LPCTSTR lpstrType);
 
 		virtual LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, bool& /*bHandled*/);
 		virtual LRESULT OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);

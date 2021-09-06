@@ -8,6 +8,7 @@ std::string Wide2UTF8(const std::wstring& strWide);
 std::string Wide2UTF8(LPCTSTR strWide);
 
 qjs::Value toValue(qjs::Context& ctx, LPCTSTR str);
+DuiLib::CDuiString toString(const qjs::Value& value);
 
 
 inline qjs::Value toValue(qjs::Context& ctx, bool b) {
@@ -37,6 +38,7 @@ qjs::Value toValue(qjs::Context& ctx, const DuiLib::TPercentInfo& b);
 DuiLib::TPercentInfo toPercentInfo(const qjs::Value& value);
 
 
+DuiLib::CControlUI* toControl(const qjs::Value& value);
 qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control);
 
 }//namespace
