@@ -12,6 +12,8 @@ extern void RegisterControl(qjs::Module* module);
 extern void RegisterLabel(qjs::Module* module);
 extern void RegisterDialogBuilder(qjs::Module* module);
 extern void RegisterContainer(qjs::Module* module);
+extern void RegisterButton(qjs::Module* module);
+
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -35,11 +37,14 @@ bool JsEngine::Init() {
 	RegisterConst(module);
 	RegisterWindow(module);
 	RegisterPaintManager(module);
-	RegisterControl(module);
-	RegisterLabel(module);
 	RegisterDialogBuilder(module);
 
+	RegisterControl(module);
+	RegisterLabel(module);
+	RegisterButton(module);
 	RegisterContainer(module);
+
+
 	return true;
 }
 

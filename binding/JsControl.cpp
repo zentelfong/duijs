@@ -564,7 +564,8 @@ static Value addCustomAttribute(CControlUI* pThis, Context& context, ArgList& ar
 }
 
 static Value getCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->GetCustomAttribute());
+	auto name = args[0].ToString();
+	return toValue(context, pThis->GetCustomAttribute(CDuiString(name.str(), name.len())));
 }
 
 static Value removeCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
