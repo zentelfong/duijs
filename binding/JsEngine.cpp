@@ -13,6 +13,8 @@ extern void RegisterLabel(qjs::Module* module);
 extern void RegisterDialogBuilder(qjs::Module* module);
 extern void RegisterContainer(qjs::Module* module);
 extern void RegisterButton(qjs::Module* module);
+extern void RegisterText(qjs::Module* module);
+extern void RegisterCombo(qjs::Module* module);
 
 
 JsEngine::JsEngine() 
@@ -42,8 +44,10 @@ bool JsEngine::Init() {
 	RegisterControl(module);
 	RegisterLabel(module);
 	RegisterButton(module);
-	RegisterContainer(module);
+	RegisterText(module);
 
+	RegisterContainer(module);
+	RegisterCombo(module);
 
 	return true;
 }
