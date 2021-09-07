@@ -5,11 +5,13 @@ namespace duijs {
 using namespace qjs;
 using namespace DuiLib;
 
+extern void RegisterConst(qjs::Module* module);
 extern void RegisterPaintManager(Module* module);
 extern void RegisterWindow(qjs::Module* module);
 extern void RegisterControl(qjs::Module* module);
 extern void RegisterLabel(qjs::Module* module);
 extern void RegisterDialogBuilder(qjs::Module* module);
+extern void RegisterContainer(qjs::Module* module);
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -30,11 +32,14 @@ bool JsEngine::Init() {
 	context_ = new qjs::Context(runtime_);
 
 	auto module = context_->NewModule("DuiLib");
+	RegisterConst(module);
 	RegisterWindow(module);
 	RegisterPaintManager(module);
 	RegisterControl(module);
 	RegisterLabel(module);
 	RegisterDialogBuilder(module);
+
+	RegisterContainer(module);
 	return true;
 }
 

@@ -408,20 +408,6 @@ static Value getToolTipWidth(CControlUI* pThis, Context& context, ArgList& args)
 	return toValue(context, pThis->GetToolTipWidth());
 }
 
-//#define IDC_ARROW           MAKEINTRESOURCE(32512)
-//#define IDC_IBEAM           MAKEINTRESOURCE(32513)
-//#define IDC_WAIT            MAKEINTRESOURCE(32514)
-//#define IDC_CROSS           MAKEINTRESOURCE(32515)
-//#define IDC_UPARROW         MAKEINTRESOURCE(32516)
-//#define IDC_SIZE            MAKEINTRESOURCE(32640)  /* OBSOLETE: use IDC_SIZEALL */
-//#define IDC_ICON            MAKEINTRESOURCE(32641)  /* OBSOLETE: use IDC_ARROW */
-//#define IDC_SIZENWSE        MAKEINTRESOURCE(32642)
-//#define IDC_SIZENESW        MAKEINTRESOURCE(32643)
-//#define IDC_SIZEWE          MAKEINTRESOURCE(32644)
-//#define IDC_SIZENS          MAKEINTRESOURCE(32645)
-//#define IDC_SIZEALL         MAKEINTRESOURCE(32646)
-//#define IDC_NO              MAKEINTRESOURCE(32648) /*not in win3.1 */
-
 static Value setCursor(CControlUI* pThis, Context& context, ArgList& args) {
 	pThis->SetCursor(args[0].ToInt32());
 	return undefined_value;
@@ -568,6 +554,45 @@ static Value setVirtualWnd(CControlUI* pThis, Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value addCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
+	auto name = args[0].ToString();
+	auto attr = args[1].ToString();
+
+	pThis->AddCustomAttribute(CDuiString(name.str(), name.len()),
+		CDuiString(attr.str(),attr.len()));
+	return undefined_value;
+}
+
+static Value getCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
+	return toValue(context, pThis->GetCustomAttribute());
+}
+
+static Value removeCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
+	auto str = args[0].ToString();
+	pThis->RemoveCustomAttribute(CDuiString(str.str(), str.len()));
+	return undefined_value;
+}
+
+static Value removeAllCustomAttribute(CControlUI* pThis, Context& context, ArgList& args) {
+	pThis->RemoveAllCustomAttribute();
+	return undefined_value;
+}
+
+static Value setAttribute(CControlUI* pThis, Context& context, ArgList& args) {
+	auto name = args[0].ToString();
+	auto attr = args[1].ToString();
+
+	pThis->SetAttribute(CDuiString(name.str(), name.len()),
+		CDuiString(attr.str(), attr.len()));
+	return undefined_value;
+}
+
+
+static Value estimateSize(CControlUI* pThis, Context& context, ArgList& args) {
+	return toValue(context, pThis->EstimateSize(toSize(args[0])));
+}
+
+
 static Value deleteControl2(CControlUI* pThis, Context& context, ArgList& args) {
 	delete pThis;
 	return undefined_value;
@@ -694,6 +719,12 @@ void RegisterControl(qjs::Module* module) {
 	ADD_FUNCTION(getAdjustColor);
 	ADD_FUNCTION(getVirtualWnd);
 	ADD_FUNCTION(setVirtualWnd);
+	ADD_FUNCTION(addCustomAttribute);
+	ADD_FUNCTION(getCustomAttribute);
+	ADD_FUNCTION(removeCustomAttribute);
+	ADD_FUNCTION(removeAllCustomAttribute);
+	ADD_FUNCTION(setAttribute);
+	ADD_FUNCTION(estimateSize);
 	ctrl.AddFunc<deleteControl2>("delete");
 }
 
