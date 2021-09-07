@@ -59,8 +59,8 @@ int Module::OnInit(JSContext* ctx, JSModuleDef* m) {
 
 void Context::Init(int argc, char** argv) {
 	JS_SetContextOpaque(context_, this);
-	js_init_module_std(context_, "std");
-	js_init_module_os(context_, "os");
+	//js_init_module_std(context_, "std");
+	//js_init_module_os(context_, "os");
 	js_std_add_helpers(context_, argc, argv);
 	JS_AddIntrinsicBigFloat(context_);
 	JS_AddIntrinsicBigDecimal(context_);
