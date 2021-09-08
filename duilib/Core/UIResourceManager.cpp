@@ -62,7 +62,7 @@ namespace DuiLib {
 			if (dwSize > 4096 * 1024) return _Failed(_T("File too large"));
 
 			DWORD dwRead = 0;
-			BYTE* pByte = new BYTE[dwSize];
+			BYTE* pByte = new BYTE[dwSize + 1];
 			::ReadFile(hFile, pByte, dwSize, &dwRead, NULL);
 			::CloseHandle(hFile);
 			if (dwRead != dwSize) {
@@ -71,7 +71,9 @@ namespace DuiLib {
 				return _Failed(_T("Could not read file"));
 			}
 
+			pByte[dwSize] = '\0';
 			*pSize = dwSize;
+			
 			return pByte;
 		}
 		else {
@@ -97,7 +99,7 @@ namespace DuiLib {
 			DWORD dwSize = ze.unc_size;
 			if (dwSize == 0) return _Failed(_T("File is empty"));
 			if (dwSize > 4096 * 1024) return _Failed(_T("File too large"));
-			BYTE* pByte = new BYTE[dwSize];
+			BYTE* pByte = new BYTE[dwSize + 1];
 			int res = UnzipItem(hz, i, pByte, dwSize);
 			if (res != 0x00000000 && res != 0x00000600) {
 				delete[] pByte;
@@ -105,6 +107,8 @@ namespace DuiLib {
 				return _Failed(_T("Could not unzip file"));
 			}
 			if (!CPaintManagerUI::IsCachedResourceZip()) CloseZip(hz);
+
+			pByte[dwSize] = '\0';
 			*pSize = dwSize;
 			return pByte;
 		}

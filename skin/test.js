@@ -1,7 +1,5 @@
 import {Window,Label,setResourcePath,postQuitMessage} from "DuiLib"
 
-setResourcePath("../skin/");
-
 class TestWindow extends Window{
 	constructor(){
 		super();

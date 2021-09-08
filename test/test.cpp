@@ -1,7 +1,7 @@
 #include "binding/JsEngine.h"
 #include <objbase.h>
 #include "Utils/CrashDump.h"
-
+#include "duilib/UIlib.h"
 
 
 #if 0
@@ -12,10 +12,11 @@ int main(int argc,const char* argv) {
 	CrashDump crash_dump;
 	CoInitialize(NULL);
 
-	//CPaintManagerUI::SetInstance(hInstance);
+	DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
+
 	duijs::JsEngine engine;
 	engine.Init();
-	bool rslt = engine.Excute("import {} from '../js/test.js'", "<eval>");
+	bool rslt = engine.Excute("import {} from 'test.js'", "<eval>");
 	if (!rslt) {
 		return -1;
 	}

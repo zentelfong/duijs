@@ -21,6 +21,9 @@ extern void RegisterComboBox(qjs::Module* module);
 extern void RegisterDateTime(qjs::Module* module);
 extern void RegisterColorPalette(qjs::Module* module);
 
+extern JSModuleDef* jsModuleLoader(JSContext* ctx,
+	const char* module_name, void* opaque);
+
 JsEngine::JsEngine() 
 	:runtime_(nullptr),context_(nullptr), manager_(nullptr)
 {
@@ -40,6 +43,9 @@ bool JsEngine::Init() {
 	runtime_ = new qjs::Runtime();
 	context_ = new qjs::Context(runtime_);
 	manager_ = new TaskManager(context_);
+
+
+	JS_SetModuleLoaderFunc(runtime_->runtime(), NULL, jsModuleLoader, NULL);
 
 	auto module = context_->NewModule("DuiLib");
 	RegisterConst(module);

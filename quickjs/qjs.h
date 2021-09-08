@@ -26,7 +26,7 @@ public:
 	Runtime() 
 		:runtime_(JS_NewRuntime())
 	{
-		JS_SetModuleLoaderFunc(runtime_, NULL, js_module_loader, NULL);
+		//JS_SetModuleLoaderFunc(runtime_, NULL, js_module_loader, NULL);
 		js_std_init_handlers(runtime_);
 	}
 
@@ -51,6 +51,9 @@ public:
 		JS_SetMaxStackSize(runtime_, stack_size);
 	}
 
+	JSRuntime* runtime() { 
+		return runtime_; 
+	}
 private:
 	friend class Context;
 	QJS_DISALLOW_COPY_AND_ASSIGN(Runtime);
