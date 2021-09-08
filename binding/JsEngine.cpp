@@ -102,5 +102,13 @@ void JsEngine::PostTask(js_task_t task) {
 	manager_->PostTask(std::move(task));
 }
 
+uint32_t JsEngine::PostDelayTask(js_task_t task, uint32_t delay) {
+	return manager_->PostDelayTask(std::move(task), delay);
+}
+
+
+bool JsEngine::CancelDelayTask(uint32_t id) {
+	return manager_->CancelDelayTask(id);
+}
 
 }//namespace

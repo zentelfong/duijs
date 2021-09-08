@@ -31,6 +31,10 @@ int main(int argc,const char* argv) {
 		});
 
 
+	engine.PostDelayTask([](qjs::Context* c) {
+		printf("run delay task\n");
+	}, 5000);
+
 	engine.RunLoop();
 	CoUninitialize();
 	return 0;
