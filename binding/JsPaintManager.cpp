@@ -222,8 +222,21 @@ static Value setResourcePath(Context& context, ArgList& args) {
 }
 
 static Value setResourceZip(Context& context, ArgList& args) {
-	auto path = args[0].ToString();
-	CPaintManagerUI::SetResourceZip(CDuiString(path.str(), path.len()));
+	
+	if (args.size() == 3) {
+		auto path = args[0].ToString();
+		auto pwd = args[1].ToString();
+		CPaintManagerUI::SetResourceZip(CDuiString(path.str(), path.len()),
+			args[2].ToBool(),CDuiString(pwd.str(), pwd.len()));
+	} else if (args.size() == 2) {
+		auto path = args[0].ToString();
+		auto pwd = args[1].ToString();
+		CPaintManagerUI::SetResourceZip(CDuiString(path.str(), path.len()), false,
+			CDuiString(pwd.str(), pwd.len()));
+	} else {
+		auto path = args[0].ToString();
+		CPaintManagerUI::SetResourceZip(CDuiString(path.str(), path.len()),false);
+	}
 	return undefined_value;
 }
 

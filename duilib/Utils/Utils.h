@@ -130,6 +130,9 @@ namespace DuiLib
 	/////////////////////////////////////////////////////////////////////////////////////
 	//
 
+	//::GetACP()
+	#define DEFAULT_ACP CP_UTF8
+
 	class UILIB_API CDuiString
 	{
 	public:
@@ -310,7 +313,7 @@ namespace DuiLib
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	//
-	static char* w2a(wchar_t* lpszSrc, UINT   CodePage = CP_ACP)
+	static char* w2a(const wchar_t* lpszSrc, UINT   CodePage = CP_ACP)
 	{
 		if (lpszSrc != NULL)
 		{
@@ -326,7 +329,7 @@ namespace DuiLib
 		return NULL;
 	}
 
-	static wchar_t* a2w(char* lpszSrc, UINT   CodePage = CP_ACP)
+	static wchar_t* a2w(const char* lpszSrc, UINT   CodePage = CP_ACP)
 	{
 		if (lpszSrc != NULL)
 		{

@@ -1,5 +1,7 @@
 #include "duilib/UIlib.h"
 #include "JsEngine.h"
+#include "JsTask.h"
+
 
 namespace duijs {
 using namespace qjs;
@@ -20,13 +22,14 @@ extern void RegisterDateTime(qjs::Module* module);
 extern void RegisterColorPalette(qjs::Module* module);
 
 JsEngine::JsEngine() 
-	:runtime_(NULL),context_(NULL)
+	:runtime_(nullptr),context_(nullptr), manager_(nullptr)
 {
 
 }
 
 
 JsEngine::~JsEngine() {
+	delete manager_;
 	delete context_;
 	delete runtime_;
 }
@@ -36,6 +39,7 @@ bool JsEngine::Init() {
 	assert(!context_);
 	runtime_ = new qjs::Runtime();
 	context_ = new qjs::Context(runtime_);
+	manager_ = new TaskManager(context_);
 
 	auto module = context_->NewModule("DuiLib");
 	RegisterConst(module);
@@ -87,5 +91,10 @@ void JsEngine::RunLoop() {
 	}
 
 }
+
+void JsEngine::PostTask(js_task_t task) {
+	manager_->PostTask(std::move(task));
+}
+
 
 }//namespace

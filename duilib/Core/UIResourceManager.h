@@ -31,6 +31,8 @@ namespace DuiLib {
 		LPCTSTR GetImagePath(LPCTSTR lpstrId);
 		LPCTSTR GetXmlPath(LPCTSTR lpstrId);
 
+		//需要delete[]
+		static BYTE* LoadFile(LPCTSTR lpstrName,DWORD* pSize,LPTSTR lpstrErrorMsg);
 	public:
 		void SetLanguage(LPCTSTR pstrLanguage) { m_sLauguage = pstrLanguage; }
 		LPCTSTR GetLanguage() { return m_sLauguage; }

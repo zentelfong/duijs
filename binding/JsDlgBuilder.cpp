@@ -26,7 +26,7 @@ private:
 };
 
 
-static void deleteObject(CDialogBuilder* w) {
+static void deleteControl(CDialogBuilder* w) {
 	delete w;
 }
 
