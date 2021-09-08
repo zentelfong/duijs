@@ -3,17 +3,6 @@
 #include "Util.h"
 
 namespace duijs {
-using namespace qjs;
-using namespace DuiLib;
-
-
-static CPaintManagerUI* newPaintManager(Context& context, Value& this_obj, ArgList& args) {
-	return new CPaintManagerUI();
-}
-
-static void deletePaintManager(CPaintManagerUI* w) {
-}
-
 
 static Value isUpdateNeeded(CPaintManagerUI* pThis, Context& context, ArgList& args) {
 	return context.NewBool(pThis->IsUpdateNeeded());
@@ -314,55 +303,54 @@ static Value findSubControlsByClass(CPaintManagerUI* pThis, Context& context, Ar
 
 
 void RegisterPaintManager(Module* module) {
-	auto mgr = module->ExportClass<CPaintManagerUI>("PaintManager");
-	mgr.Init<deletePaintManager>();
-	mgr.AddFunc<isUpdateNeeded>("isUpdateNeeded");
-	mgr.AddFunc<needUpdate>("needUpdate");
-	mgr.AddFunc<invalidate>("invalidate");
-	mgr.AddFunc<getName>("getName");
-	mgr.AddFunc<getHoverTime>("getHoverTime");
 
-	mgr.AddFunc<getMousePos>("getMousePos");
-	mgr.AddFunc<getClientSize>("getClientSize");
-	mgr.AddFunc<getInitSize>("getInitSize");
-	mgr.AddFunc<getSizeBox>("getSizeBox");
-	mgr.AddFunc<setSizeBox>("setSizeBox");
-	mgr.AddFunc<getCaptionRect>("getCaptionRect");
-	mgr.AddFunc<setCaptionRect>("setCaptionRect");
-	mgr.AddFunc<getRoundCorner>("getRoundCorner");
-	mgr.AddFunc<setRoundCorner>("setRoundCorner");
-	mgr.AddFunc<getMinInfo>("getMinInfo");
-	mgr.AddFunc<setMinInfo>("setMinInfo");
-	mgr.AddFunc<getMaxInfo>("getMaxInfo");
-	mgr.AddFunc<setMaxInfo>("setMaxInfo");
-	mgr.AddFunc<isShowUpdateRect>("isShowUpdateRect");
-	mgr.AddFunc<setShowUpdateRect>("setShowUpdateRect");
-	mgr.AddFunc<isNoActivate>("isNoActivate");
-	mgr.AddFunc<setNoActivate>("setNoActivate");
+	DEFINE_CONTROL(CPaintManagerUI, "PaintManager");
 
-	mgr.AddFunc<getOpacity>("getOpacity");
-	mgr.AddFunc<setOpacity>("setOpacity");
-	mgr.AddFunc<isLayered>("isLayered");
-	mgr.AddFunc<setLayered>("setLayered");
-	mgr.AddFunc<getLayeredInset>("getLayeredInset");
-	mgr.AddFunc<setLayeredInset>("setLayeredInset");
-	mgr.AddFunc<getLayeredOpacity>("getLayeredOpacity");
-	mgr.AddFunc<setLayeredOpacity>("setLayeredOpacity");
-	mgr.AddFunc<getLayeredImage>("getLayeredImage");
-	mgr.AddFunc<setLayeredImage>("setLayeredImage");
-	mgr.AddFunc<isUseGdiplusText>("isUseGdiplusText");
-	mgr.AddFunc<setUseGdiplusText>("setUseGdiplusText");
+	ADD_FUNCTION(isUpdateNeeded);
+	ADD_FUNCTION(needUpdate);
+	ADD_FUNCTION(invalidate);
+	ADD_FUNCTION(getName);
+	ADD_FUNCTION(getHoverTime);
 
-	mgr.AddFunc<getGdiplusTextRenderingHint>("getGdiplusTextRenderingHint");
-	mgr.AddFunc<setGdiplusTextRenderingHint>("setGdiplusTextRenderingHint");
+	ADD_FUNCTION(getMousePos);
+	ADD_FUNCTION(getClientSize);
+	ADD_FUNCTION(getInitSize);
+	ADD_FUNCTION(getSizeBox);
+	ADD_FUNCTION(setSizeBox);
+	ADD_FUNCTION(getCaptionRect);
+	ADD_FUNCTION(setCaptionRect);
+	ADD_FUNCTION(getRoundCorner);
+	ADD_FUNCTION(setRoundCorner);
+	ADD_FUNCTION(getMinInfo);
+	ADD_FUNCTION(setMinInfo);
+	ADD_FUNCTION(getMaxInfo);
+	ADD_FUNCTION(setMaxInfo);
+	ADD_FUNCTION(isShowUpdateRect);
+	ADD_FUNCTION(setShowUpdateRect);
+	ADD_FUNCTION(isNoActivate);
+	ADD_FUNCTION(setNoActivate);
 
+	ADD_FUNCTION(getOpacity);
+	ADD_FUNCTION(setOpacity);
+	ADD_FUNCTION(isLayered);
+	ADD_FUNCTION(setLayered);
+	ADD_FUNCTION(getLayeredInset);
+	ADD_FUNCTION(setLayeredInset);
+	ADD_FUNCTION(getLayeredOpacity);
+	ADD_FUNCTION(setLayeredOpacity);
+	ADD_FUNCTION(getLayeredImage);
+	ADD_FUNCTION(setLayeredImage);
+	ADD_FUNCTION(isUseGdiplusText);
+	ADD_FUNCTION(setUseGdiplusText);
 
-	mgr.AddFunc<getRoot>("getRoot");
-	mgr.AddFunc<findControl>("findControl");
-	mgr.AddFunc<findSubControlByPoint>("findSubControlByPoint");
-	mgr.AddFunc<findSubControlByName>("findSubControlByName");
-	mgr.AddFunc<findSubControlByClass>("findSubControlByClass");
-	mgr.AddFunc<findSubControlsByClass>("findSubControlsByClass");
+	ADD_FUNCTION(getGdiplusTextRenderingHint);
+	ADD_FUNCTION(setGdiplusTextRenderingHint);
+	ADD_FUNCTION(getRoot);
+	ADD_FUNCTION(findControl);
+	ADD_FUNCTION(findSubControlByPoint);
+	ADD_FUNCTION(findSubControlByName);
+	ADD_FUNCTION(findSubControlByClass);
+	ADD_FUNCTION(findSubControlsByClass);
 
 
 	module->ExportFunc<getInstancePath>("getInstancePath");

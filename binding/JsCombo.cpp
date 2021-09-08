@@ -1,17 +1,6 @@
-#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
-
-using namespace qjs;
-using namespace DuiLib;
-
-static CComboUI* newControl(Context& context, ArgList& args) {
-	return new CComboUI();
-}
-
-static void deleteControl(CComboUI* w) {
-}
 
 static Value getTextStyle(CComboUI* pThis, Context& context, ArgList& args) {
 	return toValue(context, pThis->GetTextStyle());
@@ -373,12 +362,8 @@ static Value setItemShowHtml(CComboUI* pThis, Context& context, ArgList& args) {
 	return undefined_value;
 }
 
-#define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
-
 void RegisterCombo(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CComboUI>("Combo");
-	ctrl.Init<deleteControl>(Class<CContainerUI>::class_id());
-	ctrl.AddCtor<newControl>();
+	DEFINE_CONTROL2(CComboUI, CContainerUI, "Combo");
 	ADD_FUNCTION(getTextStyle);
 	ADD_FUNCTION(setTextStyle);
 	ADD_FUNCTION(getTextColor);

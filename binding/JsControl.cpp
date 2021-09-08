@@ -1,21 +1,6 @@
-#include "JsControl.h"
-#include "duilib/UIlib.h"
 #include "Util.h"
 
-
 namespace duijs {
-
-using namespace qjs;
-using namespace DuiLib;
-
-
-
-static CControlUI* newControl(Context& context,ArgList& args) {
-	return new CControlUI();
-}
-
-static void deleteControl(CControlUI* w) {
-}
 
 static Value getName(CControlUI* pThis, Context& context, ArgList& args) {
 	return toValue(context,pThis->GetName());
@@ -603,10 +588,7 @@ static Value deleteControl2(CControlUI* pThis, Context& context, ArgList& args) 
 #define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
 
 void RegisterControl(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CControlUI>("Control");
-	ctrl.Init<deleteControl>();
-	ctrl.AddCtor<newControl>();
-
+	DEFINE_CONTROL(CControlUI, "Control");
 	ADD_FUNCTION(getName);
 	ADD_FUNCTION(setName);
 	ADD_FUNCTION(getClass);

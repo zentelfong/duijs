@@ -1,19 +1,6 @@
-#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
-using namespace DuiLib;
-using namespace qjs;
-
-
-static CDialogBuilder* newDialogBuilder(Context& context, ArgList& args) {
-	return new CDialogBuilder();
-}
-
-static void deleteDialogBuilder(CDialogBuilder* w) {
-	delete w;
-}
-
 
 class JsDialogBuilderCallback:public IDialogBuilderCallback
 {
@@ -37,6 +24,11 @@ private:
 	Context& context_;
 	Value func_;
 };
+
+
+static void deleteObject(CDialogBuilder* w) {
+	delete w;
+}
 
 static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 	CControlUI* control = nullptr;
@@ -101,13 +93,11 @@ static Value setInstance(CDialogBuilder* pThis, Context& context, ArgList& args)
 }
 
 void RegisterDialogBuilder(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CDialogBuilder>("DialogBuilder");
-	ctrl.Init<deleteDialogBuilder>(Class<CDialogBuilder>::class_id());
-	ctrl.AddCtor<newDialogBuilder>();
-	ctrl.AddFunc<create>("create");
-	ctrl.AddFunc<getLastErrorMessage>("getLastErrorMessage");
-	ctrl.AddFunc<getLastErrorLocation>("getLastErrorLocation");
-	ctrl.AddFunc<setInstance>("setInstance");
+	DEFINE_CONTROL(CDialogBuilder, "DialogBuilder");
+	ADD_FUNCTION(create);
+	ADD_FUNCTION(getLastErrorMessage);
+	ADD_FUNCTION(getLastErrorLocation);
+	ADD_FUNCTION(setInstance);
 }
 
 

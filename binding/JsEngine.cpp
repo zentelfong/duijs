@@ -15,7 +15,9 @@ extern void RegisterContainer(qjs::Module* module);
 extern void RegisterButton(qjs::Module* module);
 extern void RegisterText(qjs::Module* module);
 extern void RegisterCombo(qjs::Module* module);
-
+extern void RegisterComboBox(qjs::Module* module);
+extern void RegisterDateTime(qjs::Module* module);
+extern void RegisterColorPalette(qjs::Module* module);
 
 JsEngine::JsEngine() 
 	:runtime_(NULL),context_(NULL)
@@ -45,10 +47,13 @@ bool JsEngine::Init() {
 	RegisterLabel(module);
 	RegisterButton(module);
 	RegisterText(module);
+	RegisterDateTime(module);
+	RegisterColorPalette(module);
 
 	RegisterContainer(module);
 	RegisterCombo(module);
-
+	RegisterComboBox(module);
+	
 	return true;
 }
 

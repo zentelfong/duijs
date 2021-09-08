@@ -1,18 +1,6 @@
-#include "JsControl.h"
-#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
-using namespace qjs;
-using namespace DuiLib;
-
-static CLabelUI* newControl(Context& context, ArgList& args) {
-	return new CLabelUI();
-}
-
-static void deleteControl(CLabelUI* w) {
-}
-
 
 static Value getTextStyle(CLabelUI* pThis, Context& context, ArgList& args) {
 	return toValue(context, (uint32_t)pThis->GetTextStyle());
@@ -89,15 +77,8 @@ static Value setAutoCalcHeight(CLabelUI* pThis, Context& context, ArgList& args)
 	return undefined_value;
 }
 
-
-#define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
-
-
 void RegisterLabel(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CLabelUI>("Label");
-	ctrl.Init<deleteControl>(Class<CControlUI>::class_id());
-	ctrl.AddCtor<newControl>();
-
+	DEFINE_CONTROL2(CLabelUI, CControlUI, "Label");
 	ADD_FUNCTION(getTextStyle);
 	ADD_FUNCTION(setTextStyle);
 	ADD_FUNCTION(getTextColor);

@@ -1,17 +1,6 @@
-#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
-
-using namespace qjs;
-using namespace DuiLib;
-
-static CContainerUI* newControl(Context& context, ArgList& args) {
-	return new CContainerUI();
-}
-
-static void deleteControl(CContainerUI* w) {
-}
 
 static Value getItemAt(CContainerUI* pThis, Context& context, ArgList& args) {
 	return toValue(context, pThis->GetItemAt(args[0].ToInt32()));
@@ -292,9 +281,7 @@ static Value getHorizontalScrollBar(CContainerUI* pThis, Context& context, ArgLi
 #define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
 
 void RegisterContainer(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CContainerUI>("Container");
-	ctrl.Init<deleteControl>(Class<CControlUI>::class_id());
-	ctrl.AddCtor<newControl>();
+	DEFINE_CONTROL2(CContainerUI, CControlUI, "Container");
 	ADD_FUNCTION(getItemAt);
 	ADD_FUNCTION(getItemIndex);
 	ADD_FUNCTION(setItemIndex);

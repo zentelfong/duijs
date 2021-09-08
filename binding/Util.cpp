@@ -118,5 +118,31 @@ qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control) {
     return qjs::Class<DuiLib::CControlUI>::ToJs2(ctx, control, control->GetClassId());
 }
 
+SYSTEMTIME toSysTime(const qjs::Value& value) {
+    SYSTEMTIME time;
+    time.wDayOfWeek = value.GetProperty("dayOfWeek").ToInt32();;
+    time.wYear = value.GetProperty("year").ToInt32();
+    time.wMonth = value.GetProperty("month").ToInt32();
+    time.wDay = value.GetProperty("day").ToInt32();
+    time.wHour = value.GetProperty("hour").ToInt32();
+    time.wMinute = value.GetProperty("minute").ToInt32();
+    time.wSecond = value.GetProperty("second").ToInt32();
+    time.wMilliseconds = value.GetProperty("milliseconds").ToInt32();
+    return time;
+}
+
+qjs::Value toValue(qjs::Context& ctx, const SYSTEMTIME& time) {
+
+    auto value = ctx.NewObject();
+    value.SetPropertyInt32("year", time.wYear);
+    value.SetPropertyInt32("month", time.wMonth);
+    value.SetPropertyInt32("day", time.wDay);
+    value.SetPropertyInt32("hour", time.wHour);
+    value.SetPropertyInt32("minute", time.wMinute);
+    value.SetPropertyInt32("second", time.wSecond);
+    value.SetPropertyInt32("milliseconds", time.wMilliseconds);
+    value.SetPropertyInt32("dayOfWeek", time.wDayOfWeek);
+    return value;
+}
 
 }//namespace

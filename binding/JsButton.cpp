@@ -1,18 +1,6 @@
-#include "duilib/UIlib.h"
 #include "Util.h"
 
 namespace duijs {
-
-using namespace qjs;
-using namespace DuiLib;
-
-
-static CButtonUI* newControl(Context& context, ArgList& args) {
-	return new CButtonUI();
-}
-
-static void deleteControl(CButtonUI* w) {
-}
 
 static Value getNormalImage(CButtonUI* pThis, Context& context, ArgList& args) {
 	return toValue(context, pThis->GetNormalImage());
@@ -209,12 +197,8 @@ static Value getFocusedTextColor(CButtonUI* pThis, Context& context, ArgList& ar
 
 
 
-#define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
-
 void RegisterButton(qjs::Module* module) {
-	auto ctrl = module->ExportClass<CButtonUI>("Button");
-	ctrl.Init<deleteControl>(Class<CLabelUI>::class_id());
-	ctrl.AddCtor<newControl>();
+	DEFINE_CONTROL2(CButtonUI, CLabelUI, "Button");
 	ADD_FUNCTION(getNormalImage);
 	ADD_FUNCTION(setNormalImage);
 	ADD_FUNCTION(getHotImage);

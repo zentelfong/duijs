@@ -4,6 +4,33 @@
 
 namespace duijs {
 
+using namespace qjs;
+using namespace DuiLib;
+
+
+template<class T>
+static T* createControl(qjs::Context& context, qjs::ArgList& args) {
+	return new T();
+}
+
+template<class T>
+static void deleteControl(T* w) {
+}
+
+#define DEFINE_CONTROL(class_,name_) \
+	auto ctrl = module->ExportClass<class_>(name_); \
+	ctrl.Init<deleteControl>(); \
+	ctrl.AddCtor<createControl>()
+
+#define DEFINE_CONTROL2(class_,parent_,name_) \
+	auto ctrl = module->ExportClass<class_>(name_); \
+	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
+	ctrl.AddCtor<createControl>()
+
+#define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
+
+
+
 std::string Wide2UTF8(const std::wstring& strWide);
 std::string Wide2UTF8(LPCTSTR strWide);
 
@@ -40,5 +67,11 @@ DuiLib::TPercentInfo toPercentInfo(const qjs::Value& value);
 
 DuiLib::CControlUI* toControl(const qjs::Value& value);
 qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control);
+
+
+SYSTEMTIME toSysTime(const qjs::Value& value);
+qjs::Value toValue(qjs::Context& ctx, const SYSTEMTIME& time);
+
+
 
 }//namespace

@@ -3,7 +3,6 @@
 
 
 namespace duijs {
-using namespace qjs;
 
 JsWindow::JsWindow(Context* context, Value& this_obj)
 	:context_(context),this_(this_obj)
