@@ -1,12 +1,25 @@
-import {Window,Label,setResourcePath,postQuitMessage} from "DuiLib"
+import {Window,Label,setResourcePath,postQuitMessage, Timer} from "DuiLib"
 
 class TestWindow extends Window{
 	constructor(){
 		super();
-		
-		print(this.manager.getName());
+		this.test();
 	}
 	
+	async test(){
+		this.timer = new Timer();
+
+		let onTimer = ()=>{
+			print("timerout****");
+			this.timer.setTimer(onTimer,1000);
+		}
+		this.timer.setTimer(onTimer,1000);
+
+		//await this.timer.wait(3000);
+		//print("wait go on");
+	}
+
+
 	getSkinFile(){
 		return "popup.xml";
 	}

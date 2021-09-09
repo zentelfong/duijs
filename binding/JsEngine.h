@@ -20,7 +20,10 @@ public:
 	void PostTask(js_task_t task);
 
 	uint32_t PostDelayTask(js_task_t task, uint32_t delay);
+	void ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay);
 	bool CancelDelayTask(uint32_t id);
+
+	static JsEngine* get(qjs::Context& context);
 private:
 	qjs::Runtime* runtime_;
 	qjs::Context* context_;

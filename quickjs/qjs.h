@@ -190,6 +190,9 @@ public:
 			JS_GetContextOpaque(ctx));
 	}
 
+	void SetUserData(void* ud) { user_data_ = ud; }
+	void* user_data() { return user_data_; }
+
 	//new
 	Value NewNull();
 	Value NewBool(bool v);
@@ -267,6 +270,7 @@ private:
 	void Init(int argc, char** argv);
 	std::unique_ptr<Module> GetModule(JSModuleDef* m);
 
+	void* user_data_{nullptr};
 	JSContext* context_;
 	std::map<JSModuleDef*,std::unique_ptr<Module>> modules_;
 };
@@ -1215,6 +1219,11 @@ public:
 			rfuncs_[0] = rfuncs[0];
 			rfuncs_[1] = rfuncs[1];
 		}
+	}
+
+	Promise(Context& ctx) 
+		:Promise(ctx.context())
+	{
 	}
 
 	~Promise() {

@@ -66,6 +66,14 @@ uint32_t TaskManager::PostDelayTask(js_task_t task, uint32_t delay) {
 	return id;
 }
 
+void TaskManager::ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay) {
+	assert(id > 0);
+	::SetTimer(*task_window_, id, delay, nullptr);
+
+	std::lock_guard<std::mutex> locker(lock_);
+	timer_tasks_.insert(std::make_pair(id, task));
+}
+
 bool TaskManager::CancelDelayTask(uint32_t id) {
 	std::lock_guard<std::mutex> locker(lock_);
 	auto find = timer_tasks_.find(id);
@@ -111,6 +119,7 @@ js_task_t TaskManager::PopTimerTask(uint32_t id) {
 	}
 	return nullptr;
 }
+
 
 
 }//namespace
