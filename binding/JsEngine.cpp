@@ -21,6 +21,16 @@ extern void RegisterComboBox(qjs::Module* module);
 extern void RegisterDateTime(qjs::Module* module);
 extern void RegisterColorPalette(qjs::Module* module);
 extern void RegisterTimer(qjs::Module* module);
+extern void RegisterEdit(qjs::Module* module);
+extern void RegisterFadeButton(qjs::Module* module);
+extern void RegisterGifAnim(qjs::Module* module);
+extern void RegisterHorizontalLayout(qjs::Module* module);
+extern void RegisterVerticalLayout(qjs::Module* module);
+extern void RegisterChildLayout(qjs::Module* module);
+extern void RegisterTileLayout(qjs::Module* module);
+extern void RegisterTabLayout(qjs::Module* module);
+extern void RegisterAnimationTabLayout(qjs::Module* module);
+extern void RegisterTrayIcon(qjs::Module* module);
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -59,18 +69,29 @@ bool JsEngine::Init() {
 	RegisterPaintManager(module);
 	RegisterDialogBuilder(module);
 	RegisterTimer(module);
+	RegisterTrayIcon(module);
 
 	RegisterControl(module);
 	RegisterLabel(module);
 	RegisterButton(module);
+	RegisterFadeButton(module);
 	RegisterText(module);
 	RegisterDateTime(module);
 	RegisterColorPalette(module);
+	RegisterEdit(module);
+	RegisterGifAnim(module);
 
 	RegisterContainer(module);
 	RegisterCombo(module);
 	RegisterComboBox(module);
-	
+	RegisterHorizontalLayout(module);
+	RegisterVerticalLayout(module);
+	RegisterChildLayout(module);
+	RegisterTileLayout(module);
+
+	RegisterTabLayout(module);
+	RegisterAnimationTabLayout(module);
+
 	return true;
 }
 

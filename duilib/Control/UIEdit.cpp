@@ -559,6 +559,11 @@ namespace DuiLib
 		m_dwEditTextColor = clrColor;
 	}
 
+	void CEditUI::SetNativeEditTextColor(DWORD clrColor)
+	{
+		m_dwEditTextColor = clrColor;
+	}
+
 	DWORD CEditUI::GetNativeEditTextColor() const
 	{
 		return m_dwEditTextColor;

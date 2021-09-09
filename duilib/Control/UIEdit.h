@@ -43,6 +43,8 @@ namespace DuiLib
 		void SetNativeEditBkColor(DWORD dwBkColor);
 		DWORD GetNativeEditBkColor() const;
 		void SetNativeEditTextColor( LPCTSTR pStrColor );
+
+		void SetNativeEditTextColor(DWORD pStrColor);
 		DWORD GetNativeEditTextColor() const;
 
 		bool IsAutoSelAll();

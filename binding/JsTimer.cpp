@@ -128,6 +128,7 @@ static Value wait(Timer* pThis, Context& context, ArgList& args) {
 	}
 	else {
 		pThis->id = engine->PostDelayTask([pThis](qjs::Context* context) {
+				pThis->id = 0;
 				ArgList list;
 				auto value = pThis->promise->Resolve(list);
 				if (value.IsException()) {
