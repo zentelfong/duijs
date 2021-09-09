@@ -11,6 +11,8 @@ JsWindow::JsWindow(Context* context, Value& this_obj)
 }
 
 JsWindow::~JsWindow() {
+	this_.SetOpaque(nullptr);
+	paint_manager_.SetOpaque(nullptr);
 }
 
 
