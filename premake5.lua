@@ -28,6 +28,15 @@ project "duilib"
 	}
 
 
+project "sqlite3"
+	language "C"
+	kind "StaticLib"
+	files{
+		"third_party/sqlite3/*.h",
+		"third_party/sqlite3/*.c",
+	}
+
+
 project "duijs"
 	language "C++"
 	kind "ConsoleApp"
@@ -52,6 +61,7 @@ project "duijs"
 	links{
 		"quickjs",
 		"duilib",
+		"sqlite3",
 		"Gdiplus.lib",
 	}
 
