@@ -145,4 +145,21 @@ qjs::Value toValue(qjs::Context& ctx, const SYSTEMTIME& time) {
     return value;
 }
 
+
+CHARRANGE toCharRange(const qjs::Value& value) {
+    CHARRANGE range = {
+        value.GetProperty("min").ToInt32(),
+        value.GetProperty("max").ToInt32()
+    };
+    return range;
+}
+
+
+qjs::Value toValue(qjs::Context& ctx, const CHARRANGE& range) {
+    auto value = ctx.NewObject();
+    value.SetPropertyInt32("min", range.cpMin);
+    value.SetPropertyInt32("max", range.cpMax);
+    return value;
+}
+
 }//namespace

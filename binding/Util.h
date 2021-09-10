@@ -94,5 +94,8 @@ SYSTEMTIME toSysTime(const qjs::Value& value);
 qjs::Value toValue(qjs::Context& ctx, const SYSTEMTIME& time);
 
 
+CHARRANGE toCharRange(const qjs::Value& value);
+qjs::Value toValue(qjs::Context& ctx, const CHARRANGE& range);
+
 
 }//namespace

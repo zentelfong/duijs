@@ -2362,6 +2362,11 @@ err:
 		m_dwTipValueColor = clrColor;
 	}
 
+	void CRichEditUI::SetTipValueColor(DWORD clrColor)
+	{
+		m_dwTipValueColor = clrColor;
+	}
+
 	DWORD CRichEditUI::GetTipValueColor()
 	{
 		return m_dwTipValueColor;

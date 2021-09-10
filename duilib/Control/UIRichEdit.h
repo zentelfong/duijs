@@ -117,6 +117,8 @@ namespace DuiLib {
 		void SetTipValue(LPCTSTR pStrTipValue);
 		LPCTSTR GetTipValue();
 		void SetTipValueColor(LPCTSTR pStrColor);
+
+		void SetTipValueColor(DWORD pStrColor);
 		DWORD GetTipValueColor();
 		void SetTipValueAlign(UINT uAlign);
 		UINT GetTipValueAlign();
