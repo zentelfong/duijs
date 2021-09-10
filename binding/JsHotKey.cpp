@@ -8,8 +8,7 @@ static Value getNormalImage(CHotKeyUI* pThis, Context& context, ArgList& args) {
 }
 
 static Value setNormalImage(CHotKeyUI* pThis, Context& context, ArgList& args) {
-	auto str = args[0].ToString();
-	pThis->SetNormalImage(CDuiString(str.str(),str.len()));
+	pThis->SetNormalImage(JsString(args[0]));
 	return undefined_value;
 }
 
@@ -18,8 +17,7 @@ static Value getHotImage(CHotKeyUI* pThis, Context& context, ArgList& args) {
 }
 
 static Value setHotImage(CHotKeyUI* pThis, Context& context, ArgList& args) {
-	auto str = args[0].ToString();
-	pThis->SetHotImage(CDuiString(str.str(), str.len()));
+	pThis->SetHotImage(JsString(args[0]));
 	return undefined_value;
 }
 
@@ -29,8 +27,7 @@ static Value getFocusedImage(CHotKeyUI* pThis, Context& context, ArgList& args) 
 }
 
 static Value setFocusedImage(CHotKeyUI* pThis, Context& context, ArgList& args) {
-	auto str = args[0].ToString();
-	pThis->SetFocusedImage(CDuiString(str.str(), str.len()));
+	pThis->SetFocusedImage(JsString(args[0]));
 	return undefined_value;
 }
 

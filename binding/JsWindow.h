@@ -16,6 +16,7 @@ public:
 	qjs::Value js_this() { return this_; }
 	qjs::Value js_manager() { return paint_manager_; }
 
+	CPaintManagerUI* manager() { return &m_pm; }
 protected:
 	LPCTSTR GetWindowClassName(void) const override;
 	void InitResource() override;

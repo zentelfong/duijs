@@ -9,8 +9,7 @@ static Value getIP(CIPAddressExUI* pThis, Context& context, ArgList& args) {
 
 
 static Value setIP(CIPAddressExUI* pThis, Context& context, ArgList& args) {
-	auto str = args[0].ToString();
-	pThis->SetIP(CDuiString(str.str(),str.len()));
+	pThis->SetIP(JsString(args[0]));
 	return undefined_value;
 }
 

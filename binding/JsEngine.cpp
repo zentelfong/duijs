@@ -35,7 +35,10 @@ extern void RegisterGroupBox(qjs::Module* module);
 extern void RegisterHotKey(qjs::Module* module);
 extern void RegisterIPAddress(qjs::Module* module);
 extern void RegisterIPAddressEx(qjs::Module* module);
-
+extern void RegisterList(qjs::Module* module);
+extern void RegisterListElement(qjs::Module* module);
+extern void RegisterListContainerElement(qjs::Module* module);
+extern void RegisterMenu(qjs::Module* module);
 
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
@@ -101,7 +104,12 @@ bool JsEngine::Init() {
 	RegisterGroupBox(module);
 	RegisterTabLayout(module);
 	RegisterAnimationTabLayout(module);
-	
+	RegisterList(module);
+	RegisterListElement(module);
+	RegisterListContainerElement(module);
+	RegisterMenu(module);
+
+
 	return true;
 }
 

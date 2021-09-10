@@ -8,6 +8,20 @@ using namespace qjs;
 using namespace DuiLib;
 
 
+class JsString :public CDuiString {
+public:
+	JsString(const String& str) 
+		:CDuiString(str.str(),str.len())
+	{
+	}
+
+	JsString(const Value& value) 
+		:JsString(value.ToString())
+	{
+	}
+};
+
+
 template<class T>
 static T* createControl(qjs::Context& context, qjs::ArgList& args) {
 	return new T();
@@ -26,6 +40,12 @@ static void deleteControl(T* w) {
 	auto ctrl = module->ExportClass<class_>(name_); \
 	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
 	ctrl.AddCtor<createControl>()
+
+
+#define DEFINE_VIRTUAL_CONTROL2(class_,parent_,name_) \
+	auto ctrl = module->ExportClass<class_>(name_); \
+	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
+
 
 #define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
 

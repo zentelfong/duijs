@@ -310,14 +310,14 @@ public:
 			JS_FreeCString(context_, str_);
 	}
 
-	const char* str() {
+	const char* str() const {
 		if (str_)
 			return str_;
 		else
 			return "";
 	}
 
-	size_t len() {
+	size_t len() const {
 		return len_;
 	}
 private:
@@ -551,6 +551,24 @@ public:
 
 		Value val = GetProperty("length");
 		return val.ToUint32();
+	}
+
+	std::map<std::string, Value> GetProperties(int flags = JS_GPN_STRING_MASK | JS_GPN_SYMBOL_MASK) {
+		std::map<std::string, Value> properties;
+		if (!IsObject() || !context_) {
+			return properties;
+		}
+
+		uint32_t len;
+		JSPropertyEnum* property;
+		if (JS_GetOwnPropertyNames(context_, &property, &len, value_, flags) == 0) {
+			for (uint32_t i = 0; i < len; ++i) {
+				const char* name = JS_AtomToCString(context_, property[i].atom);
+				properties[name] = Value(context_, JS_GetProperty(context_, value_, property[i].atom));
+				JS_FreeCString(context_, name);
+			}
+		}
+		return properties;
 	}
 
 	bool HasProperty(const char* prop) const {

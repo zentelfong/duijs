@@ -62,7 +62,12 @@ void JsWindow::Notify(TNotifyUI& msg) {
 	if (funcName) {
 		std::string name = Wide2UTF8(funcName);
 		if (this_.HasProperty(name.c_str())) {
-			Value result = this_.Invoke(name.c_str(),toValue(*context_,msg.pSender));
+
+			Value result = this_.Invoke(name.c_str(),
+				toValue(*context_,msg.pSender),
+				toValue(*context_,(uint32_t)msg.wParam), 
+				toValue(*context_,(uint32_t)msg.lParam));
+
 			if (result.IsException()) {
 				context_->DumpError();
 			}
