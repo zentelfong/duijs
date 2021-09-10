@@ -39,7 +39,11 @@ extern void RegisterList(qjs::Module* module);
 extern void RegisterListElement(qjs::Module* module);
 extern void RegisterListContainerElement(qjs::Module* module);
 extern void RegisterMenu(qjs::Module* module);
+extern void RegisterOption(qjs::Module* module);
+extern void RegisterProgress(qjs::Module* module);
 
+extern void RegisterRing(qjs::Module* module);
+extern void RegisterRollText(qjs::Module* module);
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -92,7 +96,10 @@ bool JsEngine::Init() {
 	RegisterHotKey(module);
 	RegisterIPAddress(module);
 	RegisterIPAddressEx(module);
-
+	RegisterOption(module);
+	RegisterProgress(module);
+	RegisterRing(module);
+	RegisterRollText(module);
 
 	RegisterContainer(module);
 	RegisterCombo(module);
