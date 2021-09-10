@@ -141,11 +141,6 @@ static Value setText(CRichEditUI* pThis, Context& context, ArgList& args) {
 	return null_value;
 }
 
-static Value setModify(CRichEditUI* pThis, Context& context, ArgList& args) {
-	pThis->SetModify(args[0].ToBool());
-	return null_value;
-}
-
 static Value isModify(CRichEditUI* pThis, Context& context, ArgList& args) {
 	return toValue(context, pThis->IsModify());
 }
