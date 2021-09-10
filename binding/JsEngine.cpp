@@ -31,6 +31,12 @@ extern void RegisterTileLayout(qjs::Module* module);
 extern void RegisterTabLayout(qjs::Module* module);
 extern void RegisterAnimationTabLayout(qjs::Module* module);
 extern void RegisterTrayIcon(qjs::Module* module);
+extern void RegisterGroupBox(qjs::Module* module);
+extern void RegisterHotKey(qjs::Module* module);
+extern void RegisterIPAddress(qjs::Module* module);
+extern void RegisterIPAddressEx(qjs::Module* module);
+
+
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -80,6 +86,10 @@ bool JsEngine::Init() {
 	RegisterColorPalette(module);
 	RegisterEdit(module);
 	RegisterGifAnim(module);
+	RegisterHotKey(module);
+	RegisterIPAddress(module);
+	RegisterIPAddressEx(module);
+
 
 	RegisterContainer(module);
 	RegisterCombo(module);
@@ -88,10 +98,10 @@ bool JsEngine::Init() {
 	RegisterVerticalLayout(module);
 	RegisterChildLayout(module);
 	RegisterTileLayout(module);
-
+	RegisterGroupBox(module);
 	RegisterTabLayout(module);
 	RegisterAnimationTabLayout(module);
-
+	
 	return true;
 }
 
