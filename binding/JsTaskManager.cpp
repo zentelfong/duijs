@@ -1,4 +1,4 @@
-#include "JsTask.h"
+#include "JsTaskManager.h"
 #include "duilib/UIlib.h"
 
 namespace duijs {
