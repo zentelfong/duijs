@@ -44,6 +44,13 @@ extern void RegisterProgress(qjs::Module* module);
 
 extern void RegisterRing(qjs::Module* module);
 extern void RegisterRollText(qjs::Module* module);
+extern void RegisterRichEdit(qjs::Module* module);
+extern void RegisterScrollBar(qjs::Module* module);
+
+extern void RegisterTreeNode(qjs::Module* module);
+extern void RegisterTreeView(qjs::Module* module);
+
+
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -115,7 +122,10 @@ bool JsEngine::Init() {
 	RegisterListElement(module);
 	RegisterListContainerElement(module);
 	RegisterMenu(module);
-
+	RegisterRichEdit(module);
+	RegisterScrollBar(module);
+	RegisterTreeNode(module);
+	RegisterTreeView(module);
 
 	return true;
 }

@@ -39,7 +39,6 @@ namespace DuiLib
 		void CheckBoxSelected(bool _Selected);
 		bool IsCheckBoxSelected() const;
 		bool IsHasChild() const;
-		long GetTreeLevel() const;
 		bool AddChildNode(CTreeNodeUI* _pTreeNodeUI);
 		bool RemoveAt(CTreeNodeUI* _pTreeNodeUI);
 		void SetParentNode(CTreeNodeUI* _pParentTreeNode);
