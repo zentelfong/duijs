@@ -11,9 +11,11 @@ public:
 
 	void Open(const std::string& name, std::function<void(int)> finish);
 	void Close(std::function<void(int)> finish);
-	void Exec(const std::string& sql, std::function<void(int,const std::string&)> finish);
+	void Exec(const std::string& sql, std::function<void(int,std::string)> finish);
 private:
 	sqlite3* sqlite_;
 	Thread thread_;
 };
+
+void testStorage();
 

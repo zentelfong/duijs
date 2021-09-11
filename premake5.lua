@@ -16,6 +16,9 @@ filter "configurations:Release"
 	optimize "Speed"
 	vectorextensions "SSE2"	
 
+include "third_party"
+
+
 project "duilib"
 	language "C++"
 	kind "StaticLib"
@@ -27,21 +30,12 @@ project "duilib"
 		"duilib/**.cpp",
 	}
 
-
-project "sqlite3"
-	language "C"
-	kind "StaticLib"
-	files{
-		"third_party/sqlite3/*.h",
-		"third_party/sqlite3/*.c",
-	}
-
-
 project "duijs"
 	language "C++"
 	kind "ConsoleApp"
 	includedirs{
-		"./"
+		"./",
+		"third_party"
 	}
 	files{
 		"quickjs/*.h",
@@ -62,6 +56,7 @@ project "duijs"
 		"quickjs",
 		"duilib",
 		"sqlite3",
+		"cjsonpp",
 		"Gdiplus.lib",
 	}
 
