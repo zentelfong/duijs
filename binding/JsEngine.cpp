@@ -7,6 +7,7 @@ namespace duijs {
 using namespace qjs;
 using namespace DuiLib;
 
+extern void RegisterGlobal(Module* module);
 extern void RegisterConst(qjs::Module* module);
 extern void RegisterPaintManager(Module* module);
 extern void RegisterWindow(qjs::Module* module);
@@ -49,7 +50,7 @@ extern void RegisterScrollBar(qjs::Module* module);
 
 extern void RegisterTreeNode(qjs::Module* module);
 extern void RegisterTreeView(qjs::Module* module);
-
+extern void RegisterStorage(qjs::Module* module);
 
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
@@ -85,6 +86,8 @@ bool JsEngine::Init() {
 
 	auto module = context_->NewModule("DuiLib");
 	RegisterConst(module);
+	RegisterGlobal(module);
+
 	RegisterWindow(module);
 	RegisterPaintManager(module);
 	RegisterDialogBuilder(module);
@@ -127,6 +130,8 @@ bool JsEngine::Init() {
 	RegisterTreeNode(module);
 	RegisterTreeView(module);
 
+
+	RegisterStorage(module);
 	return true;
 }
 

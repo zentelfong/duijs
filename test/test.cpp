@@ -3,9 +3,6 @@
 #include "Utils/CrashDump.h"
 #include "duilib/UIlib.h"
 
-#include "utils/storage.h"
-
-
 #if 0
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow){
 #else
@@ -16,8 +13,6 @@ int main(int argc,const char* argv) {
 		printf("CoInitialize error");
 		return -1;
 	}
-
-	testStorage();
 
 	DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
 

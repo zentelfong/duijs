@@ -626,6 +626,10 @@ public:
 		return JS_SetPropertyUint32(context_, value_, key, JS_NewString(context_, value)) == 0;
 	}
 
+	bool SetPropertyString(uint32_t key, const char* value, size_t len) {
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
+	}
+
 	bool SetPropertyInt32(uint32_t key, int32_t value) {
 		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt32(context_,value)) == 0;
 	}
@@ -644,6 +648,10 @@ public:
 
 	bool SetPropertyString(const char* key, const char* value) {
 		return JS_SetPropertyStr(context_, value_, key, JS_NewString(context_, value)) == 0;
+	}
+
+	bool SetPropertyString(const char* key, const char* value, size_t len) {
+		return JS_SetPropertyStr(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
 	}
 
 	bool SetPropertyInt32(const char* key, int32_t value) {
@@ -1266,21 +1274,26 @@ public:
 		JS_MarkValue(runtime, rfuncs_[1], mark_func);
 	}
 
-	Value Settle(Type type,ArgList& arglist) {
-		JSValue argv[ArgList::MaxArgCount];
-		for (size_t i = 0; i < arglist.size(); ++i) {
-			argv[i] = arglist[i];
-		}
-		JSValue ret = JS_Call(ctx_, rfuncs_[type], JS_UNDEFINED, arglist.size(), argv);
+	Value Resolve(Value& val) {
+		JSValue argv = val;
+		JSValue ret = JS_Call(ctx_, rfuncs_[kResolve], JS_UNDEFINED, 1, &argv);
 		return Value(ctx_, std::move(ret));
 	}
 
-	Value Resolve(ArgList& arglist) {
-		return Settle(kResolve,arglist);
+	Value Resolve() {
+		JSValue ret = JS_Call(ctx_, rfuncs_[kResolve], JS_UNDEFINED, 0, NULL);
+		return Value(ctx_, std::move(ret));
 	}
 
-	Value Reject(ArgList& arglist) {
-		return Settle(kReject,arglist);
+	Value Reject(Value& val) {
+		JSValue argv = val;
+		JSValue ret = JS_Call(ctx_, rfuncs_[kReject], JS_UNDEFINED, 1, &argv);
+		return Value(ctx_, std::move(ret));
+	}
+
+	Value Reject() {
+		JSValue ret = JS_Call(ctx_, rfuncs_[kReject], JS_UNDEFINED, 0, NULL);
+		return Value(ctx_, std::move(ret));
 	}
 
 	void Clear() {

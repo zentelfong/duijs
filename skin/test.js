@@ -1,4 +1,4 @@
-import {Window,Label,setResourcePath,postQuitMessage, Timer} from "DuiLib"
+import {Window,Label,postQuitMessage, Timer,Storage, runGC} from "DuiLib"
 
 class TestWindow extends Window{
 	constructor(){
@@ -49,5 +49,15 @@ testWindow.showWindow();
 let label = testWindow.manager.findControl("testLabel");
 label.setTextColor(0xff0000);
 
+async function testStorage(){
+	let storage = new Storage();
+	let code = await storage.open("test.db");
+	print("open test.db",code);
+	let rslt = await storage.exec("select * from test");
+	print("select",rslt.code,rslt.data);
+	code = await storage.close();
+	print("close test.db",code);
+}
 
-
+testStorage();
+runGC();
