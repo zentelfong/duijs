@@ -193,6 +193,9 @@ public:
 	void SetUserData(void* ud) { user_data_ = ud; }
 	void* user_data() { return user_data_; }
 
+	Value ParseJson(const char* buf, size_t buf_len,
+		const char* filename);
+
 	//new
 	Value NewNull();
 	Value NewBool(bool v);

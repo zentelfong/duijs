@@ -1,6 +1,11 @@
 ﻿
 namespace qjs {
 
+inline 	Value Context::ParseJson(const char* buf, size_t buf_len,
+	const char* filename) {
+	return Value(context_,JS_ParseJSON(context_, buf, buf_len, filename));
+}
+
 inline Value Context::NewNull() {
 	return Value(context_, JS_NULL);
 }
