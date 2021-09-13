@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <memory>
+#include <atomic>
 #include "waitable_event.h"
 
 
