@@ -1,4 +1,5 @@
 #include "Util.h"
+#include "JsWindow.h"
 
 namespace duijs {
 
@@ -91,6 +92,25 @@ static Value runGC(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+
+static Value messageBox(Context& context, ArgList& args) {
+	int rslt = 0;
+	if (args[0].IsObject()) {
+		JsWindow* wnd = Class<JsWindow>::ToC(args[0]);
+		JsString text(args[1]);
+		JsString caption(args[2]);
+		rslt = MessageBox(wnd?wnd->GetHWND():nullptr, text,caption,args[3].ToUint32());
+	}
+	else {
+		JsString text(args[0]);
+		JsString caption(args[1]);
+		rslt = MessageBox(nullptr, text, caption, args[2].ToUint32());
+	}
+	return context.NewInt32(rslt);
+}
+
+
+
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
 
 
@@ -110,6 +130,8 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(loadPlugin);
 	ADD_GLOBAL_FUNCTION(postQuitMessage);
 	ADD_GLOBAL_FUNCTION(runGC);
+
+	ADD_GLOBAL_FUNCTION(messageBox);
 }
 
 }//namespace

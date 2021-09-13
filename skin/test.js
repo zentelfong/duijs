@@ -1,4 +1,4 @@
-import {Window,Label,postQuitMessage, Timer,Storage, runGC} from "DuiLib"
+import {Window,Label,postQuitMessage, Timer,Storage, runGC ,WS_OVERLAPPEDWINDOW,messageBox, MB_OKCANCEL, MB_OK} from "DuiLib"
 
 class TestWindow extends Window{
 	constructor(){
@@ -30,19 +30,22 @@ class TestWindow extends Window{
 
 	createControl(cname){
 		let label =  new Label();
-		label.setText("hello");
+		label.setText("你好");
 		return label;
 	}
 
 	gotoWeb(){
-		print("goto web");
-		this.close();
+		print("run gc");
+		runGC();
+
+		let rslt = messageBox(this,"进行垃圾回收？","提示",MB_OKCANCEL);
+		print("rslt",rslt);
 	}
 }
 
 let testWindow = new TestWindow();
 
-testWindow.create("test window");
+testWindow.create("test window",WS_OVERLAPPEDWINDOW);
 testWindow.centerWindow();
 testWindow.showWindow();
 
@@ -60,4 +63,4 @@ async function testStorage(){
 }
 
 testStorage();
-runGC();
+
