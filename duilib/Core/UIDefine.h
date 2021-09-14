@@ -86,6 +86,8 @@ namespace DuiLib
 #define DUI_MSGTYPE_TABSELECT              (_T("tabselect"))
 
 #define DUI_MSGTYPE_ITEMSELECT 		   	   (_T("itemselect"))
+#define DUI_MSGTYPE_ITEMUNSELECT 		   (_T("itemunselect"))
+
 #define DUI_MSGTYPE_ITEMEXPAND             (_T("itemexpand"))
 #define DUI_MSGTYPE_WINDOWINIT             (_T("windowinit"))
 #define DUI_MSGTYPE_WINDOWSIZE             (_T("windowsize"))
@@ -312,6 +314,12 @@ protected:                                                                \
 #define  DUI_CTR_TEXTSCROLL						 (_T("TextScroll"))
 
 #define DUI_CTR_COLORPALETTE					  (_T("ColorPalette"))
+
+
+#define DUI_CTR_QRCONTROL          (_T("QrControl"))
+#define DUI_CTR_WATERFALLLIST      (_T("WaterfallList"))
+#define DUI_CTR_WATERFALLLIST_CELL (_T("WaterfallListCell"))
+
 	///
 	//////////////END控件名称宏定义//////////////////////////////////////////////////
 

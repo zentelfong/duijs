@@ -113,6 +113,7 @@
 #include "Control/UIFadeButton.h"
 #include "Control/UIRing.h"
 #include "Control/UIQrControl.h"
+#include "Control/UIWaterfallList.h"
 
 #pragma comment( lib, "comctl32.lib" )
 #pragma comment( lib, "GdiPlus.lib" )

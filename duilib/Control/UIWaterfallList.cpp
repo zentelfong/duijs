@@ -3,29 +3,42 @@
 
 namespace DuiLib
 {
+IMPLEMENT_DUICONTROL(CWaterfallListUI)
+IMPLEMENT_DUICONTROL(CWaterfallListCellUI)
 
-CWaterfallList::CWaterfallList(void)
+CWaterfallListUI::CWaterfallListUI(void)
 	:m_dataSource(NULL),m_selectedItemIdx(0),m_itemHeight(-1)
 {
 }
 
 
-CWaterfallList::~CWaterfallList(void)
+CWaterfallListUI::~CWaterfallListUI(void)
 {
 	for (int i=0;i<m_removedItems.GetSize();++i)
 	{
-		delete (CWaterfallListCell*)m_removedItems[i];
+		delete (CWaterfallListCellUI*)m_removedItems[i];
 	}
 }
 
-LPVOID CWaterfallList::GetInterface(LPCTSTR pstrName)
+LPVOID CWaterfallListUI::GetInterface(LPCTSTR pstrName)
 {
     if (_tcscmp(pstrName, DUI_CTR_WATERFALLLIST) == 0) 
-        return static_cast<CWaterfallList*>(this);
+        return static_cast<CWaterfallListUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 
-void CWaterfallList::SetPos(RECT rc, bool bNeedInvalidate)
+void CWaterfallListUI::NotifyCellSelect(int index) {
+	if (m_pManager != NULL) {
+		m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMSELECT, (WPARAM)index);
+	}
+}
+void CWaterfallListUI::NotifyCellDeselect(int index) {
+	if (m_pManager != NULL) {
+		m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMUNSELECT, (WPARAM)index);
+	}
+}
+
+void CWaterfallListUI::SetPos(RECT rc, bool bNeedInvalidate)
 {
 	CControlUI::SetPos(rc, bNeedInvalidate);
 	rc = m_rcItem;
@@ -89,7 +102,7 @@ void CWaterfallList::SetPos(RECT rc, bool bNeedInvalidate)
 		if (IntersectRect(&rcTemp,&rcCtrl,&rc))
 		{
 			//如果控件在显示范围之内
-			CWaterfallListCell* listCell=findDisplayCell(it2);
+			CWaterfallListCellUI* listCell=findDisplayCell(it2);
 			if (!listCell)
 			{
 				listCell=m_dataSource->ListViewCellAtIndex(this,sz,it2);
@@ -104,7 +117,7 @@ void CWaterfallList::SetPos(RECT rc, bool bNeedInvalidate)
 		else
 		{
 			//list列表之外的控件移除
-			CWaterfallListCell* listCell=findDisplayCell(it2);
+			CWaterfallListCellUI* listCell=findDisplayCell(it2);
 			if (listCell)
 			{
                 if (m_removedItems.GetSize() < 1000)
@@ -125,7 +138,7 @@ void CWaterfallList::SetPos(RECT rc, bool bNeedInvalidate)
 	ProcessScrollBar(rc, 0, cyNeeded);
 }
 
-bool CWaterfallList::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
+bool CWaterfallListUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 {
 	RECT rcTemp = { 0 };
 	if( !IntersectRect(&rcTemp, &rcPaint, &m_rcItem) ) 
@@ -154,7 +167,7 @@ bool CWaterfallList::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopCont
 
 		if( IntersectRect(&rcTemp, &rcPaint, &rc) ){
 			for (auto i=m_displayItems.begin();i!=m_displayItems.end();++i) {
-				CWaterfallListCell* pControl = static_cast<CWaterfallListCell*>(i->second);
+				CWaterfallListCellUI* pControl = static_cast<CWaterfallListCellUI*>(i->second);
 				if( !pControl->IsVisible() ) 
                     continue;
 				if( !IntersectRect(&rcTemp, &rcPaint, &pControl->GetPos()) ) 
@@ -179,7 +192,7 @@ bool CWaterfallList::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopCont
     return true;
 }
 
-void CWaterfallList::SetScrollPos(SIZE szPos)
+void CWaterfallListUI::SetScrollPos(SIZE szPos, bool bMsg)
 {
 	int cx = 0;
 	int cy = 0;
@@ -239,7 +252,7 @@ void CWaterfallList::SetScrollPos(SIZE szPos)
 		{
 			//如果控件在显示范围之内
 			auto find=m_displayItems.find(it2);
-			CWaterfallListCell* listCell=NULL;
+			CWaterfallListCellUI* listCell=NULL;
 			if (find==m_displayItems.end())
 			{
 				listCell=m_dataSource->ListViewCellAtIndex(this,sz,it2);
@@ -270,9 +283,18 @@ void CWaterfallList::SetScrollPos(SIZE szPos)
 	}
 
 	Invalidate();
+
+	if (m_pVerticalScrollBar)
+	{
+		// 发送滚动消息
+		if (m_pManager != NULL && bMsg) {
+			int nPage = (m_pVerticalScrollBar->GetScrollPos() + m_pVerticalScrollBar->GetLineSize()) / m_pVerticalScrollBar->GetLineSize();
+			m_pManager->SendNotify(this, DUI_MSGTYPE_SCROLL, (WPARAM)nPage);
+		}
+	}
 }
 
-CControlUI* CWaterfallList::FindControl(FINDCONTROLPROC Proc,LPVOID pData, UINT uFlags)
+CControlUI* CWaterfallListUI::FindControl(FINDCONTROLPROC Proc,LPVOID pData, UINT uFlags)
 {
     // Check if this guy is valid
     if( (uFlags & UIFIND_VISIBLE) != 0 && !IsVisible() ) return NULL;
@@ -315,7 +337,7 @@ CControlUI* CWaterfallList::FindControl(FINDCONTROLPROC Proc,LPVOID pData, UINT 
 
 	{
 		for (auto i=m_displayItems.begin();i!=m_displayItems.end();++i) {
-			CWaterfallListCell* pListCell = static_cast<CWaterfallListCell*>(i->second);
+			CWaterfallListCellUI* pListCell = static_cast<CWaterfallListCellUI*>(i->second);
             CControlUI* pControl = pListCell->FindControl(Proc, pData, uFlags);
             if( pControl != NULL ) {
                 if( (uFlags & UIFIND_HITTEST) != 0 && !pControl->IsFloat() 
@@ -332,7 +354,7 @@ CControlUI* CWaterfallList::FindControl(FINDCONTROLPROC Proc,LPVOID pData, UINT 
     return pResult;
 }
 
-void CWaterfallList::SetSelect(int selIndex)
+void CWaterfallListUI::SetSelect(int selIndex)
 {
 	if (m_selectedItemIdx==selIndex)
 		return;
@@ -343,7 +365,7 @@ void CWaterfallList::SetSelect(int selIndex)
 		listCell->second->Invalidate();
 	}
 
-	SignalCellDeselect(this,m_selectedItemIdx);
+	NotifyCellDeselect(m_selectedItemIdx);
 	m_selectedItemIdx=selIndex;
 
 	listCell=m_displayItems.find(selIndex);
@@ -351,10 +373,10 @@ void CWaterfallList::SetSelect(int selIndex)
 	{
 		listCell->second->Invalidate();
 	}
-	SignalCellSelect(this,m_selectedItemIdx);
+	NotifyCellSelect(m_selectedItemIdx);
 }
 
-void CWaterfallList::Reload()
+void CWaterfallListUI::Reload()
 {
 	if (!m_dataSource)
 		return;
@@ -368,7 +390,7 @@ void CWaterfallList::Reload()
 	    SetPos(m_rcItem);
 }
 
-void CWaterfallList::SetAttribute(LPCTSTR pstrName,LPCTSTR pstrValue)
+void CWaterfallListUI::SetAttribute(LPCTSTR pstrName,LPCTSTR pstrValue)
 {
 	if (_tcscmp(pstrName,_T("itembkcolor"))==0)
 	{
@@ -396,15 +418,15 @@ void CWaterfallList::SetAttribute(LPCTSTR pstrName,LPCTSTR pstrValue)
 	}
 	else if (_tcscmp(pstrName,_T("itembkimage"))==0)
 	{
-		m_listInfo.itemBkImage=pstrValue;
+		m_listInfo.itemBkImage = pstrValue;
 	}
 	else if (_tcscmp(pstrName,_T("itemhotimage"))==0)
 	{
-		m_listInfo.itemHotImage=pstrValue;
+		m_listInfo.itemHotImage = pstrValue;
 	}
 	else if (_tcscmp(pstrName,_T("itemselimage"))==0)
 	{
-		m_listInfo.itemSelImage=pstrValue;
+		m_listInfo.itemSelImage = pstrValue;
 	}
 	else if (_tcscmp(pstrName,_T("itemheight"))==0)
 	{
@@ -415,11 +437,11 @@ void CWaterfallList::SetAttribute(LPCTSTR pstrName,LPCTSTR pstrValue)
 }
 
 
-CWaterfallListCell* CWaterfallList::DequeueReusableCell(uint32_t identifier)
+CWaterfallListCellUI* CWaterfallListUI::DequeueReusableCell(uint32_t identifier)
 {
 	for (int i=0;i<m_removedItems.GetSize();++i)
 	{
-		CWaterfallListCell* cell=static_cast<CWaterfallListCell*>(m_removedItems.GetAt(i));
+		CWaterfallListCellUI* cell=static_cast<CWaterfallListCellUI*>(m_removedItems.GetAt(i));
 		if (cell->GetReuseIdentifier()==identifier)
 		{
 			m_removedItems.Remove(i);
@@ -430,55 +452,55 @@ CWaterfallListCell* CWaterfallList::DequeueReusableCell(uint32_t identifier)
 }
 
 
-CWaterfallListCell::CWaterfallListCell()
+CWaterfallListCellUI::CWaterfallListCellUI()
 	:m_owner(NULL),m_index(-1),m_buttonState(0),m_reuseIdentifier(0)
 {
 
 }
 
-CWaterfallListCell::~CWaterfallListCell()
+CWaterfallListCellUI::~CWaterfallListCellUI()
 {
 
 }
 
-LPVOID CWaterfallListCell::GetInterface(LPCTSTR pstrName)
+LPVOID CWaterfallListCellUI::GetInterface(LPCTSTR pstrName)
 {
     if (_tcscmp(pstrName, DUI_CTR_WATERFALLLIST_CELL) == 0)
-        return static_cast<CWaterfallListCell*>(this);
+        return static_cast<CWaterfallListCellUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 
-void CWaterfallListCell::SetReuseIdentifier(uint32_t identifier)
+void CWaterfallListCellUI::SetReuseIdentifier(uint32_t identifier)
 {
 	m_reuseIdentifier=identifier;
 }
 
-uint32_t CWaterfallListCell::GetReuseIdentifier()
+uint32_t CWaterfallListCellUI::GetReuseIdentifier()
 {
 	return m_reuseIdentifier;
 }
 
-void CWaterfallListCell::SetIndex(int idx)
+void CWaterfallListCellUI::SetIndex(int idx)
 {
 	m_index=idx;
 }
 
-int CWaterfallListCell::GetIndex()
+int CWaterfallListCellUI::GetIndex()
 {
 	return m_index;
 }
 
-void CWaterfallListCell::SetOwner(CWaterfallList*  owner)
+void CWaterfallListCellUI::SetOwner(CWaterfallListUI* owner)
 {
 	m_owner=owner;
 }
 
-CWaterfallList* CWaterfallListCell::GetOwner()
+CWaterfallListUI* CWaterfallListCellUI::GetOwner()
 {
 	return m_owner;
 }
 
-void CWaterfallListCell::DoEvent(TEventUI& event)
+void CWaterfallListCellUI::DoEvent(TEventUI& event)
 {
 	switch(event.Type)
 	{
@@ -519,14 +541,14 @@ void CWaterfallListCell::DoEvent(TEventUI& event)
 
 
 
-void CWaterfallListCell::PaintStatusImage(HDC hDC)
+void CWaterfallListCellUI::PaintStatusImage(HDC hDC)
 {
 	if( !IsEnabled() ) 
 		m_buttonState |= UISTATE_DISABLED;
 	else
 		m_buttonState &= ~ UISTATE_DISABLED;
 
-	CWaterfallList::ListInfo* info=GetOwner()->GetListInfo();
+	CWaterfallListUI::ListInfo* info=GetOwner()->GetListInfo();
 
 	if(GetOwner()->GetSelect()==m_index) {
 		if (info->itemSelColor)
