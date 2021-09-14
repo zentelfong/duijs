@@ -115,7 +115,9 @@ js_task_t TaskManager::PopTimerTask(uint32_t id) {
 	std::lock_guard<std::mutex> locker(lock_);
 	auto find = timer_tasks_.find(id);
 	if (find != timer_tasks_.end()) {
-		return find->second;
+		js_task_t task = find->second;
+		timer_tasks_.erase(find);
+		return task;
 	}
 	return nullptr;
 }
