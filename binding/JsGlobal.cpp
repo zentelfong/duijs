@@ -1,5 +1,6 @@
 #include "Util.h"
 #include "JsWindow.h"
+#include <Locale.h>
 
 namespace duijs {
 
@@ -109,6 +110,27 @@ static Value messageBox(Context& context, ArgList& args) {
 	return context.NewInt32(rslt);
 }
 
+static Value showConsole(Context& context, ArgList& args) {
+	setlocale(LC_ALL, "chs");
+	AllocConsole();
+	freopen("CONOUT$", "w+t", stdout);
+	freopen("CONIN$", "r+t", stdin);
+	freopen("CONOUT$", "w+t", stderr);
+	return undefined_value;
+}
+
+
+static Value getCommandLines(Context& context, ArgList& args) {
+
+	int nArgs;
+	LPWSTR* szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+
+	auto list = context.NewArray();
+	for (int i = 0; i < nArgs; ++i) {
+		list.SetProperty(i, toValue(context, szArglist[i]));
+	}
+	return list;
+}
 
 
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
@@ -132,6 +154,8 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(runGC);
 
 	ADD_GLOBAL_FUNCTION(messageBox);
+	ADD_GLOBAL_FUNCTION(showConsole);
+	ADD_GLOBAL_FUNCTION(getCommandLines);
 }
 
 }//namespace

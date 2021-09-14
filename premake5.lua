@@ -32,7 +32,7 @@ project "duilib"
 
 project "duijs"
 	language "C++"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	includedirs{
 		"./",
 		"third_party"
@@ -44,8 +44,8 @@ project "duijs"
 		"binding/*.cpp",
 		"utils/*.h",
 		"utils/*.cpp",
-		"test/*.h",
-		"test/*.cpp",
+		"main/*.h",
+		"main/*.cpp",
 	}
 	
 	libdirs{

@@ -13,12 +13,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 	}
 
 	DuiLib::CPaintManagerUI::SetInstance(hInstance);
-	DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
+
+	int nArgs;
+	LPWSTR* szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+	if (nArgs == 2) {
+		DuiLib::CPaintManagerUI::SetResourceZip(szArglist[1], true);
+	} else {
+		DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
+	}
 
 	duijs::JsEngine engine;
 	engine.Init();
 
-	bool rslt = engine.Excute("import {} from 'test.js'", "<eval>");
+	bool rslt = engine.Excute("import {} from 'main.js'", "<eval>");
 	if (!rslt) {
 		return -1;
 	}
