@@ -236,6 +236,41 @@ namespace DuiLib {
 	/////////////////////////////////////////////////////////////////////////////////////
 	//
 	//
+	BOOL CRenderEngine::DrawBitmap(HDC hDC, HBITMAP hBitmap, const RECT& rcDest, const RECT& rcPaint, const RECT& rcBmpPart, bool hasAlpha)
+	{
+		if (!hDC || !hBitmap)
+			return FALSE;
+
+		typedef BOOL(WINAPI* LPALPHABLEND)(HDC, int, int, int, int, HDC, int, int, int, int, BLENDFUNCTION);
+		static LPALPHABLEND lpAlphaBlend = (LPALPHABLEND) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "AlphaBlend");
+
+		if (lpAlphaBlend == NULL) lpAlphaBlend = AlphaBitBlt;
+
+
+		BOOL bResult = TRUE;
+		HDC hDCBits = CreateCompatibleDC(hDC);
+
+
+		HBITMAP old = (HBITMAP)SelectObject(hDCBits, hBitmap);
+		BLENDFUNCTION bf = { AC_SRC_OVER, TRUE, 255, AC_SRC_ALPHA };
+
+		RECT rcTemp = { 0 };
+		if (::IntersectRect(&rcTemp, &rcDest, &rcPaint))
+		{
+			if (hasAlpha)
+				bResult = lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right - rcDest.left, rcDest.bottom - rcDest.top, hDCBits, rcBmpPart.left, rcBmpPart.top, rcBmpPart.right - rcBmpPart.left, rcBmpPart.bottom - rcBmpPart.top, bf);
+			else
+			{
+				::SetStretchBltMode(hDC, COLORONCOLOR);
+				bResult = ::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right - rcDest.left, rcDest.bottom - rcDest.top, hDCBits, rcBmpPart.left, rcBmpPart.top, rcBmpPart.right - rcBmpPart.left, rcBmpPart.bottom - rcBmpPart.top, SRCCOPY);
+			}
+		}
+		SelectObject(hDCBits, old);
+		DeleteDC(hDCBits);
+		return bResult;
+	}
+
+
 
 	bool DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rc, const RECT& rcPaint, const CDuiString& sImageName, \
 		const CDuiString& sImageResType, RECT rcItem, RECT rcBmpPart, RECT rcCorner, DWORD dwMask, BYTE bFade, \

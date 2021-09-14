@@ -52,6 +52,8 @@ namespace DuiLib {
 		static void DrawText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText,DWORD dwTextColor, \
 			int iFont, UINT uStyle, DWORD dwTextBKColor);
 
+		static BOOL DrawBitmap(HDC hDC, HBITMAP hBitmap, const RECT& rcDest, const RECT& rcPaint, const RECT& rcBmpPart, bool hasAlpha);
+
 		static void DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RECT& rcPaint, \
 			const RECT& rcBmpPart, const RECT& rcCorners, bool bAlpha, BYTE uFade = 255, 
 			bool hole = false, bool xtiled = false, bool ytiled = false);
