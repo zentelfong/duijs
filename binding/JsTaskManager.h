@@ -8,7 +8,7 @@
 
 namespace duijs {
 
-typedef std::function<void(qjs::Context* context)> js_task_t;
+typedef std::function<void()> js_task_t;
 class TaskWindow;
 
 class TaskManager {

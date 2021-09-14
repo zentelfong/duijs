@@ -64,21 +64,21 @@ static Value setTimer(Timer* pThis, Context& context, ArgList& args) {
 	pThis->func = args[0];
 
 	if (pThis->id > 0) {
-		engine->ResetDelayTask(pThis->id,[pThis](qjs::Context* context) {
+		engine->ResetDelayTask(pThis->id,[pThis]() {
 				pThis->id = 0;
 				auto value = pThis->func.Call();
 				if (value.IsException()) {
-					context->DumpError();
+					value.context()->DumpError();
 				}
 
 			}, delay);
 	}
 	else {
-		pThis->id = engine->PostDelayTask([pThis](qjs::Context* context) {
+		pThis->id = engine->PostDelayTask([pThis]() {
 				pThis->id = 0;
 				auto value = pThis->func.Call();
 				if (value.IsException()) {
-					context->DumpError();
+					value.context()->DumpError();
 				}
 			}, delay);
 
@@ -117,20 +117,20 @@ static Value wait(Timer* pThis, Context& context, ArgList& args) {
 	pThis->promise = new Promise(context);
 
 	if (pThis->id > 0) {
-		engine->ResetDelayTask(pThis->id, [pThis](qjs::Context* context) {
+		engine->ResetDelayTask(pThis->id, [pThis]() {
 				pThis->id = 0;
 				auto value = pThis->promise->Resolve();
 				if (value.IsException()) {
-					context->DumpError();
+					value.context()->DumpError();
 				}
 			}, delay);
 	}
 	else {
-		pThis->id = engine->PostDelayTask([pThis](qjs::Context* context) {
+		pThis->id = engine->PostDelayTask([pThis]() {
 				pThis->id = 0;
 				auto value = pThis->promise->Resolve();
 				if (value.IsException()) {
-					context->DumpError();
+					value.context()->DumpError();
 				}
 			}, delay);
 

@@ -20,7 +20,8 @@ static Value open(Storage* pThis, Context& context, ArgList& args) {
 	Promise* promise = new Promise(context);
 
 	pThis->Open(args[0].ToStdString(), [engine, promise](int code) {
-		engine->PostTask([code, promise](Context* context) {
+		engine->PostTask([code, promise]() {
+			Context* context = Context::get(promise->context());
 			promise->Resolve(context->NewInt32(code));
 			delete promise;
 		});
@@ -33,7 +34,8 @@ static Value close(Storage* pThis, Context& context, ArgList& args) {
 	Promise* promise = new Promise(context);
 
 	pThis->Close([engine, promise](int code) {
-		engine->PostTask([code, promise](Context* context) {
+		engine->PostTask([code, promise]() {
+			Context* context = Context::get(promise->context());
 			promise->Resolve(context->NewInt32(code));
 			delete promise;
 		});
@@ -45,7 +47,8 @@ static Value exec(Storage* pThis, Context& context, ArgList& args) {
 	JsEngine* engine = JsEngine::get(context);
 	Promise* promise = new Promise(context);
 	pThis->Exec(args[0].ToStdString(), [engine, promise](int code,std::string data) {
-		engine->PostTask([code, promise, data](Context* context) {
+		engine->PostTask([code, promise, data]() {
+			Context* context = Context::get(promise->context());
 			Value rslt = context->NewObject();
 			rslt.SetPropertyInt32("code", code);
 			rslt.SetPropertyString("data", data.data(),data.length());

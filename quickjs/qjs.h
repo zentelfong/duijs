@@ -1307,6 +1307,8 @@ public:
 		JS_FreeValue(ctx_, promise_);
 		promise_ = JS_UNDEFINED;
 	}
+
+	JSContext* context() { return ctx_; }
 private:
 	QJS_DISALLOW_COPY_AND_ASSIGN(Promise);
 	JSContext* ctx_;

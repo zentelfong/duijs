@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+namespace network {
+
 struct CookiesInfo
 {
     std::string domain;
@@ -30,3 +32,4 @@ private:
     std::vector<CookiesInfo> _cookies;
 };
 
+}

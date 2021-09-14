@@ -2,6 +2,8 @@
 #include <sstream>
 #include <stdio.h>
 
+namespace network {
+
 std::string ReadFileString(const std::string& path) {
     FILE* file = fopen(path.c_str(),"rb");
     if (!file) {
@@ -149,4 +151,6 @@ void HttpCookie::setCookieFileName(const std::string& filename)
 {
     _cookieFileName = filename;
 }
+
+}//namespace 
 

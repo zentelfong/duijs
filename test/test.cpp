@@ -25,12 +25,12 @@ int main(int argc,const char* argv) {
 	}
 
 
-	engine.PostTask([](qjs::Context* c) {
+	engine.PostTask([]() {
 		printf("run task\n");
 		});
 
 
-	engine.PostDelayTask([](qjs::Context* c) {
+	engine.PostDelayTask([]() {
 		printf("run delay task\n");
 	}, 5000);
 

@@ -88,7 +88,7 @@ bool TaskManager::CancelDelayTask(uint32_t id) {
 void TaskManager::ExcuteTasks() {
 	auto task = PopTask();
 	while (task) {
-		task(context_);
+		task();
 		task = PopTask();
 	}
 }
@@ -96,7 +96,7 @@ void TaskManager::ExcuteTasks() {
 void TaskManager::OnTimer(uint32_t id) {
 	auto task = PopTimerTask(id);
 	if (task) {
-		task(context_);
+		task();
 	}
 	::KillTimer(*task_window_, id);
 }

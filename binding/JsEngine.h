@@ -6,7 +6,7 @@ namespace duijs {
 
 class TaskManager;
 
-typedef std::function<void(qjs::Context* context)> js_task_t;
+typedef std::function<void()> js_task_t;
 
 class JsEngine {
 public:
@@ -22,6 +22,8 @@ public:
 	uint32_t PostDelayTask(js_task_t task, uint32_t delay);
 	void ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay);
 	bool CancelDelayTask(uint32_t id);
+
+	qjs::Context* context() { return context_; }
 
 	static JsEngine* get(qjs::Context& context);
 private:
