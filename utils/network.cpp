@@ -58,27 +58,58 @@ void Network::OnRun() {
 				break;
 		} while (handles);
 
-		CURLMsg* msg;
-		int msgs_left;
-		while ((msg = curl_multi_info_read(curlm_, &msgs_left))) {
-			if (msg->msg == CURLMSG_DONE) {
-				CURL* curl = msg->easy_handle;
-
-
-			}
-		}
 
 	}
 
 
 }
 
-void Network::Req(std::shared_ptr<Request> request) {
+void Network::CheckFinish() {
+	CURLMsg* msg;
+	int msgs_left;
+	while ((msg = curl_multi_info_read(curlm_, &msgs_left))) {
+		if (msg->msg == CURLMSG_DONE) {
+			CURL* curl = msg->easy_handle;
+
+		}
+	}
+
+}
+
+void Network::Req(RefCountedPtr<Request> request) {
 	std::lock_guard<std::mutex> lock(task_lock_);
 	tasks_.push([this,request]() {
 		CURL* curl = curl_easy_init();
 		if (curl) {
-			curl_easy_setopt(curl, CURLOPT_URL, "https://example.com");
+			Request* req = request.get();
+
+			curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
+			curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent_.c_str());
+			curl_easy_setopt(curl, CURLOPT_COOKIE, req->cookie.c_str());
+			curl_easy_setopt(curl, CURLOPT_ENCODING, "gzip, deflate");
+
+			//ÉèÖÃ301¡¢302Ìø×ª¸úËælocation
+			curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+			curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5);
+
+
+			req->AddRef();
+			curl_easy_setopt(curl, CURLOPT_PRIVATE, req);
+
+			if (req->type == Request::kPost) {
+				curl_easy_setopt(curl, CURLOPT_POSTFIELDS, req->post.data());
+				curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, req->post.size());
+			}
+
+			if (!req->headers.empty()) {
+
+				struct curl_slist* header = NULL;
+
+				for (auto h : req->headers) {
+					header = curl_slist_append(header,h.c_str());
+				}
+				curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+			}
 
 			curl_multi_add_handle(curlm_, curl);
 		}

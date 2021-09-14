@@ -18,3 +18,14 @@ project "cjsonpp"
 	}
 	
 	
+project "network"
+	language "C++"
+	kind "StaticLib"
+	includedirs{
+		"./libcurl/include",
+	}
+	files{
+		"network/*.h",
+		"network/*.cpp",
+	}
+	

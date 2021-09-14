@@ -16,11 +16,14 @@ public:
 	void Start();
 	void Stop();
 
-	void Req(std::shared_ptr<Request> request);
+	void Req(RefCountedPtr<Request> request);
 private:
 	void OnRun();
+	void CheckFinish();
+
 	void* curlm_;
 
+	std::string user_agent_;
 	std::atomic<bool> running_;
 	std::mutex task_lock_;
 	std::queue<std::function<void()>> tasks_;

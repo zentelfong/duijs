@@ -1,18 +1,19 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <memory>
 #include <functional>
+#include "ref_count.h"
 
-
-class Responce {
+class Responce:public RefCountedBase {
 public:
 	int code;
 	std::vector<char> responce;
+
+	REF_IMPLEMENT_COUNTING(Responce);
 };
 
 
-class Request {
+class Request:public RefCountedBase {
 public:
 	enum Type {
 		kGet,
@@ -26,11 +27,17 @@ public:
 
 	}
 
+	~Request() {
+
+	}
+
 	Type type;
 	std::string url;
+	std::string cookie;
 	std::vector<char> post;
 	std::vector<std::string> headers;
-	std::function<void(std::shared_ptr<Responce>)> on_responce;
+	std::function<void(RefCountedPtr<Responce>)> onResponce;
+	REF_IMPLEMENT_COUNTING(Request);
 };
 
 

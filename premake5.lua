@@ -49,7 +49,8 @@ project "duijs"
 	}
 	
 	libdirs{
-		"quickjs/lib"
+		"quickjs/lib",
+		"third_party/libcurl",
 	}
 	
 	links{
@@ -57,6 +58,7 @@ project "duijs"
 		"duilib",
 		"sqlite3",
 		"cjsonpp",
+		"libcurl.lib",
 		"Gdiplus.lib",
 	}
 
