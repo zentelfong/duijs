@@ -280,7 +280,7 @@ static Value getItemBkImage(CListUI* pThis, Context& context, ArgList& args) {
 }
 
 static Value isAlternateBk(CListUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, (uint32_t)pThis->IsAlternateBk());
+	return toValue(context, pThis->IsAlternateBk());
 }
 
 static Value getSelectedItemTextColor(CListUI* pThis, Context& context, ArgList& args) {
