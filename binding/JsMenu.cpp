@@ -148,6 +148,11 @@ void RegisterMenu(qjs::Module* module) {
 
 	}
 
+
+	{
+		DEFINE_CONTROL2(CMenuUI, CListUI, "Menu");
+	}
+
 	{
 
 		DEFINE_CONTROL2(CMenuElementUI, CListContainerElementUI, "MenuElement");

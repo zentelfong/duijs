@@ -9,9 +9,13 @@ class TestWindow extends Window{
 	async test(){
 		this.timer = new Timer();
 
+		let count = 1;
 		let onTimer = ()=>{
 			print("timerout****");
 			this.timer.setTimer(onTimer,1000);
+			let qrcode = this.manager.findControl("qrcode")
+			qrcode.setText("test text " + count);
+			count+=1;
 		}
 		this.timer.setTimer(onTimer,1000);
 

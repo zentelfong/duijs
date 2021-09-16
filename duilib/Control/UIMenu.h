@@ -36,6 +36,10 @@ enum MenuAlignment
 	eMenuAlignment_Bottom = 1 << 4,
 };
 
+#define MENU_ALIGN_LEFT eMenuAlignment_Left
+#define MENU_ALIGN_TOP eMenuAlignment_Top
+#define MENU_ALIGN_RIGHT eMenuAlignment_Right
+#define MENU_ALIGN_BOTTOM eMenuAlignment_Bottom
 
 enum MenuItemDefaultInfo
 {

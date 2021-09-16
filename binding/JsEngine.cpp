@@ -51,7 +51,7 @@ extern void RegisterScrollBar(qjs::Module* module);
 extern void RegisterTreeNode(qjs::Module* module);
 extern void RegisterTreeView(qjs::Module* module);
 extern void RegisterStorage(qjs::Module* module);
-
+extern void RegisterQrControl(qjs::Module* module);
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -110,6 +110,7 @@ bool JsEngine::Init() {
 	RegisterProgress(module);
 	RegisterRing(module);
 	RegisterRollText(module);
+	RegisterQrControl(module);
 
 	RegisterContainer(module);
 	RegisterCombo(module);
