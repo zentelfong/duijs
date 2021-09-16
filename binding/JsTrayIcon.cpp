@@ -3,11 +3,11 @@
 
 namespace duijs {
 
-static CTrayIcon* createTrayIcon(qjs::Context& context, qjs::ArgList& args) {
+static CTrayIcon* createTray(qjs::Context& context, qjs::ArgList& args) {
 	return new CTrayIcon();
 }
 
-static void deleteTrayIcon(CTrayIcon* w) {
+static void deleteTray(CTrayIcon* w) {
 	delete w;
 }
 
@@ -16,8 +16,8 @@ static Value createTrayIcon(CTrayIcon* pThis, Context& context, ArgList& args) {
 	if (!window) {
 		return context.ThrowTypeError("arg0 need window");
 	}
-	auto tip = args[2].ToString();
-	pThis->CreateTrayIcon(*window,args[1].ToInt32(),CDuiString(tip.str(),tip.len()), args[3].ToInt32());
+
+	pThis->CreateTrayIcon(*window,args[1].ToInt32(),JsString(args[2]), args[3].ToInt32());
 	return undefined_value;
 }
 
@@ -44,14 +44,15 @@ static Value getTooltipText(CTrayIcon* pThis, Context& context, ArgList& args) {
 
 
 static Value setIcon(CTrayIcon* pThis, Context& context, ArgList& args) {
+	bool rslt;
 	if (args[0].IsString()) {
 		auto file = args[0].ToString();
-		pThis->SetIcon(CDuiString(file.str(), file.len()));
+		rslt = pThis->SetIcon(CDuiString(file.str(), file.len()));
 	}
 	else {
-		pThis->SetIcon(args[0].ToUint32());
+		rslt = pThis->SetIcon(args[0].ToUint32());
 	}
-	return undefined_value;
+	return context.NewBool(rslt);
 }
 
 static Value setHideIcon(CTrayIcon* pThis, Context& context, ArgList& args) {
@@ -80,8 +81,8 @@ static Value isVisible(CTrayIcon* pThis, Context& context, ArgList& args) {
 
 void RegisterTrayIcon(qjs::Module* module) {
 	auto ctrl = module->ExportClass<CTrayIcon>("TrayIcon");
-	ctrl.Init<deleteTrayIcon>();
-	ctrl.AddCtor<createTrayIcon>();
+	ctrl.Init<deleteTray>();
+	ctrl.AddCtor<createTray>();
 	ADD_FUNCTION(createTrayIcon);
 	ADD_FUNCTION(deleteTrayIcon);
 	ADD_FUNCTION(setTooltipText);

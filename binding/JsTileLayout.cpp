@@ -24,7 +24,7 @@ static Value getColumns(CTileLayoutUI* pThis, Context& context, ArgList& args) {
 
 
 void RegisterTileLayout(qjs::Module* module) {
-	DEFINE_CONTROL2(CTileLayoutUI, CContainerUI, "TabLayout");
+	DEFINE_CONTROL2(CTileLayoutUI, CContainerUI, "TileLayout");
 	ADD_FUNCTION(setItemSize);
 	ADD_FUNCTION(getItemSize);
 	ADD_FUNCTION(setColumns);

@@ -5,7 +5,7 @@ namespace DuiLib
 {
 	IMPLEMENT_DUICONTROL(CRingUI)
 
-	CRingUI::CRingUI() : m_fCurAngle(0.0f), m_pBkimage(NULL)
+	CRingUI::CRingUI() : m_fCurAngle(0.0f), m_fStep(36.0f), m_delay(100), m_pBkimage(NULL)
 	{
 	}
 
@@ -29,8 +29,14 @@ namespace DuiLib
 
 	void CRingUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 	{
-		if( _tcscmp(pstrName, _T("bkimage")) == 0 ) SetBkImage(pstrValue);
-		else CLabelUI::SetAttribute(pstrName, pstrValue);
+		if (_tcscmp(pstrName, _T("bkimage")) == 0)
+			SetBkImage(pstrValue);
+		else if (_tcscmp(pstrName, _T("step")) == 0)
+			m_fStep = _ttof(pstrValue);
+		else if (_tcscmp(pstrName, _T("delay")) == 0)
+			m_delay = _ttoi(pstrValue);
+		else 
+			CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
 
 	void CRingUI::SetBkImage( LPCTSTR pStrImage )
@@ -64,10 +70,10 @@ namespace DuiLib
 	void CRingUI::DoEvent( TEventUI& event )
 	{
 		if( event.Type == UIEVENT_TIMER && event.wParam == RING_TIMERID ) {
-			if(m_fCurAngle > 359) {
-				m_fCurAngle = 0;
+			m_fCurAngle += m_fStep;
+			if (m_fCurAngle > 360) {
+				m_fCurAngle -= 360;
 			}
-			m_fCurAngle += 36.0;
 			Invalidate();
 		}
 		else {
@@ -79,7 +85,7 @@ namespace DuiLib
 	{
 		m_pBkimage = CRenderEngine::GdiplusLoadImage(GetBkImage());
 		if ( NULL == m_pBkimage ) return;
-		if(m_pManager) m_pManager->SetTimer(this, RING_TIMERID, 100);
+		if(m_pManager) m_pManager->SetTimer(this, RING_TIMERID, m_delay);
 	}
 
 	void CRingUI::DeleteImage()

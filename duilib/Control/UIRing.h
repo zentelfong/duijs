@@ -29,6 +29,8 @@ namespace DuiLib
 
 	public:
 		float m_fCurAngle;
+		float m_fStep;
+		int m_delay;
 		Gdiplus::Image* m_pBkimage;
 	};
 }
