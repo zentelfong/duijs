@@ -61,7 +61,32 @@ void JsWindow::Notify(TNotifyUI& msg) {
 	LPCTSTR funcName = msg.pSender->GetCustomAttribute(msg.sType);
 	if (funcName) {
 		std::string name = Wide2UTF8(funcName);
-		if (this_.HasProperty(name.c_str())) {
+
+		auto find = name.find(".");
+		if (find != std::string::npos) {
+			std::string prostr = name.substr(0,find);
+			auto object = this_.GetProperty(prostr.c_str());
+			if (object.IsObject()) {
+				std::string funcstr = name.substr(find+1);
+				if (object.HasProperty(funcstr.c_str())) {
+
+					Value result = object.Invoke(funcstr.c_str(),
+						toValue(*context_, msg.pSender),
+						toValue(*context_, (uint32_t)msg.wParam),
+						toValue(*context_, (uint32_t)msg.lParam));
+
+					if (result.IsException()) {
+						context_->DumpError();
+					}
+					return;
+				} else {
+					printf("no property %s", funcstr.c_str());
+				}
+			} else {
+				printf("no object %s", prostr.c_str());
+			}
+
+		} else if (this_.HasProperty(name.c_str())) {
 
 			Value result = this_.Invoke(name.c_str(),
 				toValue(*context_,msg.pSender),
