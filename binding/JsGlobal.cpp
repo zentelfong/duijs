@@ -133,6 +133,16 @@ static Value getCommandLines(Context& context, ArgList& args) {
 }
 
 
+static Value exec(Context& context, ArgList& args) {
+	if (args[0].IsString()) {
+		auto str = args[0].ToString();
+		return context.Excute(str.str(), str.len(),"<exec>");
+	}
+	return undefined_value;
+}
+
+
+
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
 
 
@@ -152,10 +162,12 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(loadPlugin);
 	ADD_GLOBAL_FUNCTION(postQuitMessage);
 	ADD_GLOBAL_FUNCTION(runGC);
-
+	ADD_GLOBAL_FUNCTION(exec);
 	ADD_GLOBAL_FUNCTION(messageBox);
 	ADD_GLOBAL_FUNCTION(showConsole);
 	ADD_GLOBAL_FUNCTION(getCommandLines);
+
+	
 }
 
 }//namespace

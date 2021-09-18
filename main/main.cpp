@@ -4,15 +4,15 @@
 #include "duilib/UIlib.h"
 
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow){
-
+//int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow){
+int main() {
 	CrashDump crash_dump;
 	if (CoInitialize(NULL) != 0) {
 		printf("CoInitialize error");
 		return -1;
 	}
 
-	DuiLib::CPaintManagerUI::SetInstance(hInstance);
+	//DuiLib::CPaintManagerUI::SetInstance(hInstance);
 
 	int nArgs;
 	LPWSTR* szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
@@ -25,7 +25,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 	duijs::JsEngine engine;
 	engine.Init();
 
-	bool rslt = engine.Excute("import {} from 'main.js'", "<eval>");
+	bool rslt = engine.Excute("import {} from 'debug.js'", "<eval>");
 	if (!rslt) {
 		return -1;
 	}
