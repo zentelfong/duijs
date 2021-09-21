@@ -141,6 +141,25 @@ static Value exec(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value getAppDataPath(Context& context, ArgList& args) {
+	if (args[0].IsString()) {
+		JsString name(args[0]);
+
+		TCHAR path[MAX_PATH];
+		if (SHGetSpecialFolderPath(NULL, path, CSIDL_LOCAL_APPDATA, TRUE)) {
+			CDuiString appPath = path;
+			appPath.Append(_T("\\"));
+			appPath.Append(name);
+			appPath.Append(_T("\\"));
+
+			if (_taccess(appPath, 0) == -1) {
+				_tmkdir(appPath);
+			}
+			return toValue(context, appPath);
+		}
+	}
+	return undefined_value;
+}
 
 
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
@@ -167,7 +186,7 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(showConsole);
 	ADD_GLOBAL_FUNCTION(getCommandLines);
 
-	
+	ADD_GLOBAL_FUNCTION(getAppDataPath);
 }
 
 }//namespace
