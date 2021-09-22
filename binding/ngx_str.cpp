@@ -3,24 +3,24 @@
 ngx_uint_t
 ngx_escape_sql_str(u_char* dst, u_char* src, size_t size)
 {
-	size_t               n;
 	if (dst == NULL) {
 		/* find the number of chars to be escaped */
-		n = 0;
+		size_t n = 0;
+		size_t ns = size;
 		while (size) {
 			/* the highest bit of all the UTF-8 chars
 			* is always 1 */
 			if ((*src & 0x80) == 0) {
 				switch (*src) {
-				case '\0':
-				case '\b':
-				case '\n':
-				case '\r':
-				case '\t':
-				case 26:  /* \Z */
-				case '\\':
+				case '/':
 				case '\'':
-				case '"':
+				case '[':
+				case ']':
+				case '%':
+				case '&':
+				case '_':
+				case '(':
+				case ')':
 					n++;
 					break;
 				default:
@@ -31,57 +31,57 @@ ngx_escape_sql_str(u_char* dst, u_char* src, size_t size)
 			size--;
 		}
 
-		return (ngx_uint_t)n;
+		return (ngx_uint_t)(n + ns);
 	}
 
+	u_char* sdst = dst;
 	while (size) {
 		if ((*src & 0x80) == 0) {
 			switch (*src) {
-			case '\0':
-				*dst++ = '\\';
-				*dst++ = '0';
-				break;
 
-			case '\b':
-				*dst++ = '\\';
-				*dst++ = 'b';
-				break;
 
-			case '\n':
-				*dst++ = '\\';
-				*dst++ = 'n';
-				break;
-
-			case '\r':
-				*dst++ = '\\';
-				*dst++ = 'r';
-				break;
-
-			case '\t':
-				*dst++ = '\\';
-				*dst++ = 't';
-				break;
-
-			case 26:
-				*dst++ = '\\';
-				*dst++ = 'Z';
-				break;
-
-			case '\\':
-				*dst++ = '\\';
-				*dst++ = '\\';
+			case '/':
+				*dst++ = '/';
+				*dst++ = '/';
 				break;
 
 			case '\'':
-				*dst++ = '\\';
+				*dst++ = '\'';
 				*dst++ = '\'';
 				break;
 
-			case '"':
-				*dst++ = '\\';
-				*dst++ = '"';
+			case '[':
+				*dst++ = '/';
+				*dst++ = '[';
 				break;
 
+			case ']':
+				*dst++ = '/';
+				*dst++ = ']';
+				break;
+
+			case '%':
+				*dst++ = '/';
+				*dst++ = '%';
+				break;
+
+			case '&':
+				*dst++ = '/';
+				*dst++ = '&';
+				break;
+
+			case '_':
+				*dst++ = '/';
+				*dst++ = '_';
+				break;
+			case '(':
+				*dst++ = '/';
+				*dst++ = '(';
+				break;
+			case ')':
+				*dst++ = '/';
+				*dst++ = ')';
+				break;
 			default:
 				*dst++ = *src;
 				break;
@@ -94,7 +94,7 @@ ngx_escape_sql_str(u_char* dst, u_char* src, size_t size)
 		size--;
 	} /* while (size) */
 
-	return (ngx_uint_t)dst;
+	return (ngx_uint_t) (dst - sdst);
 }
 
 
@@ -106,7 +106,7 @@ ngx_escape_json(u_char* dst, u_char* src, size_t size)
 
 	if (dst == NULL) {
 		len = 0;
-
+		size_t ns = size;
 		while (size) {
 			ch = *src++;
 
@@ -133,9 +133,10 @@ ngx_escape_json(u_char* dst, u_char* src, size_t size)
 			size--;
 		}
 
-		return (ngx_uint_t)len;
+		return (ngx_uint_t)(len + ns);
 	}
 
+	u_char* sdst = dst;
 	while (size) {
 		ch = *src++;
 
@@ -185,7 +186,7 @@ ngx_escape_json(u_char* dst, u_char* src, size_t size)
 		size--;
 	}
 
-	return (ngx_uint_t)dst;
+	return (ngx_uint_t)(dst - sdst);
 }
 
 

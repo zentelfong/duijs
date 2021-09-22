@@ -1,5 +1,7 @@
 import * as dui from "DuiLib"
 
+const escapeSql = dui.String.excapeSql;
+
 class DebugWindow extends dui.Window{
 
 	constructor(){
@@ -9,7 +11,7 @@ class DebugWindow extends dui.Window{
 	async initWindow(){
 		let mgr = this.manager;
 		this.editOut = mgr.findControl("editOut");
-
+		this.editInput = mgr.findControl("editInput");
 		this.storage = new dui.Storage();
 
 		let path = dui.getAppDataPath("DuiJs") + "debug.db";
@@ -17,8 +19,18 @@ class DebugWindow extends dui.Window{
 		if(code !=0 ){
 			await this.storage.open(":memory:");
 		}
-
-		//await this.storage.exec("CREATE TABLE IF NOT EXISTS Config()")
+		await this.storage.exec("CREATE TABLE IF NOT EXISTS Config(key TEXT,value TEXT,PRIMARY KEY (key))");
+		let data = await this.storage.exec("SELECT* FROM Config");
+		if(data.code == 0){
+			this.print(data.data);
+			let result = JSON.parse(data.data);
+			if(result.length > 0){
+				this.editInput.setText(result[0].value);
+			}
+		}else{
+			this.print(`error:${data.code}`);
+		}
+		this.print(data);
 	}
 	
 	getSkinFile(){
@@ -33,6 +45,7 @@ class DebugWindow extends dui.Window{
 		let text = edit.getText();
 		try{
 			dui.exec(text);
+			this.storage.exec(`REPLACE INTO Config(key,value) VALUES ('debugInput','${escapeSql(text)}')`);
 		}catch(e){
 			this.print(e);
 		}
@@ -56,6 +69,6 @@ debugWindow.centerWindow();
 debugWindow.showWindow();
 globalThis.debug = debugWindow;
 
-debug.print("APP_DATA_PATH:",dui.getAppDataPath("DuiJs"))
+debug.print("APP_DATA_PATH:",dui.getAppDataPath("DuiJs"));
 
 
