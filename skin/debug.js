@@ -1,5 +1,6 @@
 import * as dui from "DuiLib"
 
+
 const escapeSql = dui.String.excapeSql;
 
 class DebugWindow extends dui.Window{

@@ -12,15 +12,15 @@ ngx_escape_sql_str(u_char* dst, u_char* src, size_t size)
 			* is always 1 */
 			if ((*src & 0x80) == 0) {
 				switch (*src) {
-				case '/':
 				case '\'':
-				case '[':
-				case ']':
-				case '%':
-				case '&':
-				case '_':
-				case '(':
-				case ')':
+				//case '/':
+				//case '[':
+				//case ']':
+				//case '%':
+				//case '&':
+				//case '_':
+				//case '(':
+				//case ')':
 					n++;
 					break;
 				default:
@@ -38,50 +38,47 @@ ngx_escape_sql_str(u_char* dst, u_char* src, size_t size)
 	while (size) {
 		if ((*src & 0x80) == 0) {
 			switch (*src) {
-
-
-			case '/':
-				*dst++ = '/';
-				*dst++ = '/';
-				break;
-
 			case '\'':
 				*dst++ = '\'';
 				*dst++ = '\'';
 				break;
 
-			case '[':
-				*dst++ = '/';
-				*dst++ = '[';
-				break;
+			//case '/':
+			//	*dst++ = '/';
+			//	*dst++ = '/';
+			//	break;
+			//case '[':
+			//	*dst++ = '/';
+			//	*dst++ = '[';
+			//	break;
 
-			case ']':
-				*dst++ = '/';
-				*dst++ = ']';
-				break;
+			//case ']':
+			//	*dst++ = '/';
+			//	*dst++ = ']';
+			//	break;
 
-			case '%':
-				*dst++ = '/';
-				*dst++ = '%';
-				break;
+			//case '%':
+			//	*dst++ = '/';
+			//	*dst++ = '%';
+			//	break;
 
-			case '&':
-				*dst++ = '/';
-				*dst++ = '&';
-				break;
+			//case '&':
+			//	*dst++ = '/';
+			//	*dst++ = '&';
+			//	break;
 
-			case '_':
-				*dst++ = '/';
-				*dst++ = '_';
-				break;
-			case '(':
-				*dst++ = '/';
-				*dst++ = '(';
-				break;
-			case ')':
-				*dst++ = '/';
-				*dst++ = ')';
-				break;
+			//case '_':
+			//	*dst++ = '/';
+			//	*dst++ = '_';
+			//	break;
+			//case '(':
+			//	*dst++ = '/';
+			//	*dst++ = '(';
+			//	break;
+			//case ')':
+			//	*dst++ = '/';
+			//	*dst++ = ')';
+			//	break;
 			default:
 				*dst++ = *src;
 				break;

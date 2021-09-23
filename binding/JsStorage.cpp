@@ -1,5 +1,6 @@
 #include "quickjs/qjs.h"
 #include "utils/storage.h"
+#include "sqlite3/sqlite3.h"
 #include "JsEngine.h"
 
 namespace duijs {
@@ -59,6 +60,20 @@ static Value exec(Storage* pThis, Context& context, ArgList& args) {
 	return promise->promise();
 }
 
+
+static Value escape(Storage* pThis, Context& context, ArgList& args) {
+	if (!args[0].IsString()) {
+		return undefined_value;
+	}
+
+	String str = args[0].ToString();
+
+	char* escape = sqlite3_mprintf("%q", str.str());
+	Value rslt = context.NewString(escape);
+	sqlite3_free(escape);
+	return rslt;
+}
+
 void RegisterStorage(qjs::Module* module) {
 	auto cls = module->ExportClass<Storage>("Storage");
 	cls.Init<deleteStorage>();
@@ -66,6 +81,7 @@ void RegisterStorage(qjs::Module* module) {
 	cls.AddFunc<open>("open");
 	cls.AddFunc<close>("close");
 	cls.AddFunc<exec>("exec");
+	cls.AddFunc<escape>("escape");
 }
 
 

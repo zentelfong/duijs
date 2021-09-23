@@ -1,5 +1,5 @@
 #include "quickjs/qjs.h"
-#include "ngx_str.h"
+#include "utils/ngx_str.h"
 
 namespace duijs {
 using namespace qjs;

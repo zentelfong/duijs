@@ -25,10 +25,6 @@ typedef std::function<void(HttpClient* client, HttpResponse* response)> ccHttpRe
  * @lua NA
  */
 
-#ifdef DELETE
-#undef DELETE
-#endif
-
 class HttpRequest : public RefCountedBase
 {
 public:
