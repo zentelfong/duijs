@@ -1,0 +1,21 @@
+{
+  "include": [
+    "script"
+  ],
+  "exclude": [
+    "src"
+  ],
+  "compilerOptions": {
+    "outDir": "./skin",
+    "module":"ES2020",
+    "target": "ES2020",
+    "lib":["ES2020"],
+    "checkJs": true,
+    "allowJs": true,
+    "esModuleInterop":true,
+    "sourceMap": false,
+    "declaration": false,
+    "importHelpers": false,
+    "removeComments": true,
+  }
+}

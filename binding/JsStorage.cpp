@@ -52,9 +52,13 @@ static Value exec(Storage* pThis, Context& context, ArgList& args) {
 			Context* context = Context::get(promise->context());
 			Value rslt = context->NewObject();
 			rslt.SetPropertyInt32("code", code);
-			Value jdata = context->ParseJson(data.c_str(), data.length(), "<sqlite3>");
-			rslt.SetProperty("data", jdata);
 
+			if (code == 0) {
+				Value jdata = context->ParseJson(data.c_str(), data.length(), "<sqlite3>");
+				rslt.SetProperty("data", jdata);
+			} else {
+				rslt.SetPropertyString("error", data.c_str());
+			}
 			promise->Resolve(rslt);
 			delete promise;
 		});
