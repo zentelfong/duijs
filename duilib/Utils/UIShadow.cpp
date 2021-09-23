@@ -112,7 +112,9 @@ std::map<HWND, CShadowUI *>& CShadowUI::GetShadowMap()
 
 LRESULT CALLBACK CShadowUI::ParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	_ASSERT(GetShadowMap().find(hwnd) != GetShadowMap().end());	// Shadow must have been attached
+	if (GetShadowMap().find(hwnd) == GetShadowMap().end()) {
+		return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
 
 	CShadowUI *pThis = GetShadowMap()[hwnd];
 	if (pThis->m_bIsDisableShadow) {
