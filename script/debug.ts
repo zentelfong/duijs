@@ -1,5 +1,6 @@
 import * as dui from "DuiLib"
 import { Config } from "./config.js"
+import { format } from "./format.js"
 
 class DebugWindow extends dui.Window{
 	editOut:dui.RichEdit;
@@ -60,8 +61,9 @@ let debugWindow = new DebugWindow();
 debugWindow.create("DuiJs调试窗口",dui.WS_OVERLAPPEDWINDOW);
 debugWindow.centerWindow();
 debugWindow.showWindow();
-globalThis.debug = debugWindow;
 
-debugWindow.print("APP_DATA_PATH:",dui.getAppDataPath("DuiJs"));
+globalThis.print = function() {
+    debugWindow.print(format.apply(null, arguments));
+}
 
 
