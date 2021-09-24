@@ -15,8 +15,10 @@
     <VerticalLayout bkcolor="#ff1e1e1e">
       <RichEdit name="editOut" font="0" vscrollbar="true" textcolor="#cccccc" padding="5,5,0,5"></RichEdit>
 
-      <HorizontalLayout height="40" bkcolor="#ff252526">
-        <Edit name="editInput" tipvalue="输入js代码" textcolor="#cccccc" bkcolor="#ff252526" nativebkcolor="#ff252526" return="execJs"/>
+      <HorizontalLayout height="40" bkcolor="#ff252526" childvalign="vcenter">
+        <Edit name="editInput" height="40" tipvalue="输入js代码" textcolor="#cccccc" bkcolor="#ff252526" nativebkcolor="#ff252526" return="execJs"/>
+        <Button width="32" height="32" click="clickExec" tooltip="执行" normalimage="file='msgbox/play.png' source='0,0,32,32'" hotimage="file='msgbox/play.png' source='32,0,64,32'"/>
+        <Control width="6"/>
       </HorizontalLayout>
     </VerticalLayout>
   </VerticalLayout>

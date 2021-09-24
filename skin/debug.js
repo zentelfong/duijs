@@ -34,11 +34,11 @@ class DebugWindow extends dui.Window {
             this.print(e);
         }
     }
-    print(...values) {
-        for (const text of values) {
-            this.editOut.appendText(text.toString());
-            this.editOut.appendText("  ");
-        }
+    clickExec(btn) {
+        this.execJs(this.editInput);
+    }
+    print(text) {
+        this.editOut.appendText(text.toString());
         this.editOut.appendText("\n");
         this.editOut.endDown();
     }

@@ -45,17 +45,19 @@ class DebugWindow extends dui.Window{
 		}
 	}
 
-	print(...values){
-		for (const text of values) {
-			this.editOut.appendText(text.toString());
-			this.editOut.appendText("  ");
-		}
+	clickExec(btn:dui.Button){
+		this.execJs(this.editInput);
+	}
+
+	print(text:string){
+		this.editOut.appendText(text.toString());
 		this.editOut.appendText("\n");
 		this.editOut.endDown();
 	}
+
+
 }
 // debug.print(3213213);
-
 let debugWindow = new DebugWindow();
 
 debugWindow.create("DuiJs调试窗口",dui.WS_OVERLAPPEDWINDOW);
