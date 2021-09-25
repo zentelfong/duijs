@@ -7,24 +7,22 @@ namespace DuiLib {
 		m_instance = NULL;
 	}
 
-	CControlUI* CDialogBuilder::Create(STRINGorID xml, LPCTSTR type, IDialogBuilderCallback* pCallback, 
-		CPaintManagerUI* pManager, CControlUI* pParent)
-	{
+	bool CDialogBuilder::Load(STRINGorID xml, LPCTSTR type) {
 		//资源ID为0-65535，两个字节；字符串指针为4个字节
-		//字符串以<开头认为是XML字符串，否则认为是XML文件
-		if(HIWORD(xml.m_lpstr) != NULL && *(xml.m_lpstr) != _T('<')) {
+			//字符串以<开头认为是XML字符串，否则认为是XML文件
+		if (HIWORD(xml.m_lpstr) != NULL && *(xml.m_lpstr) != _T('<')) {
 			LPCTSTR xmlpath = CResourceManager::GetInstance()->GetXmlPath(xml.m_lpstr);
 			if (xmlpath != NULL) {
 				xml = xmlpath;
 			}
 		}
 
-		if( HIWORD(xml.m_lpstr) != NULL ) {
-			if( *(xml.m_lpstr) == _T('<') ) {
-				if( !m_xml.Load(xml.m_lpstr) ) return NULL;
+		if (HIWORD(xml.m_lpstr) != NULL) {
+			if (*(xml.m_lpstr) == _T('<')) {
+				if (!m_xml.Load(xml.m_lpstr)) return false;
 			}
 			else {
-				if( !m_xml.LoadFromFile(xml.m_lpstr) ) return NULL;
+				if (!m_xml.LoadFromFile(xml.m_lpstr)) return false;
 			}
 		}
 		else {
@@ -38,19 +36,29 @@ namespace DuiLib {
 				dll_instence = CPaintManagerUI::GetResourceDll();
 			}
 			HRSRC hResource = ::FindResource(dll_instence, xml.m_lpstr, type);
-			if( hResource == NULL ) return NULL;
+			if (hResource == NULL) return NULL;
 			HGLOBAL hGlobal = ::LoadResource(dll_instence, hResource);
-			if( hGlobal == NULL ) {
+			if (hGlobal == NULL) {
 				FreeResource(hResource);
-				return NULL;
+				return false;
 			}
 
-			m_pCallback = pCallback;
-			if( !m_xml.LoadFromMem((BYTE*)::LockResource(hGlobal), ::SizeofResource(dll_instence, hResource) )) return NULL;
-			::FreeResource(hResource);
+			if (!m_xml.LoadFromMem((BYTE*)::LockResource(hGlobal), ::SizeofResource(dll_instence, hResource))) {
+				FreeResource(hResource);
+				return false;
+			}
+			FreeResource(hResource);
 			m_pstrtype = type;
 		}
+		return true;
+	}
 
+	CControlUI* CDialogBuilder::Create(STRINGorID xml, LPCTSTR type, IDialogBuilderCallback* pCallback, 
+		CPaintManagerUI* pManager, CControlUI* pParent)
+	{
+		if (!Load(xml, type)) {
+			return NULL;
+		}
 		return Create(pCallback, pManager, pParent);
 	}
 

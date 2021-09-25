@@ -16,6 +16,7 @@ namespace DuiLib {
 	{
 	public:
 		CDialogBuilder();
+		bool Load(STRINGorID xml, LPCTSTR type = NULL);
 		CControlUI* Create(STRINGorID xml, LPCTSTR type = NULL, IDialogBuilderCallback* pCallback = NULL,
 			CPaintManagerUI* pManager = NULL, CControlUI* pParent = NULL);
 		CControlUI* Create(IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL,

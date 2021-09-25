@@ -30,6 +30,26 @@ static void deleteControl(CDialogBuilder* w) {
 	delete w;
 }
 
+static Value load(CDialogBuilder* pThis, Context& context, ArgList& args) {
+	bool rslt = false;
+	if (args[0].IsString()) {
+		auto name = toString(args[0]);
+		auto type = toString(args[1]);
+
+		rslt = pThis->Load(STRINGorID(name), type);
+
+	}
+	else if (args[0].IsNumber()) {
+		auto id = args[0].ToUint32();
+		auto type = toString(args[1]);
+		rslt = pThis->Load(STRINGorID(id), type);
+	}
+
+	return context.NewBool(rslt);
+}
+
+
+
 static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 	CControlUI* control = nullptr;
 	IDialogBuilderCallback* callback = nullptr;
@@ -94,6 +114,7 @@ static Value setInstance(CDialogBuilder* pThis, Context& context, ArgList& args)
 
 void RegisterDialogBuilder(qjs::Module* module) {
 	DEFINE_CONTROL(CDialogBuilder, "DialogBuilder");
+	ADD_FUNCTION(load);
 	ADD_FUNCTION(create);
 	ADD_FUNCTION(getLastErrorMessage);
 	ADD_FUNCTION(getLastErrorLocation);
