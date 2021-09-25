@@ -47,6 +47,7 @@ let debugWindow = new DebugWindow();
 debugWindow.create("DuiJs调试窗口", dui.WS_OVERLAPPEDWINDOW);
 debugWindow.centerWindow();
 debugWindow.showWindow();
+globalThis.dui = dui;
 globalThis.print = function () {
     debugWindow.print(format.apply(null, arguments));
 };

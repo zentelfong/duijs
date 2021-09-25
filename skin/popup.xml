@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Default name="VScrollBar">autoshowbtn="true" minthumbsize="40" width="6" button1normalimage="file='publicUI\scrollbar.png' source='0,6,6,12'" button1hotimage="file='publicUI\scrollbar.png' source='0,0,6,6'" button1pushedimage="file='publicUI\scrollbar.png' source='0,6,6,12'" button2normalimage="file='publicUI\scrollbar.png' source='7,6,13,12'" button2hotimage="file='publicUI\scrollbar.png' source='7,0,13,6'" button2pushedimage="file='publicUI\scrollbar.png' source='7,6,13,12'" thumbnormalimage="file='publicUI\scrollbar.png' source='7,13,13,47' corner='2,5,2,5'" thumbhotimage="file='publicUI\scrollbar.png' source='14,13,20,47' corner='2,5,2,5'" thumbpushedimage="file='publicUI\scrollbar.png' source='14,13,20,47' corner='2,5,2,5'" bkhotimage="file='publicUI\scrollbar.png' source='0,13,6,47' corner='2,5,2,5'" bkpushedimage="file='publicUI\scrollbar.png' source='0,13,6,47' corner='2,5,2,5'"</Default>
-
 
 <Window caption="0,0,0,97" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
   <Font name="微软雅黑" size="12" default="true"/>

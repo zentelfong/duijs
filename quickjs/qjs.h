@@ -873,14 +873,14 @@ public:
 		ClassIdManager* cmgr = ClassIdManager::Instance();
 		JSClassID id = JS_GetClassID(v);
 		JSClassID pid = id;
-		while (pid && pid != class_id_) {
+		while (pid) {
+			if (pid == class_id_) {
+				//如果id或者其父class id与class_id_相同则允许转换
+				return reinterpret_cast<T*>(v.GetOpaque(id));
+			}
 			pid = cmgr->GetParent(pid);
 		}
-		//如果id或者其父class id与class_id_相同则允许转换
-		if (pid == class_id_)
-			return reinterpret_cast<T*>(v.GetOpaque(id));
-		else
-			return nullptr;
+		return nullptr;
 	}
 
 	//创建新的js对象，注意js对象释放时会调用dtor释放ptr

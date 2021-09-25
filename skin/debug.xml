@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+
+  <Default name="VScrollBar" value="width=&quot;10&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='msgbox\scrollbar.png' source='18,0,28,34' corner='2,5,2,5'&quot; bknormalimage=&quot;file='msgbox\scrollbar.png' source='0,0,10,34' corner='2,5,2,5'&quot;"/>
+
   <Font name="微软雅黑" size="12" default="true"/>
 
   <VerticalLayout bkcolor="#ff3c3c3c">
