@@ -17,6 +17,7 @@ namespace DuiLib {
 		m_bFloat(false),
 		m_uFloatAlign(0),
 		m_bSetPos(false),
+		m_nFlex(1),
 		m_bDragEnabled(false),
 		m_bDropEnabled(false),
 		m_bResourceText(false),
@@ -546,6 +547,17 @@ namespace DuiLib {
 		NeedParentUpdate();
 	}
 
+	int CControlUI::GetFlex() const {
+		return m_nFlex;
+	}
+
+	void CControlUI::SetFlex(int flex) {
+		if (m_nFlex != flex) {
+			m_nFlex = flex;
+			NeedParentUpdate();
+		}
+	}
+
 	TPercentInfo CControlUI::GetFloatPercent() const
 	{
 		return m_piFloatPercent;
@@ -936,6 +948,9 @@ namespace DuiLib {
 			SetFixedXY(szXY);
 			SetFixedWidth(rcPos.right - rcPos.left);
 			SetFixedHeight(rcPos.bottom - rcPos.top);
+		}
+		else if (_tcsicmp(pstrName, _T("flex")) == 0) {
+			m_nFlex = _ttoi(pstrValue);
 		}
 		else if( _tcsicmp(pstrName, _T("float")) == 0 ) {
 			CDuiString nValue = pstrValue;

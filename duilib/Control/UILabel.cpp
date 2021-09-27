@@ -117,9 +117,9 @@ namespace DuiLib
 			m_bNeedEstimateSize = true;
 		}
 
-		if(m_sText == _T("IP地址")) {
-			int i = 0;
-		}
+		//if(m_sText == _T("IP地址")) {
+		//	int i = 0;
+		//}
 		if (m_bNeedEstimateSize) {
 			m_bNeedEstimateSize = false;
 			m_szAvailableLast = szAvailable;
@@ -142,7 +142,7 @@ namespace DuiLib
 						m_cxyFixedLast.cx = rcText.right - rcText.left + GetManager()->GetDPIObj()->Scale(m_rcTextPadding.left + m_rcTextPadding.right);
 					}
 					else {
-						m_cxyFixedLast.cx = szAvailable.cx;
+						m_cxyFixedLast.cx = 0;
 					}
 				}
 			}
@@ -165,7 +165,7 @@ namespace DuiLib
 						m_cxyFixedLast.cy = rcText.bottom - rcText.top + GetManager()->GetDPIObj()->Scale(m_rcTextPadding.top + m_rcTextPadding.bottom);
 					}
 					else {
-						m_cxyFixedLast.cy = szAvailable.cy;
+						m_cxyFixedLast.cy = 0;
 					}
 				}
 			}

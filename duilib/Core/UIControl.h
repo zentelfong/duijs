@@ -114,6 +114,10 @@ namespace DuiLib {
 		virtual void SetMinHeight(int cy);
 		virtual int GetMaxHeight() const;
 		virtual void SetMaxHeight(int cy);
+
+		virtual int GetFlex() const;
+		virtual void SetFlex(int flex);
+
 		virtual TPercentInfo GetFloatPercent() const;
 		virtual void SetFloatPercent(TPercentInfo piFloatPercent);
 		virtual void SetFloatAlign(UINT uAlign);
@@ -228,6 +232,7 @@ namespace DuiLib {
 		UINT m_uFloatAlign;
 		bool m_bSetPos; // 防止SetPos循环调用
 
+		int  m_nFlex; // 弹性值
 		bool m_bDragEnabled;
 		bool m_bDropEnabled;
 
