@@ -184,7 +184,7 @@ namespace DuiLib {
 							shared = (_tcsicmp(pstrValue, _T("true")) == 0);
 						}
 					}
-					if( pName ) {
+					if( pName && pStyle) {
 						pManager->AddStyle(pName, pStyle, shared);
 					}
 				}

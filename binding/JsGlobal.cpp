@@ -170,7 +170,16 @@ static Value loadLanguage(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+//清空文本缓存，需要调用loadLanguage重新加载
+static Value resetTextMap(Context& context, ArgList& args) {
+	CResourceManager::GetInstance()->ResetTextMap();
+	return undefined_value;
+}
 
+static Value reloadText(Context& context, ArgList& args) {
+	CResourceManager::GetInstance()->ReloadText();
+	return undefined_value;
+}
 
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
 
@@ -198,6 +207,8 @@ void RegisterGlobal(Module* module) {
 
 	ADD_GLOBAL_FUNCTION(getAppDataPath);
 	ADD_GLOBAL_FUNCTION(loadLanguage);
+	ADD_GLOBAL_FUNCTION(resetTextMap);
+	ADD_GLOBAL_FUNCTION(reloadText);
 }
 
 }//namespace
