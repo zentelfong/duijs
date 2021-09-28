@@ -1104,6 +1104,10 @@ namespace DuiLib {
 		else if( _tcsicmp(pstrName, _T("drag")) == 0 ) SetDragEnable(_tcsicmp(pstrValue, _T("true")) == 0);
 		else if( _tcsicmp(pstrName, _T("drop")) == 0 ) SetDropEnable(_tcsicmp(pstrValue, _T("true")) == 0);
 		else if( _tcsicmp(pstrName, _T("resourcetext")) == 0 ) SetResourceText(_tcsicmp(pstrValue, _T("true")) == 0);
+		else if (_tcsicmp(pstrName, _T("rtext")) == 0) {
+			SetResourceText(true);
+			SetText(pstrValue);
+		}
 		else if( _tcsicmp(pstrName, _T("text")) == 0 ) SetText(pstrValue);
 		else if( _tcsicmp(pstrName, _T("tooltip")) == 0 ) SetToolTip(pstrValue);
 		else if( _tcsicmp(pstrName, _T("userdata")) == 0 ) SetUserData(pstrValue);

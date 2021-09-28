@@ -313,7 +313,7 @@ namespace DuiLib
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	//
-	static char* w2a(const wchar_t* lpszSrc, UINT   CodePage = CP_ACP)
+	static char* w2a(const wchar_t* lpszSrc, UINT   CodePage = DEFAULT_ACP)
 	{
 		if (lpszSrc != NULL)
 		{
@@ -329,7 +329,7 @@ namespace DuiLib
 		return NULL;
 	}
 
-	static wchar_t* a2w(const char* lpszSrc, UINT   CodePage = CP_ACP)
+	static wchar_t* a2w(const char* lpszSrc, UINT   CodePage = DEFAULT_ACP)
 	{
 		if (lpszSrc != NULL)
 		{

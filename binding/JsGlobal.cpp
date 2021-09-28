@@ -161,6 +161,16 @@ static Value getAppDataPath(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value loadLanguage(Context& context, ArgList& args) {
+	if (args[0].IsString()) {
+		JsString xml(args[0]);
+		bool rslt = CResourceManager::GetInstance()->LoadLanguage(xml);
+		return context.NewBool(rslt);
+	}
+	return undefined_value;
+}
+
+
 
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
 
@@ -187,6 +197,7 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(getCommandLines);
 
 	ADD_GLOBAL_FUNCTION(getAppDataPath);
+	ADD_GLOBAL_FUNCTION(loadLanguage);
 }
 
 }//namespace

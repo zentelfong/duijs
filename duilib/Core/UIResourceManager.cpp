@@ -269,6 +269,10 @@ namespace DuiLib {
 						pstrText = pstrValue;
 					}
 				}
+
+				//如果没有value属性则从data内读取
+				if(!pstrText) pstrText = node.GetValue();
+
 				if( pstrId == NULL ||  pstrText == NULL) continue;
 
 				CDuiString *lpstrFind = static_cast<CDuiString *>(m_mTextResourceHashMap.Find(pstrId));
