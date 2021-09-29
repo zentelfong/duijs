@@ -1,6 +1,7 @@
 #pragma once
 #include "quickjs/qjs.h"
 #include <functional>
+#include <thread>
 
 namespace duijs {
 
@@ -31,7 +32,8 @@ public:
 private:
 	qjs::Runtime* runtime_;
 	qjs::Context* context_;
-	TaskManager* manager_;
+	TaskManager*  manager_;
+	std::thread::id thread_id_;
 };
 
 

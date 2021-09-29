@@ -1,7 +1,37 @@
 #include "thread.h"
 
+#ifdef _WIN32
+#include <Windows.h>
 
-Thread::Thread() {
+// As seen on MSDN.
+// http://msdn.microsoft.com/en-us/library/xcb2z8hs(VS.71).aspx
+#define MSDEV_SET_THREAD_NAME  0x406D1388
+typedef struct tagTHREADNAME_INFO {
+	DWORD dwType;
+	LPCSTR szName;
+	DWORD dwWorkThreadID;
+	DWORD dwFlags;
+} THREADNAME_INFO;
+
+void SetThreadName(DWORD dwWorkThreadID, LPCSTR szWorkThreadName) {
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = szWorkThreadName;
+	info.dwWorkThreadID = dwWorkThreadID;
+	info.dwFlags = 0;
+
+	__try {
+		RaiseException(MSDEV_SET_THREAD_NAME, 0, sizeof(info) / sizeof(DWORD),
+			reinterpret_cast<ULONG_PTR*>(&info));
+	}
+	__except (EXCEPTION_CONTINUE_EXECUTION) {
+	}
+}
+#endif
+
+Thread::Thread(const char* name) {
+	if (name)
+		name_ = name;
 }
 
 Thread::~Thread() {
@@ -19,6 +49,9 @@ void Thread::PostTask(Task task) {
 void Thread::Start() {
 	quit_ = false;
 	thread_.reset(new std::thread([this]() {
+#if defined(WIN32) && defined(_DEBUG)
+		SetThreadName(GetCurrentThreadId(), name_.c_str());
+#endif
 		while (!quit_) {
 			auto task = PopTask();
 			if (task) {

@@ -79,6 +79,9 @@ JsEngine::~JsEngine() {
 bool JsEngine::Init() {
 	assert(!runtime_);
 	assert(!context_);
+
+	thread_id_ = std::this_thread::get_id();
+
 	runtime_ = new qjs::Runtime();
 	context_ = new qjs::Context(runtime_);
 	manager_ = new TaskManager(context_);

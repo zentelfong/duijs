@@ -5,7 +5,7 @@
 using namespace cjsonpp;
 
 Storage::Storage() 
-	:sqlite_(nullptr)
+	:sqlite_(nullptr), thread_("Storage")
 {
 	thread_.Start();
 }

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <memory>
 #include <atomic>
+#include <string>
 #include "waitable_event.h"
 
 
@@ -12,7 +13,7 @@ using Task = std::function<void()>;
 
 class Thread {
 public:
-	Thread();
+	Thread(const char* name);
 	~Thread();
 
 	void PostTask(Task task);
@@ -24,6 +25,7 @@ private:
 
 	AutoResetWaitableEvent event_;
 
+	std::string name_;
 	std::atomic<bool> quit_;
 	std::queue<Task> tasks_;
 	std::mutex task_lock_;
