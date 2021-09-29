@@ -26,6 +26,8 @@ public:
 	qjs::Context* context() { return context_; }
 
 	static JsEngine* get(qjs::Context& context);
+
+	void Print(const char* str, size_t len);
 private:
 	qjs::Runtime* runtime_;
 	qjs::Context* context_;

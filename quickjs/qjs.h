@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include <array>
+#include <functional>
 #include <assert.h>
 
 namespace qjs {
@@ -126,56 +127,12 @@ private:
 };
 
 
-
-
 class Context {
 public:
-	Context(Runtime* runtime)
-		:context_(JS_NewContext(runtime->runtime_))
-	{
-		Init(0, nullptr);
-	}
-
-
-	Context(Runtime* runtime, int argc, char** argv) 
-		:context_(JS_NewContext(runtime->runtime_))
-	{
-		Init(argc, argv);
-	}
-
-
-	Context(JSContext* context)
-		:context_(JS_DupContext(context))
-	{
-	}
-
-	Context(const Context& context)
-		:context_(JS_DupContext(context.context_))
-	{
-	}
-
-	Context(Context&& context) noexcept {
-		context_ = context.context_;
-		context.context_ = nullptr;
-	}
-
-	Context& operator=(const Context& context) {
-		if (context.context_ == context_) {
-			return *this;
-		}
-
-		if(context_)
-			JS_FreeContext(context_);
-		context_ = JS_DupContext(context.context_);
-		return *this;
-	}
-
-	~Context() {
-		modules_.clear();
-		if (context_) {
-			JS_FreeContext(context_);
-		}
-	}
+	Context(Runtime* runtime);
+	Context(Runtime* runtime, int argc, char** argv);
+	Context(JSContext* context);
+	~Context();
 
 	JSRuntime* runtime() {
 		return JS_GetRuntime(context_);
@@ -192,6 +149,9 @@ public:
 
 	void SetUserData(void* ud) { user_data_ = ud; }
 	void* user_data() { return user_data_; }
+	void SetLogFunc(std::function<void(const std::string& msg)> func) {
+		log_func_ = func;
+	}
 
 	Value ParseJson(const char* buf, size_t buf_len,
 		const char* filename);
@@ -248,9 +208,7 @@ public:
 
 	void ExecuteJobs();
 
-	void DumpError() {
-		js_std_dump_error(context_);
-	}
+	void DumpError();
 
 	//创建模块
 	Module* NewModule(const char* name);
@@ -267,6 +225,8 @@ public:
 		JS_RunGC(JS_GetRuntime(context_));
 	}
 private:
+	QJS_DISALLOW_COPY_AND_ASSIGN(Context);
+
 	friend class Value;
 	friend class Module;
 
@@ -276,6 +236,8 @@ private:
 	void* user_data_{nullptr};
 	JSContext* context_;
 	std::map<JSModuleDef*,std::unique_ptr<Module>> modules_;
+
+	std::function<void(const std::string& msg)> log_func_;
 };
 
 
@@ -463,6 +425,10 @@ public:
 
 	bool ToBool() const {
 		return JS_ToBool(context_, value_) == 1;
+	}
+
+	bool IsError() const {
+		return JS_IsError(context_, value_) != 0;
 	}
 
 

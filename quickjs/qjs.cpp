@@ -57,6 +57,33 @@ int Module::OnInit(JSContext* ctx, JSModuleDef* m) {
 	return 0;
 }
 
+Context::Context(Runtime* runtime)
+	:context_(JS_NewContext(runtime->runtime_))
+{
+	Init(0, nullptr);
+}
+
+
+Context::Context(Runtime* runtime, int argc, char** argv)
+	:context_(JS_NewContext(runtime->runtime_))
+{
+	Init(argc, argv);
+}
+
+
+Context::Context(JSContext* context)
+	:context_(JS_DupContext(context))
+{
+}
+
+Context::~Context() {
+	modules_.clear();
+	if (context_) {
+		JS_FreeContext(context_);
+	}
+}
+
+
 void Context::Init(int argc, char** argv) {
 	JS_SetContextOpaque(context_, this);
 	//js_init_module_std(context_, "std");
@@ -74,8 +101,9 @@ void Context::ExecuteJobs() {
 	for (;;) {
 		err = JS_ExecutePendingJob(JS_GetRuntime(context_), &ctx1);
 		if (err <= 0) {
-			if (err < 0)
+			if (err < 0) {
 				DumpError();
+			}
 			break;
 		}
 	}
@@ -118,6 +146,7 @@ bool Context::LoadByteCode(const uint8_t* buf, size_t buf_len) {
 
 	Value val(context_,JS_EvalFunction(context_, obj));
 	if (val.IsException()) {
+		DumpError();
 		return false;
 	}
 	return true;
@@ -188,6 +217,32 @@ Value Context::ThrowInternalError(const char* fmt, ...) {
 Value Context::ThrowOutOfMemory() {
 	return Value(context_, JS_ThrowOutOfMemory(context_));
 }
+
+void Context::DumpError() {
+	Value exception(context_,JS_GetException(context_));
+	if (exception.IsNull()) {
+		return;
+	}
+
+	std::string msg = exception.ToStdString();
+	if(!msg.empty())
+		msg.append("\n");
+
+	if (exception.IsError()) {
+		msg.append("[Exception]\n");
+		Value stack = exception.GetProperty("stack");
+		if (!stack.IsUndefined()) {
+			msg.append(stack.ToStdString());
+		}
+	}
+	
+	if (log_func_) {
+		log_func_(msg);
+	} else {
+		printf("%s", msg.c_str());
+	}
+}
+
 
 uint8_t* Value::ToBuffer(size_t* psize) const {
 	size_t aoffset, asize, size;

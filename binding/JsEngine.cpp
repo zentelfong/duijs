@@ -134,8 +134,11 @@ bool JsEngine::Init() {
 	RegisterTreeNode(module);
 	RegisterTreeView(module);
 
-
 	RegisterStorage(module);
+
+	context_->SetLogFunc([this](const std::string& msg) {
+		Print(msg.c_str(), msg.length());
+		});
 	return true;
 }
 
@@ -194,5 +197,13 @@ bool JsEngine::CancelDelayTask(uint32_t id) {
 JsEngine* JsEngine::get(qjs::Context& context) {
 	return (JsEngine*)context.user_data();
 }
+
+void JsEngine::Print(const char* str, size_t len) {
+	auto debug = context_->Global().GetProperty("print");
+	if (debug.IsFunction()) {
+		debug.Call(context_->NewString(str, len));
+	}
+}
+
 
 }//namespace

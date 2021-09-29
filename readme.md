@@ -1,6 +1,6 @@
 # duijs
 
-duijs（duilib for javascript），使用javascript来编写windows客户端程序。为了方便duilib者使用本库，JS中的函数命名和duilib库的C++函数名一致，并提供了typescript的接口文件，在vscode中接口可以自动补全。
+duijs（duilib for javascript），使用javascript来编写windows客户端程序。为了方便duilib者使用本库，JS中的函数命名和duilib库的C++函数名一致，并提供了typescript的接口文件，在vscode中接口可以自动补全。duilib使用的是[DuiLib_Ultimate](https://github.com/qdtroy/DuiLib_Ultimate)。
 
 **特性：**
 
