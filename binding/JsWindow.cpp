@@ -339,7 +339,29 @@ LRESULT JsWindow::OnMouseHover(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 #endif
 
 LRESULT JsWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
-	if (this_.HasProperty("handleCustomMessage")) {
+	if (uMsg == WM_DROPFILES) {
+		if (this_.HasProperty("onDropFiles")) {
+			HDROP hDrop = reinterpret_cast<HDROP>(wParam);
+			TCHAR filename[MAX_PATH];
+
+			auto list = context_->NewArray();
+
+			UINT count = DragQueryFile(hDrop, -1, NULL, 0);
+			for (UINT i = 0; i < count; ++i) {
+				UINT size = DragQueryFile(hDrop, i, filename, MAX_PATH);
+				if (size > 0) {
+					filename[size] = '\0';
+					list.SetProperty(i, toValue(*context_, filename));
+				}
+			}
+			DragFinish(hDrop);
+			Value result = this_.Invoke("onDropFiles", list);
+			if (result.IsException()) {
+				context_->DumpError();
+			}
+			return 0;
+		}
+	} else if (this_.HasProperty("handleCustomMessage")) {
 		Value result = this_.Invoke("handleCustomMessage", context_->NewUint32(uMsg),
 			context_->NewUint32(wParam), context_->NewUint32(lParam));
 		if (result.IsException()) {
@@ -434,6 +456,12 @@ static Value manager(JsWindow* pThis, Context& context) {
 	return pThis->js_manager();
 }
 
+static Value dragAcceptFiles(JsWindow* pThis, Context& context, ArgList& args) {
+	DragAcceptFiles(*pThis, args[0].ToBool());
+	return undefined_value;
+}
+
+
 
 void RegisterWindow(qjs::Module* module) {
 	auto window = module->ExportClass<JsWindow>("Window");
@@ -448,6 +476,7 @@ void RegisterWindow(qjs::Module* module) {
 	window.AddFunc<resizeClient>("resizeClient");
 	window.AddFunc<sendMessage>("sendMessage");
 	window.AddFunc<postMessage>("postMessage");
+	window.AddFunc<dragAcceptFiles>("dragAcceptFiles");
 	window.AddGet<manager>("manager");
 
 

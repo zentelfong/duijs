@@ -14,6 +14,7 @@ class DebugWindow extends dui.Window{
 	//继承自父类
 	async initWindow(){
 		let mgr = this.manager;
+		this.dragAcceptFiles(true);
 		this.editOut = <dui.RichEdit>mgr.findControl("editOut");
 		this.editInput = <dui.Edit>mgr.findControl("editInput");
 		this.config = new Config();
@@ -53,6 +54,10 @@ class DebugWindow extends dui.Window{
 		this.editOut.appendText(text.toString());
 		this.editOut.appendText("\n");
 		this.editOut.endDown();
+	}
+
+	onDropFiles(list:[string]):void{
+		print(list);
 	}
 }
 
