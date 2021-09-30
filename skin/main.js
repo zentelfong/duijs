@@ -29,7 +29,8 @@ class TestWindow extends Window{
 	}
 	
 	onDestroy(){
-		postQuitMessage(0);
+		this.timer.killTimer();
+		//postQuitMessage(0);
 	}
 
 	createControl(cname){

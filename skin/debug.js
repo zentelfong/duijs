@@ -44,7 +44,14 @@ class DebugWindow extends dui.Window {
         this.editOut.endDown();
     }
     onDropFiles(list) {
-        print(list);
+        try {
+            for (const file of list) {
+                dui.execFile(file);
+            }
+        }
+        catch (e) {
+            this.print(e);
+        }
     }
 }
 let debugWindow = new DebugWindow();

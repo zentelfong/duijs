@@ -141,6 +141,34 @@ static Value exec(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value execFile(Context& context, ArgList& args) {
+	if (args[0].IsString()) {
+		auto file = args[0].ToString();
+		
+		DWORD buf_len;
+		BYTE* buf;
+
+#if _UNICODE
+		TCHAR errorMsg[64];
+		TCHAR* name = a2w(file.str(), CP_UTF8);
+		buf = CResourceManager::LoadFile(name, &buf_len, errorMsg);
+		delete[] name;
+#else
+		buf = CResourceManager::LoadFile(module_name, &buf_len, errorMsg);
+#endif
+
+		if (!buf) {
+			return context.ThrowInternalError("cant load js:%s",file.str());
+		}
+		auto rtn = context.Excute((char*)buf, buf_len, file.str());
+		delete[] buf;
+		return rtn;
+	}
+	return undefined_value;
+}
+
+
+
 static Value getAppDataPath(Context& context, ArgList& args) {
 	if (args[0].IsString()) {
 		JsString name(args[0]);
@@ -201,6 +229,7 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(postQuitMessage);
 	ADD_GLOBAL_FUNCTION(runGC);
 	ADD_GLOBAL_FUNCTION(exec);
+	ADD_GLOBAL_FUNCTION(execFile);
 	ADD_GLOBAL_FUNCTION(messageBox);
 	ADD_GLOBAL_FUNCTION(showConsole);
 	ADD_GLOBAL_FUNCTION(getCommandLines);

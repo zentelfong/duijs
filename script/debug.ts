@@ -57,7 +57,13 @@ class DebugWindow extends dui.Window{
 	}
 
 	onDropFiles(list:[string]):void{
-		print(list);
+		try{
+			for (const file of list) {
+				dui.execFile(file);
+			}
+		}catch(e){
+			this.print(e);
+		}
 	}
 }
 
@@ -69,7 +75,11 @@ debugWindow.showWindow();
 
 globalThis.dui = dui;
 globalThis.print = function() {
-    debugWindow.print(format.apply(null, arguments));
+	debugWindow.print(format.apply(null, arguments));
 }
 
+//申明为全局
+declare global{
+	function print(...arg:any):void;
+}
 

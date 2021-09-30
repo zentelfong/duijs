@@ -54,7 +54,12 @@ namespace DuiLib {
 	BYTE* CResourceManager::LoadFile(LPCTSTR pstrFilename, DWORD* pSize, LPTSTR lpstrErrorMsg) {
 		CDuiString sFile = CPaintManagerUI::GetResourcePath();
 		if (CPaintManagerUI::GetResourceZip().IsEmpty()) {
-			sFile += pstrFilename;
+			if (pstrFilename[0] && pstrFilename[1] == ':') {
+				sFile = pstrFilename;
+			} else {
+				sFile += pstrFilename;
+			}
+
 			HANDLE hFile = ::CreateFile(sFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (hFile == INVALID_HANDLE_VALUE) return _Failed(_T("Error opening file"));
 			DWORD dwSize = ::GetFileSize(hFile, NULL);
