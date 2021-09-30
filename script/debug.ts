@@ -57,6 +57,8 @@ class DebugWindow extends dui.Window{
 	}
 
 	onDropFiles(list:[string]):void{
+		let global = <any>globalThis;
+		global._DEBUG = true;
 		try{
 			for (const file of list) {
 				dui.execFile(file);
@@ -64,6 +66,7 @@ class DebugWindow extends dui.Window{
 		}catch(e){
 			this.print(e);
 		}
+		global._DEBUG = false;
 	}
 }
 
@@ -80,6 +83,7 @@ globalThis.print = function() {
 
 //申明为全局
 declare global{
+	const _DEBUG:boolean;
 	function print(...arg:any):void;
 }
 

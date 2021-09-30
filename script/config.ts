@@ -28,5 +28,3 @@ export class Config extends Storage {
         return data.code == 0;
     }
 }
-
-

@@ -1,6 +1,6 @@
 import {Window,Label,postQuitMessage, Timer,Storage, runGC ,WS_OVERLAPPEDWINDOW,messageBox, MB_OKCANCEL} from "DuiLib"
 
-class TestWindow extends Window{
+export class TestWindow extends Window{
 	constructor(){
 		super();
 		this.test();
@@ -48,24 +48,26 @@ class TestWindow extends Window{
 	}
 }
 
-let testWindow = new TestWindow();
+if(_DEBUG){
+	let testWindow = new TestWindow();
 
-testWindow.create("test window",WS_OVERLAPPEDWINDOW);
-testWindow.centerWindow();
-testWindow.showWindow();
-
-let label = testWindow.manager.findControl("testLabel");
-label.setTextColor(0xff0000);
-
-async function testStorage(){
-	let storage = new Storage();
-	let code = await storage.open("test.db");
-	print("open test.db",code);
-	let rslt = await storage.exec("select * from test");
-	print("select",rslt.code,rslt.data);
-	code = await storage.close();
-	print("close test.db",code);
+	testWindow.create("test window",WS_OVERLAPPEDWINDOW);
+	testWindow.centerWindow();
+	testWindow.showWindow();
+	
+	let label = testWindow.manager.findControl("testLabel");
+	label.setTextColor(0xff0000);
+	
+	async function testStorage(){
+		let storage = new Storage();
+		let code = await storage.open("test.db");
+		print("open test.db",code);
+		let rslt = await storage.exec("select * from test");
+		print("select",rslt.code,rslt.data);
+		code = await storage.close();
+		print("close test.db",code);
+	}
+	
+	testStorage();
 }
-
-testStorage();
 
