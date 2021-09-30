@@ -219,7 +219,7 @@ namespace DuiLib {
 		bool IsUpdateNeeded() const;
 		void NeedUpdate();
 		void Invalidate();
-		void Invalidate(RECT& rcItem);
+		void Invalidate(const RECT& rcItem);
 
 		LPCTSTR GetName() const;
 		HDC GetPaintDC() const;
@@ -233,9 +233,9 @@ namespace DuiLib {
 		SIZE GetInitSize();
 		void SetInitSize(int cx, int cy);
 		RECT& GetSizeBox();
-		void SetSizeBox(RECT& rcSizeBox);
+		void SetSizeBox(const RECT& rcSizeBox);
 		RECT& GetCaptionRect();
-		void SetCaptionRect(RECT& rcCaption);
+		void SetCaptionRect(const RECT& rcCaption);
 		SIZE GetRoundCorner() const;
 		void SetRoundCorner(int cx, int cy);
 		SIZE GetMinInfo() const;
@@ -253,7 +253,7 @@ namespace DuiLib {
 		bool IsLayered();
 		void SetLayered(bool bLayered);
 		RECT& GetLayeredInset();
-		void SetLayeredInset(RECT& rcLayeredInset);
+		void SetLayeredInset(const RECT& rcLayeredInset);
 		BYTE GetLayeredOpacity();
 		void SetLayeredOpacity(BYTE nOpacity);
 		LPCTSTR GetLayeredImage();

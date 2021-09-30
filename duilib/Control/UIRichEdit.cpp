@@ -1345,7 +1345,7 @@ err:
 		nEndChar = cr.cpMax;
 	}
 
-	int CRichEditUI::SetSel(CHARRANGE &cr)
+	int CRichEditUI::SetSel(const CHARRANGE &cr)
 	{ 
 		LRESULT lResult;
 		TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr, &lResult); 

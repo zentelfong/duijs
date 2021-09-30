@@ -434,12 +434,12 @@ static Value setUserData(CControlUI* pThis, Context& context, ArgList& args) {
 
 
 static Value setTag(CControlUI* pThis, Context& context, ArgList& args) {
-	pThis->SetTag(args[0].ToInt32());
+	pThis->SetTag(args[0].ToInt64());
 	return undefined_value;
 }
 
 static Value getTag(CControlUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->GetTag());
+	return context.NewInt64((int64_t)pThis->GetTag());
 }
 
 static Value setVisible(CControlUI* pThis, Context& context, ArgList& args) {

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "cJSONPP.h"
+#include "cjsonpp.h"
 #include <functional>
 #include <string>
 #include <unordered_map>

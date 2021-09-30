@@ -55,14 +55,14 @@ void Line::Draw(HDC hdc, const POINT& pos, uint32_t style) {
 		HBITMAP bmp = paragraph_->LoadCharBmp(content[i]);
 		if (bmp) {
 			//绘制图片
-			RECT rc = { pos.x + width,pos.y,0,0 };
+			RECT rc = { pos.x + (LONG)width,pos.y,0,0 };
 			rc.right = rc.left + paragraph_->bmpSize_;
 			rc.bottom = rc.top + paragraph_->bmpSize_;
 			DrawBitmap(hdc, bmp, rc);
 			width += paragraph_->bmpSize_;
 		} else {
 			//绘制文本
-			RECT rc = { pos.x + width,pos.y,0,0 };
+			RECT rc = { pos.x + (LONG)width,pos.y,0,0 };
 			rc.right = rc.left + paragraph_->bmpSize_;
 			rc.bottom = rc.top + paragraph_->bmpSize_;
 			width += DrawChar(hdc, rc, content[i]);
@@ -134,13 +134,13 @@ void Paragraph::AddFace(uint32_t faceId) {
 SIZE Paragraph::GetCharSize(HDC hdc, uint32_t ch) {
 	//表情
 	if (ch >= FACE_ID) {
-		SIZE sz = { bmpSize_,bmpSize_ };
+		SIZE sz = { (LONG)bmpSize_,(LONG)bmpSize_ };
 		return sz;
 	}
 
 	//emoji
 	if (LoadCharBmp(ch)) {
-		SIZE sz = { bmpSize_,bmpSize_ };
+		SIZE sz = { (LONG)bmpSize_,(LONG)bmpSize_ };
 		return sz;
 	}
 	

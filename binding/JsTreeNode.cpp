@@ -78,7 +78,7 @@ static Value getParentNode(CTreeNodeUI* pThis, Context& context, ArgList& args) 
 
 
 static Value getCountChild(CTreeNodeUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->GetCountChild());
+	return toValue(context, (int32_t)pThis->GetCountChild());
 }
 
 

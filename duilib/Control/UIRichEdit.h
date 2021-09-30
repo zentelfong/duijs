@@ -50,7 +50,7 @@ namespace DuiLib {
 		void SetModify(bool bModified = true) const;
 		void GetSel(CHARRANGE &cr) const;
 		void GetSel(long& nStartChar, long& nEndChar) const;
-		int SetSel(CHARRANGE &cr);
+		int SetSel(const CHARRANGE &cr);
 		int SetSel(long nStartChar, long nEndChar);
 		void ReplaceSel(LPCTSTR lpszNewText, bool bCanUndo);
 		void ReplaceSelW(LPCWSTR lpszNewText, bool bCanUndo = false);

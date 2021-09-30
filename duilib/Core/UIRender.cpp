@@ -1620,10 +1620,10 @@ namespace DuiLib {
 			Gdiplus::RectF rectF((Gdiplus::REAL)rc.left, (Gdiplus::REAL)rc.top, (Gdiplus::REAL)(rc.right - rc.left), (Gdiplus::REAL)(rc.bottom - rc.top));
 			Gdiplus::SolidBrush brush(Gdiplus::Color(254, GetBValue(dwTextColor), GetGValue(dwTextColor), GetRValue(dwTextColor)));
 
-			Gdiplus::StringFormat stringFormat = Gdiplus::StringFormat::GenericTypographic();
+			Gdiplus::StringFormat* stringFormat = Gdiplus::StringFormat::GenericTypographic()->Clone();
 
 			if ((uStyle & DT_END_ELLIPSIS) != 0) {
-				stringFormat.SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
+				stringFormat->SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
 			}
 
 			int formatFlags = 0;
@@ -1634,39 +1634,39 @@ namespace DuiLib {
 				formatFlags |= Gdiplus::StringFormatFlagsNoWrap;
 			}
 
-			stringFormat.SetFormatFlags(formatFlags);
+			stringFormat->SetFormatFlags(formatFlags);
 
 			if ((uStyle & DT_LEFT) != 0) {
-				stringFormat.SetAlignment(Gdiplus::StringAlignmentNear);
+				stringFormat->SetAlignment(Gdiplus::StringAlignmentNear);
 			}
 			else if ((uStyle & DT_CENTER) != 0) {
-				stringFormat.SetAlignment(Gdiplus::StringAlignmentCenter);
+				stringFormat->SetAlignment(Gdiplus::StringAlignmentCenter);
 			}
 			else if ((uStyle & DT_RIGHT) != 0) {
-				stringFormat.SetAlignment(Gdiplus::StringAlignmentFar);
+				stringFormat->SetAlignment(Gdiplus::StringAlignmentFar);
 			}
 			else {
-				stringFormat.SetAlignment(Gdiplus::StringAlignmentNear);
+				stringFormat->SetAlignment(Gdiplus::StringAlignmentNear);
 			}
-			stringFormat.GenericTypographic();
+			stringFormat->GenericTypographic();
 			if ((uStyle & DT_TOP) != 0) {
-				stringFormat.SetLineAlignment(Gdiplus::StringAlignmentNear);
+				stringFormat->SetLineAlignment(Gdiplus::StringAlignmentNear);
 			}
 			else if ((uStyle & DT_VCENTER) != 0) {
-				stringFormat.SetLineAlignment(Gdiplus::StringAlignmentCenter);
+				stringFormat->SetLineAlignment(Gdiplus::StringAlignmentCenter);
 			}
 			else if ((uStyle & DT_BOTTOM) != 0) {
-				stringFormat.SetLineAlignment(Gdiplus::StringAlignmentFar);
+				stringFormat->SetLineAlignment(Gdiplus::StringAlignmentFar);
 			}
 			else {
-				stringFormat.SetLineAlignment(Gdiplus::StringAlignmentNear);
+				stringFormat->SetLineAlignment(Gdiplus::StringAlignmentNear);
 			}
 #ifdef UNICODE
 			if ((uStyle & DT_CALCRECT) != 0)
 			{
 				Gdiplus::RectF bounds;
 
-				graphics.MeasureString(pstrText, -1, &font, rectF, &stringFormat, &bounds);
+				graphics.MeasureString(pstrText, -1, &font, rectF, stringFormat, &bounds);
 
 				// MeasureString存在计算误差，这里加一像素
 				rc.bottom = rc.top + (long)bounds.Height + 1;
@@ -1674,7 +1674,7 @@ namespace DuiLib {
 			}
 			else
 			{
-				graphics.DrawString(pstrText, -1, &font, rectF, &stringFormat, &brush);
+				graphics.DrawString(pstrText, -1, &font, rectF, stringFormat, &brush);
 			}
 #else
 			DWORD dwSize = MultiByteToWideChar(CP_ACP, 0, pstrText, -1, NULL, 0);
@@ -1686,18 +1686,20 @@ namespace DuiLib {
 				if ((uStyle & DT_CALCRECT) != 0)
 				{
 					Gdiplus::RectF bounds;
-					graphics.MeasureString(pcwszDest, -1, &font, rectF, &stringFormat, &bounds);
+					graphics.MeasureString(pcwszDest, -1, &font, rectF, stringFormat, &bounds);
 					rc.bottom = rc.top + (long)(bounds.Height * 1.06);
 					rc.right = rc.left + (long)(bounds.Width * 1.06);
 				}
 				else
 				{
-					graphics.DrawString(pcwszDest, -1, &font, rectF, &stringFormat, &brush);
+					graphics.DrawString(pcwszDest, -1, &font, rectF, stringFormat, &brush);
 				}
 				delete []pcwszDest;
 			}
 #endif
 			::SelectObject(hDC, hOldFont);
+
+			delete stringFormat;
 		}
 		else
 		{

@@ -11,7 +11,7 @@ static Value add(CTreeViewUI* pThis, Context& context, ArgList& args) {
 }
 
 static Value addAt(CTreeViewUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->AddAt(toTreeNode(args[0]),args[1].ToInt32()));
+	return toValue(context, (int32_t)pThis->AddAt(toTreeNode(args[0]),args[1].ToInt32()));
 }
 
 static Value remove(CTreeViewUI* pThis, Context& context, ArgList& args) {

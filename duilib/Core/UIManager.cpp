@@ -636,7 +636,7 @@ namespace DuiLib {
 		return m_rcSizeBox;
 	}
 
-	void CPaintManagerUI::SetSizeBox(RECT& rcSizeBox)
+	void CPaintManagerUI::SetSizeBox(const RECT& rcSizeBox)
 	{
 		m_rcSizeBox = rcSizeBox;
 	}
@@ -646,7 +646,7 @@ namespace DuiLib {
 		return m_rcCaption;
 	}
 
-	void CPaintManagerUI::SetCaptionRect(RECT& rcCaption)
+	void CPaintManagerUI::SetCaptionRect(const RECT& rcCaption)
 	{
 		m_rcCaption = rcCaption;
 	}
@@ -764,7 +764,7 @@ namespace DuiLib {
 		return m_rcLayeredInset;
 	}
 
-	void CPaintManagerUI::SetLayeredInset(RECT& rcLayeredInset)
+	void CPaintManagerUI::SetLayeredInset(const RECT& rcLayeredInset)
 	{
 		m_rcLayeredInset = rcLayeredInset;
 		m_bLayeredChanged = true;
@@ -1228,7 +1228,7 @@ namespace DuiLib {
 
 						BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_nOpacity, AC_SRC_ALPHA };
 						POINT ptPos   = { rcWnd.left, rcWnd.top };
-						SIZE sizeWnd  = { dwWidth, dwHeight };
+						SIZE sizeWnd  = { (LONG)dwWidth, (LONG)dwHeight };
 						POINT ptSrc   = { 0, 0 };
 						g_fUpdateLayeredWindow(m_hWndPaint, m_hDcPaint, &ptPos, &sizeWnd, m_hDcOffscreen, &ptSrc, 0, &bf, ULW_ALPHA);
 					}
@@ -1873,8 +1873,9 @@ namespace DuiLib {
 		::InvalidateRect(m_hWndPaint, NULL, FALSE);
 	}
 
-	void CPaintManagerUI::Invalidate(RECT& rcItem)
+	void CPaintManagerUI::Invalidate(const RECT& param)
 	{
+		RECT rcItem = param;
 		if( rcItem.left < 0 ) rcItem.left = 0;
 		if( rcItem .top < 0 ) rcItem.top = 0;
 		if( rcItem.right < rcItem.left ) rcItem.right = rcItem.left;

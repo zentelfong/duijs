@@ -1243,7 +1243,7 @@ public:
 		JS_MarkValue(runtime, rfuncs_[1], mark_func);
 	}
 
-	Value Resolve(Value& val) {
+	Value Resolve(Value val) {
 		JSValue argv = val;
 		JSValue ret = JS_Call(ctx_, rfuncs_[kResolve], JS_UNDEFINED, 1, &argv);
 		return Value(ctx_, std::move(ret));
@@ -1254,7 +1254,7 @@ public:
 		return Value(ctx_, std::move(ret));
 	}
 
-	Value Reject(Value& val) {
+	Value Reject(Value val) {
 		JSValue argv = val;
 		JSValue ret = JS_Call(ctx_, rfuncs_[kReject], JS_UNDEFINED, 1, &argv);
 		return Value(ctx_, std::move(ret));

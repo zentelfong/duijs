@@ -106,7 +106,7 @@ static Value setWinStyle(CRichEditUI* pThis, Context& context, ArgList& args) {
 
 
 static Value getWinStyle(CRichEditUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->GetWinStyle());
+	return toValue(context, (uint32_t)pThis->GetWinStyle());
 }
 
 static Value setTextColor(CRichEditUI* pThis, Context& context, ArgList& args) {
@@ -129,7 +129,7 @@ static Value getLimitText(CRichEditUI* pThis, Context& context, ArgList& args) {
 }
 
 static Value getTextLength(CRichEditUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->GetTextLength(args[0].ToUint32()));
+	return toValue(context, (int32_t)pThis->GetTextLength(args[0].ToUint32()));
 }
 
 static Value getText(CRichEditUI* pThis, Context& context, ArgList& args) {
@@ -338,7 +338,7 @@ static Value getCharPos(CRichEditUI* pThis, Context& context, ArgList& args) {
 
 
 static Value lineFromChar(CRichEditUI* pThis, Context& context, ArgList& args) {
-	return toValue(context, pThis->LineFromChar(args[0].ToInt32()));
+	return toValue(context, (int32_t)pThis->LineFromChar(args[0].ToInt32()));
 }
 
 static Value posFromChar(CRichEditUI* pThis, Context& context, ArgList& args) {
