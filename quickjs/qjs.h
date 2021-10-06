@@ -29,6 +29,7 @@ public:
 	{
 		//JS_SetModuleLoaderFunc(runtime_, NULL, js_module_loader, NULL);
 		js_std_init_handlers(runtime_);
+		JS_SetHostPromiseRejectionTracker(runtime_, PromiseRejectionTracker,NULL);
 	}
 
 	~Runtime() {
@@ -56,6 +57,9 @@ public:
 		return runtime_; 
 	}
 private:
+	static void PromiseRejectionTracker(JSContext* ctx, JSValueConst promise,
+		JSValueConst reason,
+		JS_BOOL is_handled, void* opaque);
 	friend class Context;
 	QJS_DISALLOW_COPY_AND_ASSIGN(Runtime);
 	JSRuntime* runtime_;
@@ -223,6 +227,11 @@ public:
 
 	void RunGC() {
 		JS_RunGC(JS_GetRuntime(context_));
+	}
+
+	void Log(const std::string& msg) {
+		if (log_func_)
+			log_func_(msg);
 	}
 private:
 	QJS_DISALLOW_COPY_AND_ASSIGN(Context);

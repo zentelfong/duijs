@@ -10,6 +10,47 @@ const Value false_value(nullptr, JS_FALSE);
 const Value exception_value(nullptr, JS_EXCEPTION);
 const Value uninit_value(nullptr, JS_UNINITIALIZED);
 
+static void js_dump_obj(JSContext* ctx,std::string& msg, JSValueConst val)
+{
+	const char* str;
+
+	str = JS_ToCString(ctx, val);
+	if (str) {
+		msg.append(str);
+		JS_FreeCString(ctx, str);
+	}
+	else {
+		msg.append("[exception]");
+	}
+}
+
+static std::string dump_error(JSContext* ctx, JSValueConst exception_val)
+{
+	std::string msg;
+	JSValue val;
+	bool is_error = JS_IsError(ctx, exception_val);
+	js_dump_obj(ctx, msg, exception_val);
+	if (is_error) {
+		val = JS_GetPropertyStr(ctx, exception_val, "stack");
+		if (!JS_IsUndefined(val)) {
+			js_dump_obj(ctx, msg, val);
+		}
+		JS_FreeValue(ctx, val);
+	}
+	return msg;
+}
+
+
+void Runtime::PromiseRejectionTracker(JSContext* ctx, JSValueConst promise,
+	JSValueConst reason,
+	JS_BOOL is_handled, void* opaque) {
+	if (!is_handled) {
+		Context* context = Context::get(ctx);
+		context->Log(dump_error(ctx, reason));
+	}
+}
+
+
 
 
 Module::Module(JSContext* ctx, const char* name)
@@ -82,6 +123,8 @@ Context::~Context() {
 		JS_FreeContext(context_);
 	}
 }
+
+
 
 
 void Context::Init(int argc, char** argv) {
@@ -219,27 +262,15 @@ Value Context::ThrowOutOfMemory() {
 }
 
 void Context::DumpError() {
-	Value exception(context_,JS_GetException(context_));
-	if (exception.IsNull()) {
-		return;
-	}
+	JSValue exception_val;
+	exception_val = JS_GetException(context_);
+	std::string error = dump_error(context_, exception_val);
+	JS_FreeValue(context_, exception_val);
 
-	std::string msg = exception.ToStdString();
-	if(!msg.empty())
-		msg.append("\n");
-
-	if (exception.IsError()) {
-		msg.append("[Exception]\n");
-		Value stack = exception.GetProperty("stack");
-		if (!stack.IsUndefined()) {
-			msg.append(stack.ToStdString());
-		}
-	}
-	
 	if (log_func_) {
-		log_func_(msg);
+		log_func_(error);
 	} else {
-		printf("%s", msg.c_str());
+		printf("%s", error.c_str());
 	}
 }
 
