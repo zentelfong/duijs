@@ -96,7 +96,7 @@ static Value killTimer(Timer* pThis, Context& context, ArgList& args) {
 }
 
 //·µ»Øpromise
-static Value wait(Timer* pThis, Context& context, ArgList& args) {
+static Value delay(Timer* pThis, Context& context, ArgList& args) {
 	JsEngine* engine = JsEngine::get(context);
 
 	if (!args[0].IsNumber()) {
@@ -145,7 +145,7 @@ void RegisterTimer(qjs::Module* module) {
 	ctrl.AddCtor<createTimer>();
 	ctrl.AddFunc<setTimer>("setTimer");
 	ctrl.AddFunc<killTimer>("killTimer");
-	ctrl.AddFunc<wait>("wait");
+	ctrl.AddFunc<delay>("delay");
 }
 
 

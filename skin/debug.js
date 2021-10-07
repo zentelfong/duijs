@@ -52,7 +52,6 @@ class DebugWindow extends dui.Window {
             }
         }
         catch (e) {
-            this.print("script error");
             this.print(e);
         }
         global._DEBUG = false;

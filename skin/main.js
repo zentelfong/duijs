@@ -1,4 +1,4 @@
-import {Window,Label,postQuitMessage, Timer,Storage, runGC ,WS_OVERLAPPEDWINDOW,messageBox, MB_OKCANCEL} from "DuiLib"
+import {Window,Label, Timer, runGC ,WS_OVERLAPPEDWINDOW,messageBox, MB_OKCANCEL} from "DuiLib"
 
 export class TestWindow extends Window{
 	constructor(){

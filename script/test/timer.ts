@@ -23,9 +23,9 @@ timer.setTimer(onTimer,1000);
 async function delayTest(){
     let delayTimer = new Timer();
     print("do task");
-    await delayTimer.wait(1000);
+    await delayTimer.delay(1000);
     print("step");
-    await delayTimer.wait(2000);
+    await delayTimer.delay(2000);
     print("finish task");
 }
 
