@@ -51,6 +51,8 @@ namespace DuiLib {
 				m_pEditUI->ApplyAttributeList(pDefaultAttributes);
 			}
 
+			GetManager()->ApplyCss(m_pEditUI, _T("Edit"), NULL, NULL);
+
 			Add(m_pEditUI);
 		}
 		if (m_pComboBoxUI)
@@ -79,6 +81,7 @@ namespace DuiLib {
 				m_pComboBoxUI->ApplyAttributeList(pDefaultAttributes);
 			}
 
+			GetManager()->ApplyCss(m_pComboBoxUI, _T("Combo"), NULL, NULL);
 			Add(m_pComboBoxUI);
 		}
 		if (m_pEditUI)

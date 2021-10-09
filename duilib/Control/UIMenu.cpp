@@ -336,6 +336,9 @@ namespace DuiLib {
 			if( pDefaultAttributes ) {
 				m_pLayout->ApplyAttributeList(pDefaultAttributes);
 			}
+
+			m_pOwner->GetManager()->ApplyCss(m_pLayout, _T("Menu"), NULL, NULL);
+
 			m_pLayout->GetList()->SetAutoDestroy(false);
 
 			for( int i = 0; i < m_pOwner->GetCount(); i++ ) {
