@@ -187,6 +187,10 @@ namespace DuiLib {
 					if( pName && pStyle) {
 						pManager->AddStyle(pName, pStyle, shared);
 					}
+
+					//Style内容为css样式
+					LPCTSTR css = node.GetValue();
+					pManager->ParseCss(css);
 				}
 				else if (_tcsicmp(pstrClass, _T("Import")) == 0) {
 					nAttributes = node.GetAttributeCount();
@@ -493,7 +497,12 @@ namespace DuiLib {
 				if( pDefaultAttributes ) {
 					pControl->ApplyAttributeList(pDefaultAttributes);
 				}
+
+				// Process css style
+				pManager->ApplyCss(pControl, pstrClass,node.GetAttributeValue(_T("class")), 
+					node.GetAttributeValue(_T("name")));
 			}
+
 			// Process attributes
 			if( node.HasAttributes() ) {
 				TCHAR szValue[500] = { 0 };
@@ -504,6 +513,7 @@ namespace DuiLib {
 					pControl->SetAttribute(node.GetAttributeName(i), node.GetAttributeValue(i));
 				}
 			}
+
 			if( pManager ) {
 				if(pTreeView == NULL) {
 					pControl->SetManager(NULL, NULL, false);

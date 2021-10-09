@@ -46,6 +46,7 @@
 #include <gdiplus.h>
 #include <string>
 
+#include "Utils/CssSheet.h"
 #include "Utils/Utils.h"
 #include "Utils/unzip.h"
 #include "Utils/VersionHelpers.h"

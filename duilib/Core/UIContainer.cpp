@@ -553,6 +553,8 @@ namespace DuiLib
 				if( pDefaultAttributes ) {
 					m_pVerticalScrollBar->ApplyAttributeList(pDefaultAttributes);
 				}
+
+				m_pManager->ApplyCss(m_pVerticalScrollBar, _T("VScrollBar"), NULL, NULL);
 			}
 		}
 		else if( !bEnableVertical && m_pVerticalScrollBar ) {
@@ -571,6 +573,8 @@ namespace DuiLib
 				if( pDefaultAttributes ) {
 					m_pHorizontalScrollBar->ApplyAttributeList(pDefaultAttributes);
 				}
+
+				m_pManager->ApplyCss(m_pVerticalScrollBar, _T("HScrollBar"), NULL, NULL);
 			}
 		}
 		else if( !bEnableHorizontal && m_pHorizontalScrollBar ) {

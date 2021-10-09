@@ -2,8 +2,32 @@
 
 <Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
 
-  <Default name="VScrollBar" value="width=&quot;10&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='msgbox\scrollbar.png' source='18,0,28,34' corner='2,5,2,5'&quot; bknormalimage=&quot;file='msgbox\scrollbar.png' source='0,0,10,34' corner='2,5,2,5'&quot;"/>
-
+  <Style>
+	#minbtn{
+		width:28;
+		height:20;
+		tooltip:最小化;
+		normalimage:file='msgbox/btn_mini_normal.png';
+		hotimage:file='msgbox/btn_mini_highlight.png';
+		pushedimage:file='msgbox/btn_mini_down.png'
+	}
+	#closebtn{
+		width:39;
+		height:20;
+		tooltip:关闭;
+		normalimage:file='msgbox/btn_close_normal.png';
+		hotimage:file='msgbox/btn_close_highlight.png';
+		pushedimage:file='msgbox/btn_close_down.png';
+	}
+	VScrollBar{
+		width:10;
+		showbutton1:false;
+		showbutton2:false;
+		thumbnormalimage:file='msgbox/scrollbar.png' source='18,0,28,34' corner='2,5,2,5';
+		bknormalimage:file='msgbox/scrollbar.png' source='0,0,10,34' corner='2,5,2,5'
+	}
+  </Style>
+  
   <Font name="微软雅黑" size="12" default="true"/>
 
   <VerticalLayout bkcolor="#ff3c3c3c">
@@ -11,8 +35,8 @@
       <HorizontalLayout inset="8,0,0,0">
           <Label text="DuiJs调试窗口" valign="vcenter" align="left" textcolor="#FFEEEEEE" font="0"/>
       </HorizontalLayout>
-      <Button name="minbtn" width="28" height="20" tooltip="最小化" normalimage="file='msgbox/btn_mini_normal.png'" hotimage="file='msgbox/btn_mini_highlight.png'" pushedimage="file='msgbox/btn_mini_down.png' "/>
-      <Button name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='msgbox/btn_close_normal.png'" hotimage="file='msgbox/btn_close_highlight.png'" pushedimage="file='msgbox/btn_close_down.png' "/>
+      <Button name="minbtn"/>
+      <Button name="closebtn"/>
     </HorizontalLayout>
     
     <VerticalLayout bkcolor="#ff1e1e1e">

@@ -3824,6 +3824,48 @@ namespace DuiLib {
 		m_bUsedVirtualWnd = bUsed;
 	}
 
+
+	bool CPaintManagerUI::ParseCss(LPCTSTR pStrCss) 
+	{
+		if (pStrCss) 
+		{
+			return m_cssSheet.Parse(pStrCss);
+		}
+		return false;
+	}
+
+
+	void ApplyControlCss(CControlUI* pControl, std::shared_ptr<CssStyles> sheets) {
+		if (!sheets)
+			return;
+
+		for (auto itr = sheets->begin(); itr != sheets->end(); ++itr) 
+		{
+			pControl->SetAttribute(itr->first.c_str(), itr->second.c_str());
+		}
+	}
+
+	void CPaintManagerUI::ApplyCss(CControlUI* pControl, LPCTSTR pStrElement, LPCTSTR pStrClass, LPCTSTR pStrName)
+	{
+		std::shared_ptr<CssStyles> sheets;
+		
+		if (pStrElement) {
+			sheets = m_cssSheet.GetStylesByElement(pStrElement);
+			ApplyControlCss(pControl, sheets);
+		}
+
+		if (pStrClass) {
+			sheets = m_cssSheet.GetStylesByClass(pStrClass);
+			ApplyControlCss(pControl, sheets);
+		}
+
+		if (pStrName) {
+			sheets = m_cssSheet.GetStylesById(pStrName);
+			ApplyControlCss(pControl, sheets);
+		}
+	}
+
+
 	// 样式管理
 	void CPaintManagerUI::AddStyle(LPCTSTR pName, LPCTSTR pDeclarationList, bool bShared)
 	{

@@ -436,6 +436,8 @@ namespace DuiLib {
 		bool PreMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
 		void UsedVirtualWnd(bool bUsed);
 
+		bool ParseCss(LPCTSTR pStrCss);
+		void ApplyCss(CControlUI* pControl,LPCTSTR pStrElement, LPCTSTR pStrClass, LPCTSTR pStrName);
 	private:
 		CStdPtrArray* GetFoundControls();
 		static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);
@@ -540,6 +542,9 @@ namespace DuiLib {
 		bool m_bDragMode;
 		HBITMAP m_hDragBitmap;
 		
+		// css样式
+		CssSheet m_cssSheet;
+
 		//
 		static HINSTANCE m_hInstance;
 		static HINSTANCE m_hResourceInstance;
