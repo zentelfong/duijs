@@ -106,6 +106,7 @@ namespace DuiLib {
 		virtual void SetFixedWidth(int cx);      // 预设的参考值
 		virtual int GetFixedHeight() const;      // 实际大小位置使用GetPos获取，这里得到的是预设的参考值
 		virtual void SetFixedHeight(int cy);     // 预设的参考值
+		virtual SIZE GetFixedSize() const;
 		virtual int GetMinWidth() const;
 		virtual void SetMinWidth(int cx);
 		virtual int GetMaxWidth() const;

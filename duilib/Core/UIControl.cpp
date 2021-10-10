@@ -1223,6 +1223,14 @@ namespace DuiLib {
 		return m_cxyFixed;
 	}
 
+	SIZE CControlUI::GetFixedSize() const
+	{
+		SIZE cxyFixed = m_cxyFixed;
+		if (m_pManager != NULL) m_pManager->GetDPIObj()->Scale(&cxyFixed);
+		return cxyFixed;
+	}
+
+
 	bool CControlUI::Paint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	{
 		if (pStopControl == this) return false;

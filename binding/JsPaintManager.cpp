@@ -229,6 +229,10 @@ static Value findSubControlsByClass(CPaintManagerUI* pThis, Context& context, Ar
 }
 
 
+static Value setDpi(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	pThis->SetDPI(args[0].ToInt32());
+	return undefined_value;
+}
 
 
 void RegisterPaintManager(Module* module) {
@@ -280,6 +284,8 @@ void RegisterPaintManager(Module* module) {
 	ADD_FUNCTION(findSubControlByName);
 	ADD_FUNCTION(findSubControlByClass);
 	ADD_FUNCTION(findSubControlsByClass);
+	ADD_FUNCTION(setDpi);
+	
 }
 
 

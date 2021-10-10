@@ -85,6 +85,7 @@ namespace DuiLib
 
 	RECT CLabelUI::GetTextPadding() const
 	{
+		if (m_pManager != NULL) return m_pManager->GetDPIObj()->Scale(m_rcTextPadding);
 		return m_rcTextPadding;
 	}
 
@@ -111,7 +112,7 @@ namespace DuiLib
 
 	SIZE CLabelUI::EstimateSize(SIZE szAvailable)
 	{
-		if (m_cxyFixed.cx > 0 && m_cxyFixed.cy > 0) return m_cxyFixed;
+		if (m_cxyFixed.cx > 0 && m_cxyFixed.cy > 0) return GetFixedSize();
 
 		if ((szAvailable.cx != m_szAvailableLast.cx || szAvailable.cy != m_szAvailableLast.cy)) {
 			m_bNeedEstimateSize = true;
@@ -123,7 +124,7 @@ namespace DuiLib
 		if (m_bNeedEstimateSize) {
 			m_bNeedEstimateSize = false;
 			m_szAvailableLast = szAvailable;
-			m_cxyFixedLast = m_cxyFixed;
+			m_cxyFixedLast = GetFixedSize();
 			if ((m_uTextStyle & DT_SINGLELINE) != 0) {
 				if (m_cxyFixedLast.cy == 0) {
 					m_cxyFixedLast.cy = m_pManager->GetFontInfo(m_iFont)->tm.tmHeight + 8;
