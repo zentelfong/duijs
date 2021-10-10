@@ -35,8 +35,12 @@
       <HorizontalLayout inset="8,0,0,0">
           <Label text="DuiJs调试窗口" valign="vcenter" align="left" textcolor="#FFEEEEEE" font="0"/>
       </HorizontalLayout>
-      <Button name="minbtn"/>
-      <Button name="closebtn"/>
+
+      <Button name="minbtn" width="27" height="22" normalimage="file='common/sys_btn_min.png' source='0,0,26,22'" hotimage="file='common/sys_btn_min.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_min.png' source='54,0,80,22'"/>
+      <Button name="maxbtn" width="27" height="22" normalimage="file='common/sys_btn_max.png' source='0,0,26,22'" hotimage="file='common/sys_btn_max.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_max.png' source='54,0,80,22'"/>
+      <Button name="restorebtn"  visible="false" width="27" height="22" normalimage="file='common/sys_btn_restore.png' source='0,0,26,22'" hotimage="file='common/sys_btn_restore.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_restore.png' source='54,0,80,22'"/>
+      <Button name="closebtn" width="27" height="22" normalimage="file='common/sys_btn_close.png' source='0,0,26,22'" hotimage="file='common/sys_btn_close.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_close.png' source='54,0,80,22'"/>
+
     </HorizontalLayout>
     
     <VerticalLayout bkcolor="#ff1e1e1e">
