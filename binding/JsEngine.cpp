@@ -84,7 +84,7 @@ bool JsEngine::Init() {
 
 	runtime_ = new qjs::Runtime();
 	context_ = new qjs::Context(runtime_);
-	manager_ = new TaskManager(context_);
+	manager_ = new TaskManager();
 	context_->SetUserData(this);
 
 	JS_SetModuleLoaderFunc(runtime_->runtime(), NULL, jsModuleLoader, NULL);

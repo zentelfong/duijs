@@ -40,15 +40,23 @@ private:
 	TaskManager* manager_;
 };
 
+static DWORD tls = TlsAlloc();
 
-TaskManager::TaskManager(qjs::Context* context)
-	:context_(context),last_timer_id_(0)
+TaskManager* TaskManager::GetCurrent() {
+	return (TaskManager*)TlsGetValue(tls);
+}
+
+
+TaskManager::TaskManager()
+	:last_timer_id_(0)
 {
+	TlsSetValue(tls, this);
 	task_window_ = new TaskWindow(this);
 	task_window_->Create(NULL, _T("JSTaskWindow"), UI_WNDSTYLE_CONTAINER, UI_WNDSTYLE_CONTAINER);
 }
 
 TaskManager::~TaskManager() {
+	TlsFree(tls);
 	task_window_->Close();
 	task_window_->OnClose();
 }

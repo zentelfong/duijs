@@ -3,8 +3,6 @@
 #include <queue>
 #include <mutex>
 #include <unordered_map>
-#include "quickjs/qjs.h"
-
 
 namespace duijs {
 
@@ -13,8 +11,11 @@ class TaskWindow;
 
 class TaskManager {
 public:
-	TaskManager(qjs::Context* context);
+	TaskManager();
 	~TaskManager();
+
+	//获取当前线程的taskmanager
+	static TaskManager* GetCurrent();
 
 	void PostTask(js_task_t task);
 
@@ -29,7 +30,6 @@ private:
 	js_task_t PopTimerTask(uint32_t id);
 
 	TaskWindow* task_window_;
-	qjs::Context* context_;
 	uint32_t last_timer_id_;
 	std::mutex lock_;
 	std::queue<js_task_t> tasks_;
