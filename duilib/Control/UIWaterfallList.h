@@ -29,7 +29,7 @@ public:
 	CWaterfallListUI(void);
 	~CWaterfallListUI(void);
 
-    LPCTSTR GetClass() const { return DUI_CTR_WATERFALLLIST; }
+    LPCTSTR GetClass() const { return _T("WaterfallListUI"); }
     LPVOID GetInterface(LPCTSTR pstrName);
 
 	void NotifyCellSelect(int index);

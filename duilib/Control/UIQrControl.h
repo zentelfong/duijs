@@ -14,7 +14,7 @@ public:
 	virtual void PaintStatusImage(HDC hDC);//绘制二维码
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-	LPCTSTR GetClass() const { return DUI_CTR_QRCONTROL; }
+	LPCTSTR GetClass() const { return _T("QrControlUI"); }
 
 	//生成二维码图片
 	static HBITMAP GenQrImage(HDC hdc,LPCTSTR text,int size);
