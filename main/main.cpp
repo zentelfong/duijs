@@ -21,6 +21,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 		DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
 	}
 
+	LocalFree(szArglist);
+
 	duijs::JsEngine engine;
 	engine.Init();
 

@@ -319,28 +319,28 @@ namespace DuiLib {
 		return dwColor;
 	}
 
-	TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask, HINSTANCE instance)
-	{
+
+	LPBYTE ReadImageData(STRINGorID bitmap, LPCTSTR type, HINSTANCE instance, DWORD& dwSize) {
 		LPBYTE pData = NULL;
-		DWORD dwSize = 0;
-		do 
+		dwSize = 0;
+		do
 		{
-			if( type == NULL ) {
+			if (type == NULL) {
 				CDuiString sFile = CPaintManagerUI::GetResourcePath();
-				if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
+				if (CPaintManagerUI::GetResourceZip().IsEmpty()) {
 					sFile += bitmap.m_lpstr;
 					HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 						FILE_ATTRIBUTE_NORMAL, NULL);
-					if( hFile == INVALID_HANDLE_VALUE ) break;
+					if (hFile == INVALID_HANDLE_VALUE) break;
 					dwSize = ::GetFileSize(hFile, NULL);
-					if( dwSize == 0 ) break;
+					if (dwSize == 0) break;
 
 					DWORD dwRead = 0;
-					pData = new BYTE[ dwSize ];
-					::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
-					::CloseHandle( hFile );
+					pData = new BYTE[dwSize];
+					::ReadFile(hFile, pData, dwSize, &dwRead, NULL);
+					::CloseHandle(hFile);
 
-					if( dwRead != dwSize ) {
+					if (dwRead != dwSize) {
 						delete[] pData;
 						pData = NULL;
 						break;
@@ -350,34 +350,34 @@ namespace DuiLib {
 					sFile += CPaintManagerUI::GetResourceZip();
 					CDuiString sFilePwd = CPaintManagerUI::GetResourceZipPwd();
 					HZIP hz = NULL;
-					if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+					if (CPaintManagerUI::IsCachedResourceZip()) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
 					else
 					{
 #ifdef UNICODE
 						char* pwd = w2a((wchar_t*)sFilePwd.GetData());
 						hz = OpenZip(sFile.GetData(), pwd);
-						if(pwd) delete[] pwd;
+						if (pwd) delete[] pwd;
 #else
 						hz = OpenZip(sFile.GetData(), sFilePwd.GetData());
 #endif
 					}
-					if( hz == NULL ) break;
-					ZIPENTRY ze; 
-					int i = 0; 
+					if (hz == NULL) break;
+					ZIPENTRY ze;
+					int i = 0;
 					CDuiString key = bitmap.m_lpstr;
 					key.Replace(_T("\\"), _T("/"));
-					if( FindZipItem(hz, key, true, &i, &ze) != 0 ) break;
+					if (FindZipItem(hz, key, true, &i, &ze) != 0) break;
 					dwSize = ze.unc_size;
-					if( dwSize == 0 ) break;
-					pData = new BYTE[ dwSize ];
+					if (dwSize == 0) break;
+					pData = new BYTE[dwSize];
 					int res = UnzipItem(hz, i, pData, dwSize);
-					if( res != 0x00000000 && res != 0x00000600) {
+					if (res != 0x00000000 && res != 0x00000600) {
 						delete[] pData;
 						pData = NULL;
-						if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+						if (!CPaintManagerUI::IsCachedResourceZip()) CloseZip(hz);
 						break;
 					}
-					if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+					if (!CPaintManagerUI::IsCachedResourceZip()) CloseZip(hz);
 				}
 			}
 			else {
@@ -389,16 +389,16 @@ namespace DuiLib {
 					dllinstance = CPaintManagerUI::GetResourceDll();
 				}
 				HRSRC hResource = ::FindResource(dllinstance, bitmap.m_lpstr, type);
-				if( hResource == NULL ) break;
+				if (hResource == NULL) break;
 				HGLOBAL hGlobal = ::LoadResource(dllinstance, hResource);
-				if( hGlobal == NULL ) {
+				if (hGlobal == NULL) {
 					FreeResource(hResource);
 					break;
 				}
 
 				dwSize = ::SizeofResource(dllinstance, hResource);
-				if( dwSize == 0 ) break;
-				pData = new BYTE[ dwSize ];
+				if (dwSize == 0) break;
+				pData = new BYTE[dwSize];
 				::CopyMemory(pData, (LPBYTE)::LockResource(hGlobal), dwSize);
 				::FreeResource(hResource);
 			}
@@ -409,23 +409,113 @@ namespace DuiLib {
 			//读不到图片, 则直接去读取bitmap.m_lpstr指向的路径
 			HANDLE hFile = ::CreateFile(bitmap.m_lpstr, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 				FILE_ATTRIBUTE_NORMAL, NULL);
-			if( hFile == INVALID_HANDLE_VALUE ) break;
+			if (hFile == INVALID_HANDLE_VALUE) break;
 			dwSize = ::GetFileSize(hFile, NULL);
-			if( dwSize == 0 ) break;
+			if (dwSize == 0) break;
 
 			DWORD dwRead = 0;
-			pData = new BYTE[ dwSize ];
-			::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
-			::CloseHandle( hFile );
+			pData = new BYTE[dwSize];
+			::ReadFile(hFile, pData, dwSize, &dwRead, NULL);
+			::CloseHandle(hFile);
 
-			if( dwRead != dwSize ) {
+			if (dwRead != dwSize) {
 				delete[] pData;
 				pData = NULL;
 			}
 			break;
 		}
-		if (!pData)
+		return pData;
+	}
+
+	HBITMAP ToBitmap(Gdiplus::Image* image, UINT height, UINT width)
+	{
+		if (height <= 0 || width <= 0)
+			return NULL;
+
+
+		HDC WndDC = ::GetDC(NULL);
+		HDC MemoryDC = ::CreateCompatibleDC(WndDC);
+
+		BITMAPINFO bmpInfo;
+		bmpInfo.bmiHeader.biHeight = -(LONG)height;
+		bmpInfo.bmiHeader.biWidth = width;
+		bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmpInfo.bmiHeader.biPlanes = 1;
+		bmpInfo.bmiHeader.biBitCount = 32;
+		bmpInfo.bmiHeader.biCompression = BI_RGB;
+		bmpInfo.bmiHeader.biSizeImage = 0;
+		bmpInfo.bmiHeader.biXPelsPerMeter = 0;
+		bmpInfo.bmiHeader.biYPelsPerMeter = 0;
+		bmpInfo.bmiHeader.biClrUsed = 0;
+		bmpInfo.bmiHeader.biClrImportant = 0;
+		BYTE* pbase = NULL;
+		HBITMAP memoryBmp = ::CreateDIBSection(MemoryDC, &bmpInfo, DIB_RGB_COLORS, (void**)&pbase, 0, 0);
+		if (!memoryBmp)
 		{
+			::DeleteDC(MemoryDC);
+			::ReleaseDC(NULL, WndDC);
+			return NULL;
+		}
+
+		HBITMAP hOldBmp = (HBITMAP)SelectObject(MemoryDC, memoryBmp);
+
+		Gdiplus::Graphics graphics(MemoryDC);
+
+		//如果没有alpha则设背景为白色
+		Gdiplus::Rect rect(0, 0, width, height);
+		graphics.DrawImage(image, rect);
+
+		SelectObject(MemoryDC, hOldBmp);
+
+		::DeleteDC(MemoryDC);
+		::ReleaseDC(NULL, WndDC);
+
+		return memoryBmp;
+	}
+
+	TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask, HINSTANCE instance)
+	{
+		LPBYTE pData = NULL;
+		DWORD dwSize = 0;
+
+		
+		pData = ReadImageData(bitmap, type, instance, dwSize);
+
+		if (!pData) {
+			//加载图片，如果dpi缩放，没有高清图片时，则加载原图片后进行缩放
+			LPCTSTR find = _tcschr(bitmap.m_lpstr, _T('@'));
+			if (find) {
+				//加载原图再进行缩放
+				UINT dpi = _ttoi(find + 1);
+
+				CDuiString sScale;
+				sScale.SmallFormat(_T("@%d."), dpi);
+
+				CDuiString imgFile = bitmap.m_lpstr;
+				imgFile.Replace(sScale, _T("."));
+
+				pData = ReadImageData(STRINGorID(imgFile), type, instance, dwSize);
+				if (pData) {
+					Gdiplus::Image* image = GdiplusLoadImage(pData, dwSize);
+					delete[] pData;
+
+					if (image) {
+						UINT w = image->GetWidth() * dpi / 96;
+						UINT h = image->GetHeight() * dpi / 96;
+						HBITMAP hBitmap = ToBitmap(image, w,h);
+						delete image;
+
+						TImageInfo* data = new TImageInfo;
+						data->pBits = NULL;
+						data->pSrcBits = NULL;
+						data->hBitmap = hBitmap;
+						data->nX = w;
+						data->nY = h;
+						data->bAlpha = true;
+						return data;
+					}
+				}
+			}
 			return NULL;
 		}
 
