@@ -427,11 +427,10 @@ namespace DuiLib {
 		return pData;
 	}
 
-	HBITMAP ToBitmap(Gdiplus::Image* image, UINT height, UINT width)
+	HBITMAP ToBitmap(Gdiplus::Image* image, UINT width, UINT height)
 	{
 		if (height <= 0 || width <= 0)
 			return NULL;
-
 
 		HDC WndDC = ::GetDC(NULL);
 		HDC MemoryDC = ::CreateCompatibleDC(WndDC);
