@@ -500,8 +500,8 @@ namespace DuiLib {
 					delete[] pData;
 
 					if (image) {
-						UINT w = image->GetWidth() * dpi / 96;
-						UINT h = image->GetHeight() * dpi / 96;
+						UINT w = image->GetWidth() * dpi / 100;
+						UINT h = image->GetHeight() * dpi / 100;
 						HBITMAP hBitmap = ToBitmap(image, w,h);
 						delete image;
 
