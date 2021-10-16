@@ -439,6 +439,9 @@ namespace DuiLib {
 		bool LoadCss(LPCTSTR pStrCssFile);
 		bool ParseCss(LPCTSTR pStrCss);
 		void ApplyCss(CControlUI* pControl,LPCTSTR pStrElement, LPCTSTR pStrClass, LPCTSTR pStrName);
+
+		void ApplyCss(LPCTSTR pStrElement, LPCTSTR pStrClass);
+		void SetAttribute(LPCTSTR pStrName, LPCTSTR pStrValue);
 	private:
 		CStdPtrArray* GetFoundControls();
 		static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);

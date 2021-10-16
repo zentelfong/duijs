@@ -1,49 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="4,4,4,4" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+<Window>
   <Font name="微软雅黑" id="0" size="13" default="true"/>
   
-  <Style>
-	#minbtn{
-		tooltip:最小化;
-		width:27;
-		height:22;
-		normalimage:file='common/sys_btn_min.png' source='0,0,26,22';
-		hotimage:file='common/sys_btn_min.png' source='27,0,53,22';
-		pushedimage:file='common/sys_btn_min.png' source='54,0,80,22';
+  <Style css="css/common.css">
+	#exeBtn{
+		width:32;
+		height:32;
+		tooltip:执行;
+		normalimage:file='msgbox/play.png' source='0,0,32,32';
+		hotimage:file='msgbox/play.png' source='32,0,64,32';
+		click:clickExec;
 	}
-	#maxbtn{
-		tooltip:最大化;
-		width:27;
-		height:22;
-		normalimage:file='common/sys_btn_max.png' source='0,0,26,22';
-		hotimage:file='common/sys_btn_max.png' source='27,0,53,22';
-		pushedimage:file='common/sys_btn_max.png' source='54,0,80,22';
-	}	
-	#closebtn{
-		width:27;
-		height:22;
-		tooltip:关闭;
-		normalimage:file='common/sys_btn_close.png' source='0,0,26,22';
-		hotimage:file='common/sys_btn_close.png' source='27,0,53,22';
-		pushedimage:file='common/sys_btn_close.png' source='54,0,80,22';
-	}
-	#restorebtn{
-		width:27;
-		height:22;
-		visible:false;
-		tooltip:还原;
-		normalimage:file='common/sys_btn_restore.png' source='0,0,26,22';
-		hotimage:file='common/sys_btn_restore.png' source='27,0,53,22';
-		pushedimage:file='common/sys_btn_restore.png' source='54,0,80,22';
-	}	
-	
-	VScrollBar{
-		width:10;
-		showbutton1:false;
-		showbutton2:false;
-		thumbnormalimage:file='msgbox/scrollbar.png' source='18,0,28,34' corner='2,5,2,5';
-		bknormalimage:file='msgbox/scrollbar.png' source='0,0,10,34' corner='2,5,2,5'
+
+	#editInput{
+		height:40;
+		tipvalue:输入js代码;
+		textcolor:#cccccc;
+		bkcolor:#ff252526;
+		nativebkcolor:#ff252526;
+		return:execJs;
 	}
   </Style>
   
@@ -57,15 +33,13 @@
       <Button name="maxbtn"/>
       <Button name="restorebtn"/>
       <Button name="closebtn"/>
-
     </HorizontalLayout>
     
     <VerticalLayout bkcolor="#ff1e1e1e">
       <RichEdit name="editOut" font="0" vscrollbar="true" textcolor="#cccccc" padding="5,5,0,5"></RichEdit>
-
       <HorizontalLayout height="40" bkcolor="#ff252526" childvalign="vcenter">
-        <Edit name="editInput" height="40" tipvalue="输入js代码" textcolor="#cccccc" bkcolor="#ff252526" nativebkcolor="#ff252526" return="execJs"/>
-        <Button width="32" height="32" click="clickExec" tooltip="执行" normalimage="file='msgbox/play.png' source='0,0,32,32'" hotimage="file='msgbox/play.png' source='32,0,64,32'"/>
+        <Edit name="editInput" />
+        <Button name="exeBtn"/>
         <Control width="6"/>
       </HorizontalLayout>
     </VerticalLayout>
