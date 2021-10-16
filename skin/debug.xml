@@ -8,8 +8,8 @@
 		width:32;
 		height:32;
 		tooltip:执行;
-		normalimage:file='msgbox/play.png' source='0,0,32,32';
-		hotimage:file='msgbox/play.png' source='32,0,64,32';
+		normalimage:file='debug/play.png' source='0,0,32,32';
+		hotimage:file='debug/play.png' source='32,0,64,32';
 		click:clickExec;
 	}
 

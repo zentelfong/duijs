@@ -36,8 +36,8 @@ VScrollBar{
     width:10;
     showbutton1:false;
     showbutton2:false;
-    thumbnormalimage:file='debug/scrollbar.png' source='18,0,28,34' corner='2,5,2,5';
-    bknormalimage:file='debug/scrollbar.png' source='0,0,10,34' corner='2,5,2,5'
+    thumbnormalimage:file='common/scrollbar.png' source='18,0,28,34' corner='2,5,2,5';
+    bknormalimage:file='common/scrollbar.png' source='0,0,10,34' corner='2,5,2,5'
 }
 
 Window{

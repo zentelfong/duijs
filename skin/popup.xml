@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<Window caption="0,0,0,97" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+<Window caption="0,0,0,97">
   <Font name="微软雅黑" size="12" default="true"/>
-
+  <Style css="css/common.css"/>
   <VerticalLayout name="root" bkcolor="#EE202223">
     <HorizontalLayout name="appbar" height="64" >
       <HorizontalLayout name="apptitle" childpadding="6">
@@ -12,8 +12,8 @@
 
         </VerticalLayout>
       </HorizontalLayout>
-      <Button name="minbtn" width="28" height="20" tooltip="最小化" normalimage="file='msgbox/btn_mini_normal.png'" hotimage="file='msgbox/btn_mini_highlight.png'" pushedimage="file='msgbox/btn_mini_down.png' "/>
-      <Button name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='msgbox/btn_close_normal.png'" hotimage="file='msgbox/btn_close_highlight.png'" pushedimage="file='msgbox/btn_close_down.png' "/>
+      <Button name="minbtn"/>
+      <Button name="closebtn"/>
     </HorizontalLayout>
     
     <VerticalLayout bkcolor="#EEFFFFFF">
