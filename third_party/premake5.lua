@@ -29,3 +29,5 @@ project "network"
 		"network/*.cpp",
 	}
 	
+	
+include "libcef"

@@ -1,24 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
-
+  <Font name="微软雅黑" size="12" default="true"/>
+  
   <Style>
 	#minbtn{
-		width:28;
-		height:20;
 		tooltip:最小化;
-		normalimage:file='msgbox/btn_mini_normal.png';
-		hotimage:file='msgbox/btn_mini_highlight.png';
-		pushedimage:file='msgbox/btn_mini_down.png'
+		width:27;
+		height:22;
+		normalimage:file='common/sys_btn_min.png' source='0,0,26,22';
+		hotimage:file='common/sys_btn_min.png' source='27,0,53,22';
+		pushedimage:file='common/sys_btn_min.png' source='54,0,80,22';
 	}
+	#maxbtn{
+		tooltip:最大化;
+		width:27;
+		height:22;
+		normalimage:file='common/sys_btn_max.png' source='0,0,26,22';
+		hotimage:file='common/sys_btn_max.png' source='27,0,53,22';
+		pushedimage:file='common/sys_btn_max.png' source='54,0,80,22';
+	}	
 	#closebtn{
-		width:39;
-		height:20;
+		width:27;
+		height:22;
 		tooltip:关闭;
-		normalimage:file='msgbox/btn_close_normal.png';
-		hotimage:file='msgbox/btn_close_highlight.png';
-		pushedimage:file='msgbox/btn_close_down.png';
+		normalimage:file='common/sys_btn_close.png' source='0,0,26,22';
+		hotimage:file='common/sys_btn_close.png' source='27,0,53,22';
+		pushedimage:file='common/sys_btn_close.png' source='54,0,80,22';
 	}
+	#restorebtn{
+		width:27;
+		height:22;
+		visible:false;
+		tooltip:还原;
+		normalimage:file='common/sys_btn_restore.png' source='0,0,26,22';
+		hotimage:file='common/sys_btn_restore.png' source='27,0,53,22';
+		pushedimage:file='common/sys_btn_restore.png' source='54,0,80,22';
+	}	
+	
 	VScrollBar{
 		width:10;
 		showbutton1:false;
@@ -28,18 +47,16 @@
 	}
   </Style>
   
-  <Font name="微软雅黑" size="12" default="true"/>
-
   <VerticalLayout bkcolor="#ff3c3c3c">
     <HorizontalLayout height="30" >
       <HorizontalLayout inset="8,0,0,0">
           <Label text="DuiJs调试窗口" valign="vcenter" align="left" textcolor="#FFEEEEEE" font="0"/>
       </HorizontalLayout>
 
-      <Button name="minbtn" width="27" height="22" normalimage="file='common/sys_btn_min.png' source='0,0,26,22'" hotimage="file='common/sys_btn_min.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_min.png' source='54,0,80,22'"/>
-      <Button name="maxbtn" width="27" height="22" normalimage="file='common/sys_btn_max.png' source='0,0,26,22'" hotimage="file='common/sys_btn_max.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_max.png' source='54,0,80,22'"/>
-      <Button name="restorebtn"  visible="false" width="27" height="22" normalimage="file='common/sys_btn_restore.png' source='0,0,26,22'" hotimage="file='common/sys_btn_restore.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_restore.png' source='54,0,80,22'"/>
-      <Button name="closebtn" width="27" height="22" normalimage="file='common/sys_btn_close.png' source='0,0,26,22'" hotimage="file='common/sys_btn_close.png' source='27,0,53,22'" pushedimage="file='common/sys_btn_close.png' source='54,0,80,22'"/>
+      <Button name="minbtn"/>
+      <Button name="maxbtn"/>
+      <Button name="restorebtn"/>
+      <Button name="closebtn"/>
 
     </HorizontalLayout>
     

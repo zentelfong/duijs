@@ -110,6 +110,11 @@ static Value messageBox(Context& context, ArgList& args) {
 	return context.NewInt32(rslt);
 }
 
+static Value setAllDPI(Context& context, ArgList& args) {
+	CPaintManagerUI::SetAllDPI(args[0].ToInt32());
+	return undefined_value;
+}
+
 static Value showConsole(Context& context, ArgList& args) {
 	setlocale(LC_ALL, "chs");
 	AllocConsole();
@@ -238,6 +243,9 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(loadLanguage);
 	ADD_GLOBAL_FUNCTION(resetTextMap);
 	ADD_GLOBAL_FUNCTION(reloadText);
+	ADD_GLOBAL_FUNCTION(setAllDPI);
+	
+
 }
 
 }//namespace

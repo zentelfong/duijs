@@ -2,6 +2,7 @@ solution "duijs"
 	location ( "build" )
 	configurations { "Debug", "Release" }
 	platforms { "Win32", "Win64" }
+	flags { "StaticRuntime" }
 	defines { 
 		"_WIN32","WIN32",
 		"_CRT_SECURE_NO_WARNINGS",
@@ -19,11 +20,12 @@ filter { "platforms:Win64" }
 filter "configurations:Debug"
 	defines { "DEBUG" , "_DEBUG" }
 	optimize "Debug"
+	flags { "Symbols" }
 	
 filter "configurations:Release"
 	defines { "NDEBUG" }
 	optimize "Speed"
-	vectorextensions "SSE2"	
+	flags { "OptimizeSpeed", "EnableSSE2"}
 
 include "third_party"
 
