@@ -3824,6 +3824,23 @@ namespace DuiLib {
 		m_bUsedVirtualWnd = bUsed;
 	}
 
+	bool CPaintManagerUI::LoadCss(LPCTSTR pStrCssFile) 
+	{
+		DWORD size;
+		TCHAR buf[128];
+		BYTE* pData = CResourceManager::LoadFile(pStrCssFile, &size, buf);
+
+		if (pData) 
+		{
+			wchar_t* css = a2w((const char*)pData);
+			bool rslt = ParseCss(css);
+			delete[] css;
+			delete[] pData;
+			return rslt;
+		}
+		return false;
+	}
+
 
 	bool CPaintManagerUI::ParseCss(LPCTSTR pStrCss) 
 	{

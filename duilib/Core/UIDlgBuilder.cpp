@@ -170,6 +170,7 @@ namespace DuiLib {
 					nAttributes = node.GetAttributeCount();
 					LPCTSTR pName = NULL;
 					LPCTSTR pStyle = NULL;
+					LPCTSTR pCssFile = NULL;
 					bool shared = false;
 					for( int i = 0; i < nAttributes; i++ ) {
 						pstrName = node.GetAttributeName(i);
@@ -182,15 +183,23 @@ namespace DuiLib {
 						}
 						else if( _tcsicmp(pstrName, _T("shared")) == 0 ) {
 							shared = (_tcsicmp(pstrValue, _T("true")) == 0);
+						} else if (_tcsicmp(pstrName, _T("css")) == 0) {
+							pCssFile = pstrValue;
 						}
 					}
 					if( pName && pStyle) {
 						pManager->AddStyle(pName, pStyle, shared);
 					}
 
+					if (pCssFile) {
+						pManager->LoadCss(pCssFile);
+					}
+
 					//Style内容为css样式
 					LPCTSTR css = node.GetValue();
-					pManager->ParseCss(css);
+					if(css)
+						pManager->ParseCss(css);
+
 				}
 				else if (_tcsicmp(pstrClass, _T("Import")) == 0) {
 					nAttributes = node.GetAttributeCount();
@@ -383,7 +392,9 @@ namespace DuiLib {
 				|| _tcsicmp(pstrClass, _T("Default")) == 0 || _tcsicmp(pstrClass, _T("Style")) == 0 ) continue;
 
 			CControlUI* pControl = NULL;
-			if (_tcsicmp(pstrClass, _T("Import")) == 0) continue;
+			if (_tcsicmp(pstrClass, _T("Import")) == 0) 
+				continue;
+
 			if( _tcsicmp(pstrClass, _T("Include")) == 0 ) {
 				if( !node.HasAttributes() ) continue;
 				int count = 1;

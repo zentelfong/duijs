@@ -436,6 +436,7 @@ namespace DuiLib {
 		bool PreMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
 		void UsedVirtualWnd(bool bUsed);
 
+		bool LoadCss(LPCTSTR pStrCssFile);
 		bool ParseCss(LPCTSTR pStrCss);
 		void ApplyCss(CControlUI* pControl,LPCTSTR pStrElement, LPCTSTR pStrClass, LPCTSTR pStrName);
 	private:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="6,6,6,6" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+<Window caption="0,0,0,30" size="600,384" mininfo="600,384" sizebox="4,4,4,4" layered="false" textrenderinghint="0" showshadow="true" shadowimage="msgbox/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
   <Font name="微软雅黑" id="0" size="13" default="true"/>
   
   <Style>
