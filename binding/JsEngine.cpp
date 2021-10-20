@@ -7,6 +7,7 @@ namespace duijs {
 using namespace qjs;
 using namespace DuiLib;
 
+extern void RegisterDPI(Module* module);
 extern void RegisterString(qjs::Module* module);
 extern void RegisterGlobal(Module* module);
 extern void RegisterConst(qjs::Module* module);
@@ -93,6 +94,7 @@ bool JsEngine::Init() {
 	RegisterConst(module);
 	RegisterGlobal(module);
 	RegisterString(module);
+	RegisterDPI(module);
 
 	RegisterWindow(module);
 	RegisterPaintManager(module);

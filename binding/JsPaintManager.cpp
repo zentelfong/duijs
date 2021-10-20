@@ -234,6 +234,10 @@ static Value setDpi(CPaintManagerUI* pThis, Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value getDPIObj(CPaintManagerUI* pThis, Context& context, ArgList& args) {
+	CDPI* dpi = pThis->GetDPIObj();
+	return Class<CDPI>::ToJs(context, dpi);
+}
 
 void RegisterPaintManager(Module* module) {
 
@@ -285,7 +289,7 @@ void RegisterPaintManager(Module* module) {
 	ADD_FUNCTION(findSubControlByClass);
 	ADD_FUNCTION(findSubControlsByClass);
 	ADD_FUNCTION(setDpi);
-	
+	ADD_FUNCTION(getDPIObj);
 }
 
 

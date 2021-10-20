@@ -35,7 +35,7 @@ public:
 	}
 private:
 	virtual LPCTSTR GetWindowClassName() const {
-		return L"DuiJsTaskWindowClass";
+		return _T("DuiJsTaskWindowClass");
 	}
 	TaskManager* manager_;
 };

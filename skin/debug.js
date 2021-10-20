@@ -57,6 +57,7 @@ class DebugWindow extends dui.Window {
         global._DEBUG = false;
     }
 }
+
 let debugWindow = new DebugWindow();
 debugWindow.create("DuiJs调试窗口", dui.WS_OVERLAPPEDWINDOW);
 //debugWindow.manager.setDpi(144);

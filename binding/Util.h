@@ -41,6 +41,9 @@ static void deleteControl(T* w) {
 	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
 	ctrl.AddCtor<createControl>()
 
+#define DEFINE_VIRTUAL_CONTROL(class_,name_) \
+	auto ctrl = module->ExportClass<class_>(name_); \
+	ctrl.Init<deleteControl>(); \
 
 #define DEFINE_VIRTUAL_CONTROL2(class_,parent_,name_) \
 	auto ctrl = module->ExportClass<class_>(name_); \
@@ -48,6 +51,9 @@ static void deleteControl(T* w) {
 
 
 #define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
+
+
+#define EXPORT_FUNCTION(name) module->ExportFunc<name>(#name)
 
 #define EXPORT_CONST_VALUE(name) module->ExportUint32(#name,(uint32_t)name)
 
