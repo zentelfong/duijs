@@ -89,7 +89,7 @@ void HttpClient::networkThread()
         _schedulerMutex.lock();
         if (nullptr != _scheduler)
         {
-            _scheduler->PostTask(std::bind(&HttpClient::dispatchResponseCallbacks, this));
+            _scheduler(std::bind(&HttpClient::dispatchResponseCallbacks, this));
         }
         _schedulerMutex.unlock();
     }
@@ -117,7 +117,7 @@ void HttpClient::networkThreadAlone(HttpRequestPtr request, HttpResponsePtr resp
     _schedulerMutex.lock();
     if (nullptr != _scheduler)
     {
-        _scheduler->PostTask([this, response, request]{
+        _scheduler([this, response, request]{
             const ccHttpRequestCallback& callback = request->getCallback();
 
             if (callback != nullptr)
@@ -303,7 +303,7 @@ static int processDeleteTask(HttpClient* client, HttpRequest* request, write_cal
 }
 
 // HttpClient implementation
-HttpClient* HttpClient::Create(Scheduler* scheduler)
+HttpClient* HttpClient::Create(scheduler_t scheduler)
 {
     HttpClient* httpClient = new (std::nothrow) HttpClient(scheduler);
     return httpClient;
@@ -343,7 +343,7 @@ void HttpClient::setSSLVerification(const std::string& caFile)
     _sslCaFilename = caFile;
 }
 
-HttpClient::HttpClient(Scheduler* scheduler)
+HttpClient::HttpClient(scheduler_t scheduler)
 : _timeoutForConnect(30)
 , _timeoutForRead(60)
 , _isInited(false)

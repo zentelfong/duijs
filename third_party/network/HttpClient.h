@@ -5,7 +5,7 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "HttpCookie.h"
-#include "Scheduler.h"
+#include <functional>
 
 /**
  * @addtogroup network
@@ -14,6 +14,9 @@
 
 namespace network {
 
+
+using task_t = std::function<void()>;
+using scheduler_t = std::function<void(task_t)>;
 
 /** Singleton that handles asynchronous http requests.
  *
@@ -34,7 +37,7 @@ public:
      *
      * @return the instance of HttpClient.
      */
-    static HttpClient *Create(Scheduler* scheduler);
+    static HttpClient *Create(scheduler_t scheduler);
 
     /**
      * Release the instance of HttpClient.
@@ -119,7 +122,7 @@ public:
 
     std::mutex& getSSLCaFileMutex() {return _sslCaFileMutex;}
 private:
-    HttpClient(Scheduler* scheduler);
+    HttpClient(scheduler_t scheduler);
     virtual ~HttpClient();
 
     /**
@@ -148,7 +151,7 @@ private:
     int  _threadCount;
     std::mutex _threadCountMutex;
 
-    Scheduler* _scheduler;
+    scheduler_t _scheduler;
     std::mutex _schedulerMutex;
 
     std::deque<HttpRequestPtr>  _requestQueue;
