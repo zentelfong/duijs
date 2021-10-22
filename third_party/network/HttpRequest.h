@@ -48,7 +48,7 @@ public:
          Please refer to HttpRequestTest.cpp to find its usage.
      */
     HttpRequest()
-    : _requestType(Type::kUNKNOWN)
+    : _requestType(Type::kGET)
     , _pCallback(nullptr)
     , _pUserData(nullptr)
     {

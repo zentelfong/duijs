@@ -20,7 +20,6 @@ public:
     HttpResponse(HttpRequest* request)
     : _pHttpRequest(request)
     , _succeed(false)
-    , _responseDataString("")
     {
         if (_pHttpRequest)
         {
@@ -154,25 +153,6 @@ public:
         _errorBuffer.assign(value);
     }
 
-    /**
-     * Set the response data by the string pointer and the defined size.
-     * @param value a string pointer that point to response data buffer.
-     * @param n the defined size that the response data buffer would be copied.
-     */
-    inline void setResponseDataString(const char* value, size_t n)
-    {
-        _responseDataString.clear();
-        _responseDataString.assign(value, n);
-    }
-
-    /**
-     * Get the string pointer that point to the response data.
-     * @return const char* the string pointer that point to the response data.
-     */
-    inline const char* getResponseDataString() const
-    {
-        return _responseDataString.c_str();
-    }
 
     REF_IMPLEMENT_COUNTING(HttpResponse);
 protected:
@@ -183,7 +163,6 @@ protected:
     std::vector<char>   _responseHeader;  /// the returned raw header data. You can also dump it as a string
     long                _responseCode;    /// the status code returned from libcurl, e.g. 200, 404
     std::string         _errorBuffer;   /// if _responseCode != 200, please read _errorBuffer to find the reason
-    std::string         _responseDataString; // the returned raw data. You can also dump it as a string
 
 };
 

@@ -881,20 +881,15 @@ public:
 	}
 
 
-	template<void dtor(T*) = nullptr>
+	template<void dtor(T*)>
 	void Init(JSClassID parent_id = 0) {
 		assert(!class_inited_);
 
 		JSClassDef class_def = {
 			class_name_,[](JSRuntime* rt, JSValue val) {
 				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
-				if (!s) {
-					return;
-				}
-				if (dtor != nullptr)
+				if (s)
 					dtor(s);
-				else
-					delete s;
 
 			},nullptr,nullptr,nullptr
 		};
