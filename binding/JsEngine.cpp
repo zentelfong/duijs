@@ -55,6 +55,7 @@ extern void RegisterTreeView(qjs::Module* module);
 extern void RegisterStorage(qjs::Module* module);
 extern void RegisterQrControl(qjs::Module* module);
 
+extern void RegisterHttpClient(Module* module);
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -95,7 +96,7 @@ bool JsEngine::Init() {
 	RegisterGlobal(module);
 	RegisterString(module);
 	RegisterDPI(module);
-
+	RegisterHttpClient(module);
 	RegisterWindow(module);
 	RegisterPaintManager(module);
 	RegisterDialogBuilder(module);

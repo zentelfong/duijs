@@ -17,14 +17,11 @@ public:
      * Constructor, it's used by HttpClient internal, users don't need to create HttpResponse manually.
      * @param request the corresponding HttpRequest which leads to this response.
      */
-    HttpResponse(HttpRequest* request)
+    HttpResponse(HttpRequestPtr request)
     : _pHttpRequest(request)
     , _succeed(false)
     {
-        if (_pHttpRequest)
-        {
-            _pHttpRequest->AddRef();
-        }
+
     }
 
     /**
@@ -33,10 +30,6 @@ public:
      */
     virtual ~HttpResponse()
     {
-        if (_pHttpRequest)
-        {
-            _pHttpRequest->Release();
-        }
     }
 
     // getters, will be called by users
@@ -157,7 +150,7 @@ public:
     REF_IMPLEMENT_COUNTING(HttpResponse);
 protected:
     // properties
-    HttpRequest*        _pHttpRequest;  /// the corresponding HttpRequest pointer who leads to this response
+    HttpRequestPtr      _pHttpRequest;  /// the corresponding HttpRequest pointer who leads to this response
     bool                _succeed;       /// to indicate if the http request is successful simply
     std::vector<char>   _responseData;  /// the returned raw data. You can also dump it as a string
     std::vector<char>   _responseHeader;  /// the returned raw header data. You can also dump it as a string

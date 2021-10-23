@@ -56,7 +56,7 @@ void HttpClient::networkThread()
 
     while (true)
     {
-        HttpRequest *request;
+        HttpRequestPtr request;
 
         // step 1: send http request if the requestQueue isn't empty
         {
@@ -76,7 +76,7 @@ void HttpClient::networkThread()
         // step 2: libcurl sync access
 
         // Create a HttpResponse object, the default setting is http access failed
-        HttpResponse *response = new (std::nothrow) HttpResponse(request);
+        HttpResponsePtr response = new (std::nothrow) HttpResponse(request);
 
         processResponse(response, _responseMessage);
 
@@ -419,7 +419,7 @@ void HttpClient::dispatchResponseCallbacks()
 {
     // log("CCHttpClient::dispatchResponseCallbacks is running");
     //occurs when cocos thread fires but the network thread has already quited
-    HttpResponse* response = nullptr;
+    HttpResponsePtr response;
 
     _responseQueueMutex.lock();
     if (!_responseQueue.empty())
@@ -431,7 +431,7 @@ void HttpClient::dispatchResponseCallbacks()
 
     if (response)
     {
-        HttpRequest *request = response->getHttpRequest();
+        HttpRequestPtr request = response->getHttpRequest();
         const ccHttpRequestCallback& callback = request->getCallback();
 
         if (callback != nullptr)

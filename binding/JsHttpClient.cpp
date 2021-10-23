@@ -98,6 +98,9 @@ public:
 	JsRequest() {
 	}
 
+	~JsRequest() {
+	}
+
 	void OnFinish(HttpClient* client, HttpResponse* response) {
 		if (callback_.IsFunction()) {
 			callback_.Call(ToValue(*callback_.context(), response));
@@ -110,6 +113,8 @@ public:
 
 	void SetCallback(Value callback) {
 		callback_ = callback;
+		setResponseCallback(std::bind(&JsRequest::OnFinish, 
+			this, std::placeholders::_1, std::placeholders::_2));
 	}
 private:
 	Value callback_;
