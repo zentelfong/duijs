@@ -411,6 +411,10 @@ namespace DuiLib
 				if( m_nRange > 0 ) {
 					int cxThumb = cx * (rc.right - rc.left) / (m_nRange + rc.right - rc.left);
 					if( cxThumb < m_cxyFixed.cy ) cxThumb = m_cxyFixed.cy;
+					int minWidth = GetMinWidth();
+					if (cxThumb < minWidth) {
+						cxThumb = minWidth;
+					}
 
 					m_rcThumb.left = m_nScrollPos * (cx - cxThumb) / m_nRange + m_rcButton1.right;
 					m_rcThumb.right = m_rcThumb.left + cxThumb;
@@ -484,6 +488,11 @@ namespace DuiLib
 				if( m_nRange > 0 ) {
 					int cyThumb = cy * (rc.bottom - rc.top) / (m_nRange + rc.bottom - rc.top);
 					if( cyThumb < m_cxyFixed.cx ) cyThumb = m_cxyFixed.cx;
+
+					int minHeight = GetMinHeight();
+					if (cyThumb < minHeight) {
+						cyThumb = minHeight;
+					}
 
 					m_rcThumb.top = m_nScrollPos * (cy - cyThumb) / m_nRange + m_rcButton1.bottom;
 					m_rcThumb.bottom = m_rcThumb.top + cyThumb;
