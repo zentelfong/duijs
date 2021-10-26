@@ -87,3 +87,33 @@ Task Thread::PopTask() {
 	}
 }
 
+
+ThreadManager* ThreadManager::s_instance_ = NULL;
+
+ThreadManager* ThreadManager::Instance() {
+	if (!s_instance_)
+		s_instance_ = new ThreadManager();
+	return s_instance_;
+}
+
+void ThreadManager::PostTask(TID tid, Task task) {
+	threads_[tid]->PostTask(task);
+}
+
+ThreadManager::ThreadManager() {
+	threads_[kIO] = new Thread("IO_Thread");
+	threads_[kStorage] = new Thread("Storage_Thread");
+	threads_[kImage] = new Thread("Image_Thread");
+	for (auto& thread:threads_) {
+		thread->Start();
+	}
+}
+
+
+ThreadManager::~ThreadManager() {
+	for (auto& thread : threads_) {
+		thread->Stop();
+		thread->Join();
+		delete thread;
+	}
+}

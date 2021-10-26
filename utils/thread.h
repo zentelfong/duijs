@@ -6,6 +6,7 @@
 #include <memory>
 #include <atomic>
 #include <string>
+#include <array>
 #include "waitable_event.h"
 
 
@@ -33,4 +34,22 @@ private:
 	std::unique_ptr<std::thread> thread_;
 };
 
+//线程管理器
+class ThreadManager {
+public:
+	enum TID{
+		kIO,		//文件io
+		kStorage,	//存储线程
+		kImage,     //图片加载解码线程
+	};
 
+	static ThreadManager* Instance();
+	void PostTask(TID tid,Task task);
+
+protected:
+	ThreadManager();
+	~ThreadManager();
+
+	static ThreadManager* s_instance_;
+	std::array<Thread*, 3> threads_;
+};

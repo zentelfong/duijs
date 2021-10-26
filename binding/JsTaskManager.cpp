@@ -52,7 +52,7 @@ TaskManager::TaskManager()
 {
 	TlsSetValue(tls, this);
 	task_window_ = new TaskWindow(this);
-	task_window_->Create(NULL, _T("JSTaskWindow"), UI_WNDSTYLE_CONTAINER, UI_WNDSTYLE_CONTAINER);
+	task_window_->Create(NULL, _T("JSTaskWindow"), UI_WNDSTYLE_CONTAINER, UI_WNDSTYLE_CONTAINER,-1,-1,1,1);
 }
 
 TaskManager::~TaskManager() {
