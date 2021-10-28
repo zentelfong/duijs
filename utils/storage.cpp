@@ -19,8 +19,8 @@ void Storage::Open(const std::string& name, std::function<void(int)> finish) {
 		Storage* pThis = ptr.Lock();
 		if (pThis) {
 			if (pThis->sqlite_) {
-				finish(0);
-				return;
+				sqlite3_close(pThis->sqlite_);
+				pThis->sqlite_ = nullptr;
 			}
 
 			int rslt = sqlite3_open(name_.c_str(), &pThis->sqlite_);

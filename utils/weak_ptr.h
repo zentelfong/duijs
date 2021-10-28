@@ -14,7 +14,7 @@ struct WeakImpl {
 		return ptr != nullptr;
 	}
 
-	void Freed() {
+	void Destroy() {
 		lock.lock();
 		ptr = nullptr;
 		int r = --ref;
@@ -63,7 +63,7 @@ public:
 	}
 
 	~WeakObject() {
-		weak_impl_->Freed();
+		weak_impl_->Destroy();
 	}
 
 	WeakPtr<T> weak_ptr() {
