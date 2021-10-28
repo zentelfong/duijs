@@ -5,44 +5,47 @@
 using namespace cjsonpp;
 
 Storage::Storage() 
-	:sqlite_(nullptr), thread_("Storage")
+	:sqlite_(nullptr), thread_mgr_(ThreadManager::Instance())
 {
-	thread_.Start();
 }
 
-
 Storage::~Storage() {
-	thread_.Stop();
-	thread_.Join();
 }
 
 void Storage::Open(const std::string& name, std::function<void(int)> finish) {
 	std::string name_(name);
-	thread_.PostTask([this, name_,finish]() {
-			if (sqlite_) {
+	WeakPtr<Storage> ptr = weak_ptr();
+	thread_mgr_->PostTask(ThreadManager::kStorage,[ptr, name_,finish]() {
+		Storage* pThis = ptr.Lock();
+		if (pThis) {
+			if (pThis->sqlite_) {
 				finish(0);
 				return;
 			}
-			int rslt = sqlite3_open(name_.c_str(), &sqlite_);
+
+			int rslt = sqlite3_open(name_.c_str(), &pThis->sqlite_);
 			if (rslt != 0) {
-				sqlite3_close(sqlite_);
-				sqlite_ = nullptr;
+				sqlite3_close(pThis->sqlite_);
+				pThis->sqlite_ = nullptr;
 			}
 			finish(rslt);
-		});
+		}
+		ptr.Unlock();
+	});
 }
 
 
 void Storage::Close(std::function<void(int)> finish) {
-	thread_.PostTask([this, finish]() {
-		if (!sqlite_) {
-			finish(0);
-			return;
+	WeakPtr<Storage> ptr = weak_ptr();
+	thread_mgr_->PostTask(ThreadManager::kStorage, [ptr, finish]() {
+		Storage* pThis = ptr.Lock();
+		if (pThis && pThis->sqlite_) {
+			int rslt = sqlite3_close(pThis->sqlite_);
+			pThis->sqlite_ = nullptr;
+			finish(rslt);
 		}
-		int rslt = sqlite3_close(sqlite_);
-		sqlite_ = nullptr;
-		finish(rslt);
-		});
+		ptr.Unlock();
+	});
 
 }
 
@@ -58,19 +61,22 @@ int on_exec(void* ud, int argc, char** argv, char** name) {
 
 void Storage::Exec(const std::string& sql, std::function<void(int,std::string)> finish) {
 	std::string sql_(sql);
-	thread_.PostTask([this, sql_, finish]() {
-		if (!sqlite_) {
-			finish(-1, "");
-			return;
+	WeakPtr<Storage> ptr = weak_ptr();
+
+	thread_mgr_->PostTask(ThreadManager::kStorage,[ptr, sql_, finish]() {
+		Storage* pThis = ptr.Lock();
+		if (pThis && pThis->sqlite_) {
+			Json result = Json::array();
+			char* error;
+			int code = sqlite3_exec(pThis->sqlite_, sql_.c_str(), on_exec, &result, &error);
+			if (code != SQLITE_OK) {
+				finish(code, error);
+			}
+			else {
+				finish(code, result.dump());
+			}
 		}
-		Json result = Json::array();
-		char* error;
-		int code = sqlite3_exec(sqlite_,sql_.c_str(),on_exec,&result,&error);
-		if (code != SQLITE_OK) {
-			finish(code, error);
-		} else {
-			finish(code, result.dump());
-		}
+		ptr.Unlock();
 	});
 }
 

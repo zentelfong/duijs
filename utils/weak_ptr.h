@@ -81,26 +81,25 @@ template<class T>
 class WeakPtr {
 public:
 	WeakPtr()
-		:locked_(false), ptr_(nullptr)
+		:ptr_(nullptr)
 	{
 	}
 
 	WeakPtr(WeakImpl<T>* data)
-		:locked_(false), ptr_(data)
+		:ptr_(data)
 	{
 		if(ptr_)
 			ptr_->AddRef();
 	}
 
 
-	WeakPtr(const WeakPtr<T>& r) :locked_(false), ptr_(r.ptr_)
+	WeakPtr(const WeakPtr<T>& r):ptr_(r.ptr_)
 	{
 		if (ptr_)
 			ptr_->AddRef();
 	}
 
 	~WeakPtr() {
-		Unlock();
 		ptr_->Release();
 	}
 
@@ -117,9 +116,8 @@ public:
 		return *this = r.ptr_;
 	}
 
-	T* Lock() {
-		if (!locked_ && ptr_) {
-			locked_ = true;
+	T* Lock() const {
+		if (ptr_) {
 			ptr_->Lock();
 			return ptr_->ptr;
 		}
@@ -127,14 +125,12 @@ public:
 	}
 
 
-	void Unlock() {
-		if (locked_ && ptr_) {
-			locked_ = false;
+	void Unlock() const {
+		if (ptr_) {
 			ptr_->Unlock();
 		}
 	}
 private:
-	bool locked_;
 	WeakImpl<T>* ptr_;
 };
 
