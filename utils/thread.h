@@ -44,6 +44,8 @@ public:
 	};
 
 	static ThreadManager* Instance();
+	static void DestroyInstance();
+
 	void PostTask(TID tid,Task task);
 
 protected:

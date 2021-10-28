@@ -96,6 +96,11 @@ ThreadManager* ThreadManager::Instance() {
 	return s_instance_;
 }
 
+void ThreadManager::DestroyInstance() {
+	delete s_instance_;
+	s_instance_ = nullptr;
+}
+
 void ThreadManager::PostTask(TID tid, Task task) {
 	threads_[tid]->PostTask(task);
 }

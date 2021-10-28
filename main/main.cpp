@@ -1,4 +1,5 @@
 #include "binding/JsEngine.h"
+#include "utils/thread.h"
 #include <objbase.h>
 #include "Utils/CrashDump.h"
 #include "duilib/UIlib.h"
@@ -31,6 +32,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 		return -1;
 	}
 	engine.RunLoop();
+
+	ThreadManager::DestroyInstance();
 	CoUninitialize();
 	return 0;
 }
