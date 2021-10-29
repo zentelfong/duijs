@@ -58,6 +58,9 @@ static Value setTimer(Timer* pThis, Context& context, ArgList& args) {
 		return context.ThrowTypeError("arg 1 must > 0");
 	}
 
+	auto repeat = args[2].ToBool();
+
+
 	//保存回调函数
 	delete pThis->promise;
 	pThis->promise = nullptr;
@@ -65,22 +68,20 @@ static Value setTimer(Timer* pThis, Context& context, ArgList& args) {
 
 	if (pThis->id > 0) {
 		engine->ResetDelayTask(pThis->id,[pThis]() {
-				pThis->id = 0;
 				auto value = pThis->func.Call();
 				if (value.IsException()) {
 					value.context()->DumpError();
 				}
 
-			}, delay);
+			}, delay, repeat);
 	}
 	else {
 		pThis->id = engine->PostDelayTask([pThis]() {
-				pThis->id = 0;
 				auto value = pThis->func.Call();
 				if (value.IsException()) {
 					value.context()->DumpError();
 				}
-			}, delay);
+			}, delay,repeat);
 
 	}
 	return undefined_value;
@@ -123,7 +124,7 @@ static Value delay(Timer* pThis, Context& context, ArgList& args) {
 				if (value.IsException()) {
 					value.context()->DumpError();
 				}
-			}, delay);
+			}, delay,false);
 	}
 	else {
 		pThis->id = engine->PostDelayTask([pThis]() {
@@ -132,7 +133,7 @@ static Value delay(Timer* pThis, Context& context, ArgList& args) {
 				if (value.IsException()) {
 					value.context()->DumpError();
 				}
-			}, delay);
+			}, delay,false);
 
 	}
 	return pThis->promise->promise();

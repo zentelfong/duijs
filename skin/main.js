@@ -12,12 +12,11 @@ export class TestWindow extends Window{
 		let count = 1;
 		let onTimer = ()=>{
 			print("timerout****");
-			this.timer.setTimer(onTimer,1000);
 			let qrcode = this.manager.findControl("qrcode")
 			qrcode.setText("test text " + count);
 			count+=1;
 		}
-		this.timer.setTimer(onTimer,1000);
+		this.timer.setTimer(onTimer,1000,true);
 
 		//await this.timer.wait(3000);
 		//print("wait go on");

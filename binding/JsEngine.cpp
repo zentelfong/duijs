@@ -183,15 +183,15 @@ void JsEngine::PostTask(js_task_t task) {
 	manager_->PostTask(std::move(task));
 }
 
-uint32_t JsEngine::PostDelayTask(js_task_t task, uint32_t delay) {
+uint32_t JsEngine::PostDelayTask(js_task_t task, uint32_t delay, bool repeat) {
 	if (!manager_)
 		return 0;
-	return manager_->PostDelayTask(std::move(task), delay);
+	return manager_->PostDelayTask(std::move(task), delay,repeat);
 }
 
-void JsEngine::ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay) {
+void JsEngine::ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay, bool repeat) {
 	if (manager_)
-		manager_->ResetDelayTask(id,std::move(task), delay);
+		manager_->ResetDelayTask(id,std::move(task), delay, repeat);
 }
 
 bool JsEngine::CancelDelayTask(uint32_t id) {

@@ -20,8 +20,8 @@ public:
 	bool Excute(const char* input, const char* filename);
 	void PostTask(js_task_t task);
 
-	uint32_t PostDelayTask(js_task_t task, uint32_t delay);
-	void ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay);
+	uint32_t PostDelayTask(js_task_t task, uint32_t delay, bool repeat);
+	void ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay,bool repeat);
 	bool CancelDelayTask(uint32_t id);
 
 	qjs::Context* context() { return context_; }

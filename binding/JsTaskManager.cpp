@@ -67,19 +67,19 @@ void TaskManager::PostTask(js_task_t task) {
 	task_window_->PostMessage(WM_THREAD_MSG_ACTIVE, 0, 0);
 }
 
-uint32_t TaskManager::PostDelayTask(js_task_t task, uint32_t delay) {
+uint32_t TaskManager::PostDelayTask(js_task_t task, uint32_t delay, bool repeat) {
 	uint32_t id = ::SetTimer(*task_window_, ++last_timer_id_, delay, nullptr);
 	std::lock_guard<std::mutex> locker(lock_);
-	timer_tasks_.insert(std::make_pair(id, task));
+	timer_tasks_.insert(std::make_pair(id, std::make_shared<TimerTask>(task,repeat)));
 	return id;
 }
 
-void TaskManager::ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay) {
+void TaskManager::ResetDelayTask(uint32_t id, js_task_t task, uint32_t delay, bool repeat) {
 	assert(id > 0);
 	::SetTimer(*task_window_, id, delay, nullptr);
 
 	std::lock_guard<std::mutex> locker(lock_);
-	timer_tasks_.insert(std::make_pair(id, task));
+	timer_tasks_.insert(std::make_pair(id, std::make_shared<TimerTask>(task, repeat)));
 }
 
 bool TaskManager::CancelDelayTask(uint32_t id) {
@@ -104,9 +104,11 @@ void TaskManager::ExcuteTasks() {
 void TaskManager::OnTimer(uint32_t id) {
 	auto task = PopTimerTask(id);
 	if (task) {
-		task();
+		task->task();
 	}
-	::KillTimer(*task_window_, id);
+
+	if (!task->repeat)
+		::KillTimer(*task_window_, id);
 }
 
 js_task_t TaskManager::PopTask() {
@@ -119,12 +121,13 @@ js_task_t TaskManager::PopTask() {
 	return std::move(task);
 }
 
-js_task_t TaskManager::PopTimerTask(uint32_t id) {
+std::shared_ptr<TaskManager::TimerTask> TaskManager::PopTimerTask(uint32_t id) {
 	std::lock_guard<std::mutex> locker(lock_);
 	auto find = timer_tasks_.find(id);
 	if (find != timer_tasks_.end()) {
-		js_task_t task = find->second;
-		timer_tasks_.erase(find);
+		std::shared_ptr<TimerTask> task = find->second;
+		if(!task->repeat)
+			timer_tasks_.erase(find);
 		return task;
 	}
 	return nullptr;
