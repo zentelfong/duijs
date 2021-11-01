@@ -469,7 +469,7 @@ void RegisterWindow(qjs::Module* module) {
 	window.Init2<deleteWindow, markWindow>();
 	window.AddCtor2<newWindow>();
 	window.AddFunc<createWindow>("create");
-	window.AddReleaseFunc<closeWindow>("close");
+	window.AddFunc<closeWindow>("close");
 	window.AddFunc<showWindow>("showWindow");
 	window.AddFunc<centerWindow>("centerWindow");
 	window.AddFunc<showModal>("showModal");

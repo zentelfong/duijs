@@ -1027,22 +1027,6 @@ public:
 		}, name,0),0);
 	}
 
-	template<Value func(T* pThis, Context& context, ArgList& args)>
-	void AddReleaseFunc(const char* name) {
-		JS_DefinePropertyValueStr(context_, prototype_, name,
-			JS_NewCFunction(context_,
-				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = nullptr;
-			if (!GetThis(this_val,&pThis)) {
-				return JS_ThrowTypeError(ctx, "no this pointer exist");
-			}
-			JS_SetOpaque(this_val, nullptr);
-			Context* context = Context::get(ctx);
-			ArgList arg_list(ctx, argc, argv);
-			return func(pThis, *context, arg_list).Release();
-		}, name, 0), 0);
-	}
-
 	template<JSCFunction func>
 	void AddCFunc(const char* name) {
 		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewCFunction(context_, func, name, 0));
