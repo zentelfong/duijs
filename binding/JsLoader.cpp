@@ -95,16 +95,26 @@ JSModuleDef* jsModuleLoader(JSContext* ctx,
 			return NULL;
 		}
 
-		/* compile the module */
-		func_val = JS_Eval(ctx, (char*)buf, buf_len, module_name,
-			JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);
+		if (has_suffix(module_name, "jsc")) {
+			//º”‘ÿjs bytecode
 
-		delete[] buf;
+			func_val = JS_ReadObject(ctx, buf, buf_len, JS_READ_OBJ_BYTECODE);
+			if (JS_IsException(func_val))
+				return NULL;
+			js_module_set_import_meta(ctx, func_val, TRUE, FALSE);
+		} else {
+			/* compile the module */
+			func_val = JS_Eval(ctx, (char*)buf, buf_len, module_name,
+				JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);
 
-		if (JS_IsException(func_val))
-			return NULL;
-		/* XXX: could propagate the exception */
-		js_module_set_import_meta(ctx, func_val, TRUE, FALSE);
+			delete[] buf;
+
+			if (JS_IsException(func_val))
+				return NULL;
+			/* XXX: could propagate the exception */
+			js_module_set_import_meta(ctx, func_val, TRUE, FALSE);
+		}
+
 		/* the module is already referenced, so we must free it */
 		m = (JSModuleDef*)JS_VALUE_GET_PTR(func_val);
 		JS_FreeValue(ctx, func_val);

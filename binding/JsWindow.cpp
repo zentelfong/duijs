@@ -382,7 +382,8 @@ static void deleteWindow(JsWindow* w) {
 }
 
 static void markWindow(JsWindow* pThis, JS_MarkFunc* mark_func) {
-	pThis->Mark(mark_func);
+	if(pThis)
+		pThis->Mark(mark_func);
 }
 
 static Value createWindow(JsWindow* pThis, Context& context, ArgList& args) {

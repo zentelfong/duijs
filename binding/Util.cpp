@@ -115,7 +115,7 @@ DuiLib::CControlUI* toControl(const qjs::Value& value) {
 }
 
 qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control) {
-    return qjs::Class<DuiLib::CControlUI>::ToJs2(ctx, control, control->GetClassId());
+    return qjs::Class<DuiLib::CControlUI>::ToJsById(ctx, control, control->GetClassId());
 }
 
 SYSTEMTIME toSysTime(const qjs::Value& value) {

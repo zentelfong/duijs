@@ -822,6 +822,35 @@ private:
 	std::unordered_map<JSClassID, JSClassID> class_ids_;
 };
 
+template<class T>
+bool GetThis(JSValueConst this_val, T** pThis, JSClassID cid = 0) {
+	if (!JS_IsObject(this_val)) {
+		return false;
+	}
+
+	JSClassID id = JS_GetClassID(this_val);
+	if (cid) {
+		ClassIdManager* cmgr = ClassIdManager::Instance();
+		JSClassID pid = id;
+		while (pid) {
+			if (pid == cid) {
+				//如果id或者其父class id与class_id_相同则允许转换
+				*pThis = reinterpret_cast<T*>(JS_GetOpaque(this_val, id));
+				return *pThis != nullptr;
+			}
+			pid = cmgr->GetParent(pid);
+		}
+		return false;
+	}
+	*pThis = reinterpret_cast<T*>(JS_GetOpaque(this_val, id));
+	return *pThis != nullptr;
+}
+
+template<class T>
+void SetThis(JSValueConst this_val,T* pThis) {
+	JS_SetOpaque(this_val, pThis);
+}
+
 
 template<class T>
 class Class {
@@ -842,20 +871,8 @@ public:
 
 	//转为c
 	static T* ToC(const Value& v) {
-		if (!JS_IsObject(v)) {
-			return nullptr;
-		}
-		ClassIdManager* cmgr = ClassIdManager::Instance();
-		JSClassID id = JS_GetClassID(v);
-		JSClassID pid = id;
-		while (pid) {
-			if (pid == class_id_) {
-				//如果id或者其父class id与class_id_相同则允许转换
-				return reinterpret_cast<T*>(v.GetOpaque(id));
-			}
-			pid = cmgr->GetParent(pid);
-		}
-		return nullptr;
+		T* pThis = nullptr;
+		return GetThis(v,&pThis,class_id_)?pThis:nullptr;
 	}
 
 	//创建新的js对象，注意js对象释放时会调用dtor释放ptr
@@ -864,22 +881,35 @@ public:
 			return null_value;
 
 		Value obj = context.NewＣlassObject(class_id_);
-		obj.SetOpaque(ptr);
+		SetThis(obj,ptr);
 		return obj;
 	}
 
-	static Value ToJs2(Context& context, T* ptr,JSClassID cid) {
+	static Value ToJsById(Context& context, T* ptr,JSClassID cid) {
 		if (!ptr)
 			return null_value;
-
-		if (!cid)
-			cid = class_id_;
-
+		//TODO:检测cid为class_id_的子类
 		Value obj = context.NewＣlassObject(cid);
-		obj.SetOpaque(ptr);
+		SetThis(obj, ptr);
 		return obj;
 	}
 
+
+	void Init(JSClassFinalizer* finalizer,JSClassID parent_id = 0) {
+		assert(!class_inited_);
+		JSClassDef class_def = {
+			class_name_,finalizer,nullptr,nullptr,nullptr
+		};
+		NewClass(&class_def, parent_id);
+	}
+
+	void Init(JSClassFinalizer* finalizer, JSClassGCMark* gc_mark,JSClassID parent_id = 0) {
+		assert(!class_inited_);
+		JSClassDef class_def = {
+			class_name_,finalizer,gc_mark,nullptr,nullptr
+		};
+		NewClass(&class_def, parent_id);
+	}
 
 	template<void dtor(T*)>
 	void Init(JSClassID parent_id = 0) {
@@ -887,10 +917,10 @@ public:
 
 		JSClassDef class_def = {
 			class_name_,[](JSRuntime* rt, JSValue val) {
-				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
-				if (s)
+				T* s = nullptr;
+				if (GetThis(val, &s)) {
 					dtor(s);
-
+				}
 			},nullptr,nullptr,nullptr
 		};
 
@@ -905,19 +935,14 @@ public:
 		JSClassDef class_def = {
 			class_name_,
 			[](JSRuntime* rt, JSValue val) {
-				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
-				if (!s) {
-					return;
-				}
-				if (dtor != nullptr)
+				T* s = nullptr;
+				if (GetThis(val,&s)) {
 					dtor(s);
-				else
-					delete s;
-
+				}
 			},
 			[](JSRuntime* rt, JSValueConst val, JS_MarkFunc* mark_func) {
-				T* s = (T*)JS_GetOpaque(val, JS_GetClassID(val));
-				if (s) {
+				T* s = nullptr;
+				if (GetThis(val,&s)) {
 					mark(s, mark_func);
 				}
 			},nullptr,nullptr
@@ -949,8 +974,7 @@ public:
 			if (obj.IsException()) {
 				return JS_EXCEPTION;
 			}
-
-			obj.SetOpaque(pThis);
+			SetThis(obj,pThis);
 			return obj.Release();
 		},class_name_, 0, JS_CFUNC_constructor, 0);
 		JS_SetConstructor(context_, constructor, prototype_);
@@ -980,7 +1004,8 @@ public:
 			if (!pThis) {
 				return JS_ThrowInternalError(ctx, "ctor error");
 			}
-			obj.SetOpaque(pThis);
+
+			SetThis(obj, pThis);
 			return obj.Release();
 		}, class_name_, 0, JS_CFUNC_constructor, 0);
 		JS_SetConstructor(context_, constructor, prototype_);
@@ -992,8 +1017,8 @@ public:
 		JS_DefinePropertyValueStr(context_, prototype_, name, 
 			JS_NewCFunction(context_, 
 				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val,&pThis)) {
 				return JS_ThrowTypeError(ctx, "no this pointer exist");
 			}
 			Context* context = Context::get(ctx);
@@ -1007,8 +1032,8 @@ public:
 		JS_DefinePropertyValueStr(context_, prototype_, name,
 			JS_NewCFunction(context_,
 				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val,&pThis)) {
 				return JS_ThrowTypeError(ctx, "no this pointer exist");
 			}
 			JS_SetOpaque(this_val, nullptr);
@@ -1027,8 +1052,8 @@ public:
 	void AddGetSet(const char* name) {
 		JSCFunctionType get_func;
 		get_func.getter = [](JSContext* ctx, JSValueConst this_val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val,&pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
@@ -1042,8 +1067,8 @@ public:
 
 		JSCFunctionType set_func;
 		set_func.setter = [](JSContext* ctx, JSValueConst this_val, JSValueConst val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val, &pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
@@ -1063,8 +1088,8 @@ public:
 	void AddGet(const char* name) {
 		JSCFunctionType get_func;
 		get_func.getter = [](JSContext* ctx, JSValueConst this_val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val, &pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
@@ -1087,8 +1112,8 @@ public:
 	void AddSet(const char* name) {
 		JSCFunctionType set_func;
 		set_func.setter = [](JSContext* ctx, JSValueConst this_val, JSValueConst val) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val, &pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
@@ -1110,8 +1135,8 @@ public:
 		JSCFunctionType itr_func;
 		itr_func.iterator_next = [](JSContext* ctx, JSValueConst this_val,
 			int argc, JSValueConst* argv, int* pdone, int magic) {
-			T* pThis = (T*)JS_GetOpaque2(ctx, this_val, JS_GetClassID(this_val));
-			if (!pThis) {
+			T* pThis = nullptr;
+			if (!GetThis(this_val,&pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
