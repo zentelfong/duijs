@@ -30,7 +30,9 @@ namespace DuiLib {
 		UIEVENT_KEYDOWN,
 		UIEVENT_KEYUP,
 		UIEVENT_CHAR,
-		UIEVENT_SYSKEY,
+		UIEVENT_SYSCHAR,
+		UIEVENT_SYSKEYDOWN,
+		UIEVENT_SYSKEYUP,
 		UIEVENT__KEYEND,
 		UIEVENT__MOUSEBEGIN,
 		UIEVENT_MOUSEMOVE,
@@ -442,6 +444,10 @@ namespace DuiLib {
 
 		void ApplyCss(LPCTSTR pStrElement, LPCTSTR pStrClass);
 		void SetAttribute(LPCTSTR pStrName, LPCTSTR pStrValue);
+
+
+		void ShowToolTip(LPCTSTR pszToolTip, POINT point);
+		void HideToolTip();
 	private:
 		CStdPtrArray* GetFoundControls();
 		static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);

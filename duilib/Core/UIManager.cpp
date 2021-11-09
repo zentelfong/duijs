@@ -850,6 +850,16 @@ namespace DuiLib {
 			break;
 		case WM_SYSCHAR:
 			{
+				if (m_pFocus != NULL) {
+					TEventUI event = { 0 };
+					event.Type = UIEVENT_SYSCHAR;
+					event.chKey = (TCHAR)wParam;
+					event.ptMouse = m_ptLastMousePos;
+					event.wKeyState = MapKeyState();
+					event.dwTimestamp = ::GetTickCount();
+					m_pFocus->Event(event);
+				}
+
 				// Handle ALT-shortcut key-combinations
 				FINDSHORTCUT fs = { 0 };
 				fs.ch = toupper((int)wParam);
@@ -861,19 +871,31 @@ namespace DuiLib {
 				}
 			}
 			break;
-		case WM_SYSKEYDOWN:
-			{
-				if( m_pFocus != NULL ) {
-					TEventUI event = { 0 };
-					event.Type = UIEVENT_SYSKEY;
-					event.chKey = (TCHAR)wParam;
-					event.ptMouse = m_ptLastMousePos;
-					event.wKeyState = MapKeyState();
-					event.dwTimestamp = ::GetTickCount();
-					m_pFocus->Event(event);
-				}
+
+		case WM_SYSKEYDOWN: {
+			if (m_pFocus != NULL) {
+				TEventUI event = { 0 };
+				event.Type = UIEVENT_SYSKEYDOWN;
+				event.chKey = (TCHAR)wParam;
+				event.ptMouse = m_ptLastMousePos;
+				event.wKeyState = MapKeyState();
+				event.dwTimestamp = ::GetTickCount();
+				m_pFocus->Event(event);
 			}
 			break;
+		}
+		case WM_SYSKEYUP: {
+			if (m_pFocus != NULL) {
+				TEventUI event = { 0 };
+				event.Type = UIEVENT_SYSKEYUP;
+				event.chKey = (TCHAR)wParam;
+				event.ptMouse = m_ptLastMousePos;
+				event.wKeyState = MapKeyState();
+				event.dwTimestamp = ::GetTickCount();
+				m_pFocus->Event(event);
+			}
+			break;
+		}
 		}
 		return false;
 	}
@@ -4369,4 +4391,33 @@ namespace DuiLib {
 		}
 		return true; //let base free the medium
 	}
+
+	void CPaintManagerUI::ShowToolTip(LPCTSTR pszToolTip, POINT point) {
+		::ZeroMemory(&m_ToolTip, sizeof(TOOLINFO));
+		m_ToolTip.cbSize = sizeof(TOOLINFO);
+		m_ToolTip.uFlags = TTF_IDISHWND;
+		m_ToolTip.hwnd = m_hWndPaint;
+		m_ToolTip.uId = (UINT_PTR)m_hWndPaint;
+		m_ToolTip.hinst = m_hInstance;
+		m_ToolTip.lpszText = const_cast<LPTSTR>((LPCTSTR)pszToolTip);
+		m_ToolTip.rect = { point.x, point.y, 0, 0 };
+
+		if (m_hwndTooltip == NULL) {
+			m_hwndTooltip = ::CreateWindowEx(0, TOOLTIPS_CLASS, NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, m_hWndPaint, NULL, m_hInstance, NULL);
+			::SendMessage(m_hwndTooltip, TTM_ADDTOOL, 0, (LPARAM)&m_ToolTip);
+			::SendMessage(m_hwndTooltip, TTM_SETMAXTIPWIDTH, 0, 300);
+		}
+
+		if (!::IsWindowVisible(m_hwndTooltip)) {
+			::SendMessage(m_hwndTooltip, TTM_SETTOOLINFO, 0, (LPARAM)&m_ToolTip);
+			::SendMessage(m_hwndTooltip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ToolTip);
+		}
+	}
+
+	void CPaintManagerUI::HideToolTip() {
+		if (m_hwndTooltip)
+			::SendMessage(m_hwndTooltip, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ToolTip);
+	}
+
+
 } // namespace DuiLib
