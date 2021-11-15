@@ -34,6 +34,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 	engine.RunLoop();
 
 	ThreadManager::DestroyInstance();
+	DuiLib::CPaintManagerUI::Term();
 	CoUninitialize();
 	return 0;
 }

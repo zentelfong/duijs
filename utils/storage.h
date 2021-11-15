@@ -1,6 +1,6 @@
 #pragma once
-#include "thread.h"
-#include "weak_ptr.h"
+#include "async/thread.h"
+#include "async/weak_ptr.h"
 #include <string>
 
 typedef struct sqlite3 sqlite3;

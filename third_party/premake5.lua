@@ -29,5 +29,15 @@ project "network"
 		"network/*.cpp",
 	}
 	
+project "async"
+	language "C++"
+	kind "StaticLib"
+	includedirs{
+	}
+	files{
+		"async/*.h",
+		"async/*.cpp",
+	}
+
 	
 --include "libcef"

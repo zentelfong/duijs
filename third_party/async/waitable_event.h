@@ -32,6 +32,8 @@ class AutoResetWaitableEvent final {
   // event is returned to the unsignaled state, so that (unless |Reset()| is
   // called) each |Signal()| unblocks exactly one |Wait()|.
   void Wait();
+
+  bool WaitWithTimeout(int32_t ms);
  private:
   std::condition_variable cv_;
   std::mutex mutex_;

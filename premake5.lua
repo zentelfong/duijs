@@ -60,6 +60,7 @@ project "duijs"
 	}
 
 	links{
+		"async",
 		"quickjs",
 		"duilib",
 		"sqlite3",

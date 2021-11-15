@@ -85,6 +85,10 @@ public:
 		return weak_impl_->Release();
 	}
 
+	CWeakImpl<T>* WeakImpl() {
+		InitWeakImpl();
+		return weak_impl_;
+	}
 private:
 	inline void InitWeakImpl() {
 		if(!weak_impl_)
