@@ -1,5 +1,5 @@
 #include "binding/JsEngine.h"
-#include "utils/thread.h"
+#include "async/thread.h"
 #include <objbase.h>
 #include "Utils/CrashDump.h"
 #include "duilib/UIlib.h"

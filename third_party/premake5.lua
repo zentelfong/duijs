@@ -29,6 +29,17 @@ project "network"
 		"network/*.cpp",
 	}
 	
+project "stbimage"
+	language "C"
+	kind "StaticLib"
+	includedirs{
+		"./"
+	}
+	files{
+		"stbimage/*.h",
+		"stbimage/*.c",
+	}	
+	
 project "async"
 	language "C++"
 	kind "StaticLib"
@@ -39,6 +50,19 @@ project "async"
 		"async/*.h",
 		"async/*.cpp",
 	}
+
+project "duilib"
+	language "C++"
+	kind "StaticLib"
+	includedirs{
+		"duilib",
+	}
+	files{
+		"duilib/**.h",
+		"duilib/**.cpp",
+	}
+
+
 
 	
 --include "libcef"

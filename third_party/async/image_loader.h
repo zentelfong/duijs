@@ -10,11 +10,14 @@ public:
 	ImageData();
 	~ImageData();
 
+	bool Load(const char* file);
+
 	int x() { return x_; }
 	int y() { return y_; }
 	int comp() { return comp_; }
 	uint8_t* pixel() { return pixel_; }
 
+	void Resize(int x, int y);
 private:
 	int x_;
 	int y_;
@@ -22,7 +25,7 @@ private:
 	uint8_t* pixel_;
 };
 
-//图片加载器
+//图片加载器，如果ImageLoader被释放,则finish不会被调用
 class ImageLoader:public WeakObject<ImageLoader> {
 public:
 	ImageLoader();
@@ -33,7 +36,7 @@ public:
 		std::function<void(RefPtr<ImageData>)> finish);
 
 private:
-
+	ThreadManager* thread_mgr_;
 };
 
 

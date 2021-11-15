@@ -8,7 +8,10 @@ solution "duijs"
 		"_CRT_SECURE_NO_WARNINGS",
 		"UILIB_STATIC",
 	}
-
+	includedirs{
+		"third_party"
+	}
+	
 filter { "platforms:Win32" }
     system "windows"
     architecture "x32"
@@ -30,23 +33,12 @@ filter "configurations:Release"
 include "third_party"
 
 
-project "duilib"
-	language "C++"
-	kind "StaticLib"
-	includedirs{
-		"duilib",
-	}
-	files{
-		"duilib/**.h",
-		"duilib/**.cpp",
-	}
 
 project "duijs"
 	language "C++"
 	kind "WindowedApp"
 	includedirs{
 		"./",
-		"third_party"
 	}
 	files{
 		"quickjs/*.h",
@@ -61,6 +53,7 @@ project "duijs"
 
 	links{
 		"async",
+		"stbimage",
 		"quickjs",
 		"duilib",
 		"sqlite3",
