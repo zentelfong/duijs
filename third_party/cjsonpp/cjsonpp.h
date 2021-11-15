@@ -182,7 +182,7 @@ public:
 	int size() const  {
 		switch (type()) {
 		case kString:
-			return strlen(json_->valuestring);
+			return (int)strlen(json_->valuestring);
 		case kArray:
 		case kObject:
 			return cJSON_GetArraySize(json_);

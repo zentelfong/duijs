@@ -33,6 +33,7 @@ project "async"
 	language "C++"
 	kind "StaticLib"
 	includedirs{
+		"./"
 	}
 	files{
 		"async/*.h",
