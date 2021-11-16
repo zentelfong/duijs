@@ -63,6 +63,12 @@ project "duilib"
 	}
 
 
-
+project "gtest"
+	language "C++"
+	kind "StaticLib"
+	files{
+		"gtest/*.h",
+		"gtest/*.cc",
+	}
 	
 --include "libcef"

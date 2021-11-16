@@ -76,3 +76,36 @@ filter { "platforms:Win64" }
 	}
 
 
+project "test"
+	language "C++"
+	kind "ConsoleApp"
+	includedirs{
+	}
+	files{
+		"test/*.h",
+		"test/*.cpp",
+	}
+	links{
+		"gtest",
+		"async",
+		"stbimage",
+		"quickjs",
+		"duilib",
+		"sqlite3",
+		"cjsonpp",
+		"network",
+		"libcurl.lib",
+		"Gdiplus.lib",	
+	}
+	
+filter { "platforms:Win32" }
+	libdirs{
+		"quickjs/lib",
+		"third_party/libcurl/lib"
+	}
+
+filter { "platforms:Win64" }
+	libdirs{
+		"quickjs/lib64",
+		"third_party/libcurl/lib64"
+	}	

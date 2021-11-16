@@ -18,6 +18,9 @@ public:
 	uint8_t* pixel() { return pixel_; }
 
 	void Resize(int x, int y);
+
+	bool SaveJpg(const char* file);
+	bool SavePng(const char* file);
 private:
 	int x_;
 	int y_;
