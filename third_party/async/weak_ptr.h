@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <atomic>
 
 template<class T> class WeakPtr;
 
@@ -25,14 +26,11 @@ struct WeakImpl {
 	}
 
 	int AddRef() {
-		std::lock_guard<std::recursive_mutex> guard(lock);
 		return ++ref;
 	}
 
 	int Release() {
-		lock.lock();
 		int r = --ref;
-		lock.unlock();
 		if (r == 0) {
 			delete this;
 		}
@@ -48,7 +46,7 @@ struct WeakImpl {
 	}
 
 	T* ptr;
-	int ref;
+	std::atomic<int> ref;
 	std::recursive_mutex lock;
 };
 
