@@ -137,9 +137,7 @@ static Value setShowExplandIcon(CMenuElementUI* pThis, Context& context, ArgList
 
 void RegisterMenu(qjs::Module* module) {
 	{
-		auto ctrl = module->ExportClass<CMenuWnd>("MenuWnd");
-		ctrl.Init(nullptr);
-
+		DEFINE_CONTROL(CMenuWnd, "MenuWnd");
 		ADD_FUNCTION(create);
 		ADD_FUNCTION(close);
 

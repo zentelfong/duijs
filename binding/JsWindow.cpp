@@ -45,6 +45,10 @@ void JsWindow::InitResource() {
 
 void JsWindow::InitWindow() {
 	if (this_.HasProperty("initWindow")) {
+		Value func = this_.GetProperty("initWindow");
+		auto str = func.tag();
+
+
 		Value result = this_.Invoke("initWindow");
 		if (result.IsException()) {
 			context_->DumpError();

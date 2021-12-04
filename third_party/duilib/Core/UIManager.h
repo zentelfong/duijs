@@ -210,7 +210,7 @@ namespace DuiLib {
 	//
 	typedef CControlUI* (*LPCREATECONTROL)(LPCTSTR pstrType);
 
-	class UILIB_API CPaintManagerUI : public CIDropTarget
+	class UILIB_API CPaintManagerUI : public CIDropTarget,public WeakObject<CPaintManagerUI>
 	{
 	public:
 		CPaintManagerUI();

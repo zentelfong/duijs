@@ -58,7 +58,7 @@ namespace DuiLib {
 		CStdStringPtrMap m_VirtualWndMap;
 	};
 
-	class UILIB_API CWindowWnd
+	class UILIB_API CWindowWnd:public WeakObject<CWindowWnd>
 	{
 	public:
 		CWindowWnd();
