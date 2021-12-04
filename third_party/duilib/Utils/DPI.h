@@ -22,7 +22,7 @@ typedef enum MONITOR_DPI_TYPE {
 
 namespace DuiLib
 {
-	class UILIB_API CDPI
+	class UILIB_API CDPI:public WeakObject<CDPI>
 	{
 	public:
 		CDPI(void);

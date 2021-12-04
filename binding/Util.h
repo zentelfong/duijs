@@ -24,35 +24,32 @@ public:
 
 
 template<class T>
-static T* createControl(qjs::Context& context, qjs::ArgList& args) {
-	return new T();
+static WeakPtr<T> createControl(qjs::Context& context, qjs::ArgList& args) {
+	T* ctrl = new T();
+	return ctrl->get_weak_ptr<T>();
 }
 
-template<class T>
-static void deleteControl(T* w) {
-}
 
 #define DEFINE_CONTROL(class_,name_) \
-	auto ctrl = module->ExportClass<class_>(name_); \
-	ctrl.Init<deleteControl>(); \
+	auto ctrl = module->ExportWeakClass<class_>(name_); \
+	ctrl.Init(); \
 	ctrl.AddCtor<createControl>()
 
 #define DEFINE_CONTROL2(class_,parent_,name_) \
-	auto ctrl = module->ExportClass<class_>(name_); \
-	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
+	auto ctrl = module->ExportWeakClass<class_>(name_); \
+	ctrl.Init(WeakClass<parent_>::class_id()); \
 	ctrl.AddCtor<createControl>()
 
 #define DEFINE_VIRTUAL_CONTROL(class_,name_) \
-	auto ctrl = module->ExportClass<class_>(name_); \
-	ctrl.Init<deleteControl>(); \
+	auto ctrl = module->ExportWeakClass<class_>(name_); \
+	ctrl.Init();
 
 #define DEFINE_VIRTUAL_CONTROL2(class_,parent_,name_) \
-	auto ctrl = module->ExportClass<class_>(name_); \
-	ctrl.Init<deleteControl>(Class<parent_>::class_id()); \
+	auto ctrl = module->ExportWeakClass<class_>(name_); \
+	ctrl.Init(WeakClass<parent_>::class_id());
 
 
 #define ADD_FUNCTION(name) ctrl.AddFunc<name>(#name)
-
 
 #define EXPORT_FUNCTION(name) module->ExportFunc<name>(#name)
 

@@ -55,11 +55,12 @@ public:
 			weak_impl_->Destroy();
 	}
 
-	WeakPtr<T> weak_ptr() {
+	template<class U>
+	WeakPtr<U> get_weak_ptr() {
 		if (!weak_impl_) {
 			weak_impl_ = new WeakImpl<T>(static_cast<T*>(this));
 		}
-		return WeakPtr<T>(weak_impl_);
+		return WeakPtr<U>((WeakImpl<U>*)weak_impl_);
 	}
 
 private:

@@ -241,7 +241,8 @@ static Value getDPIObj(CPaintManagerUI* pThis, Context& context, ArgList& args) 
 
 void RegisterPaintManager(Module* module) {
 
-	DEFINE_CONTROL(CPaintManagerUI, "PaintManager");
+	auto ctrl = module->ExportClass<CPaintManagerUI>("PaintManager");
+	ctrl.Init(nullptr);
 
 	ADD_FUNCTION(isUpdateNeeded);
 	ADD_FUNCTION(needUpdate);

@@ -12,7 +12,7 @@ namespace DuiLib {
 	};
 
 
-	class UILIB_API CDialogBuilder
+	class UILIB_API CDialogBuilder:public WeakObject<CDialogBuilder>
 	{
 	public:
 		CDialogBuilder();

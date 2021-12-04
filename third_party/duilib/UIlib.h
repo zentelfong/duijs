@@ -47,6 +47,9 @@
 #include <string>
 
 #include "quickjs/weak_ptr.h"
+
+using qjs::WeakObject;
+
 #include "Utils/CssSheet.h"
 #include "Utils/Utils.h"
 #include "Utils/unzip.h"
