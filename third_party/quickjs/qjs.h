@@ -21,15 +21,18 @@ class Value;
 class Context;
 class ArgList;
 template<class T> class Class;
+template<class T> class WeakClass;
+template<class T> class RefClass;
+
 
 class Runtime {
 public:
-	Runtime() 
+	Runtime()
 		:runtime_(JS_NewRuntime())
 	{
 		//JS_SetModuleLoaderFunc(runtime_, NULL, js_module_loader, NULL);
 		js_std_init_handlers(runtime_);
-		JS_SetHostPromiseRejectionTracker(runtime_, PromiseRejectionTracker,NULL);
+		JS_SetHostPromiseRejectionTracker(runtime_, PromiseRejectionTracker, NULL);
 	}
 
 	~Runtime() {
@@ -53,8 +56,8 @@ public:
 		JS_SetMaxStackSize(runtime_, stack_size);
 	}
 
-	JSRuntime* runtime() { 
-		return runtime_; 
+	JSRuntime* runtime() {
+		return runtime_;
 	}
 private:
 	static void PromiseRejectionTracker(JSContext* ctx, JSValueConst promise,
@@ -73,11 +76,11 @@ public:
 	~Module();
 
 	//导出到模块
-	bool Export(const char* name,const Value& value);
+	bool Export(const char* name, const Value& value);
 	bool Export(const char* name, JSValue value);
 
 	bool ExportString(const char* name, const char* value) {
-		return Export(name, JS_NewString(context_,value));
+		return Export(name, JS_NewString(context_, value));
 	}
 
 	bool ExportInt32(const char* name, int32_t value) {
@@ -122,6 +125,12 @@ public:
 	template<class T>
 	Class<T> ExportClass(const char* name);
 
+
+	template<class T>
+	WeakClass<T> ExportWeakClass(const char* name);
+
+	template<class T>
+	RefClass<T> ExportRefClass(const char* name);
 private:
 	QJS_DISALLOW_COPY_AND_ASSIGN(Module);
 	static int OnInit(JSContext* ctx, JSModuleDef* m);
@@ -171,7 +180,7 @@ public:
 	Value NewFloat64(double v);
 
 	Value NewString(const char* str);
-	Value NewString(const char* str,size_t len);
+	Value NewString(const char* str, size_t len);
 
 
 	Value NewObject();
@@ -185,7 +194,7 @@ public:
 	Value NewUint8ArrayBuffer(const uint8_t* buf, size_t len);
 
 	/* Note: at least 'length' arguments will be readable in 'argv' */
-	Value NewCFunction(JSCFunction* func, const char* name,size_t length);
+	Value NewCFunction(JSCFunction* func, const char* name, size_t length);
 
 	template<Value func(Context& context, ArgList& args)>
 	Value NewFunction(const char* name);
@@ -198,7 +207,7 @@ public:
 
 
 	Value Excute(const char* input, size_t input_len,
-		const char* filename,int flags);
+		const char* filename, int flags);
 
 	Value Compile(const char* input, size_t input_len,
 		const char* filename);
@@ -233,6 +242,10 @@ public:
 		if (log_func_)
 			log_func_(msg);
 	}
+
+	void AddClassId(JSClassID classid, JSClassID parent_classid);
+	JSClassID GetParentClassId(JSClassID classid);
+
 private:
 	QJS_DISALLOW_COPY_AND_ASSIGN(Context);
 
@@ -242,11 +255,14 @@ private:
 	void Init(int argc, char** argv);
 	std::unique_ptr<Module> GetModule(JSModuleDef* m);
 
-	void* user_data_{nullptr};
+	void* user_data_{ nullptr };
 	JSContext* context_;
-	std::map<JSModuleDef*,std::unique_ptr<Module>> modules_;
+	std::map<JSModuleDef*, std::unique_ptr<Module>> modules_;
 
 	std::function<void(const std::string& msg)> log_func_;
+
+	//存储classid，及其父classid
+	std::unordered_map<JSClassID, JSClassID> class_ids_;
 };
 
 
@@ -262,7 +278,7 @@ public:
 	}
 
 	String(const char* str, size_t len)
-		:context_(nullptr),str_(str), len_(len)
+		:context_(nullptr), str_(str), len_(len)
 	{
 		if (!str_) {
 			str_ = "";
@@ -305,7 +321,7 @@ private:
 
 class Value {
 public:
-	Value() 
+	Value()
 		:context_(nullptr), value_(JS_UNDEFINED)
 	{
 	}
@@ -322,18 +338,18 @@ public:
 		value = JS_UNDEFINED;
 	}
 
-	Value(JSContext* ctx,const JSValueConst& value)
-		:context_(ctx), value_(JS_DupValue(ctx,value))
+	Value(JSContext* ctx, const JSValueConst& value)
+		:context_(ctx), value_(JS_DupValue(ctx, value))
 	{
 	}
 
-	Value(const Value& value) 
+	Value(const Value& value)
 		:context_(value.context_),
-		value_(JS_DupValue(context_,value.value_))
+		value_(JS_DupValue(context_, value.value_))
 	{
 	}
 
-	Value(Value&& value) noexcept{
+	Value(Value&& value) noexcept {
 		context_ = value.context_;
 		value_ = value.value_;
 		value.value_ = JS_UNDEFINED;
@@ -362,7 +378,7 @@ public:
 	}
 
 	JSValue CopyValue() const {
-		return JS_DupValue(context_,value_);
+		return JS_DupValue(context_, value_);
 	}
 
 	JSValue Release() {
@@ -381,7 +397,7 @@ public:
 	}
 
 	bool IsBigInt() const {
-		return JS_IsBigInt(context_,value_);
+		return JS_IsBigInt(context_, value_);
 	}
 
 	bool IsBigFloat() const {
@@ -425,7 +441,7 @@ public:
 	}
 
 	bool IsArray() const {
-		return JS_IsArray(context_,value_);
+		return JS_IsArray(context_, value_);
 	}
 
 	bool IsFunction()const {
@@ -493,7 +509,7 @@ public:
 
 	String ToString() const {
 		if (!IsString()) {
-			return String("",0);
+			return String("", 0);
 		}
 
 		size_t len;
@@ -514,7 +530,7 @@ public:
 	}
 
 	Value GetProperty(const char* prop) const {
-		return Value(context_,JS_GetPropertyStr(context_, value_, prop));
+		return Value(context_, JS_GetPropertyStr(context_, value_, prop));
 	}
 
 	Value GetProperty(uint32_t idx) const {
@@ -565,7 +581,7 @@ public:
 
 	bool DeleteProperty(const char* prop) {
 		auto atom = JS_NewAtom(context_, prop);
-		int rslt = JS_DeleteProperty(context_, value_, atom,0);
+		int rslt = JS_DeleteProperty(context_, value_, atom, 0);
 		JS_FreeAtom(context_, atom);
 		return rslt == 1;
 	}
@@ -577,8 +593,8 @@ public:
 		return rslt == 1;
 	}
 
-	bool SetProperty(const char* key,const Value& value) {
-		return JS_SetPropertyStr(context_, value_, key, 
+	bool SetProperty(const char* key, const Value& value) {
+		return JS_SetPropertyStr(context_, value_, key,
 			JS_DupValue(context_, value.value_)) == 0;
 	}
 
@@ -590,8 +606,8 @@ public:
 	}
 
 	bool SetProperty(uint32_t key, const Value& value) {
-		return JS_SetPropertyUint32(context_, value_, key, 
-			JS_DupValue(context_,value.value_)) == 0;
+		return JS_SetPropertyUint32(context_, value_, key,
+			JS_DupValue(context_, value.value_)) == 0;
 	}
 
 	bool SetProperty(uint32_t key, Value&& value) {
@@ -609,7 +625,7 @@ public:
 	}
 
 	bool SetPropertyInt32(uint32_t key, int32_t value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt32(context_,value)) == 0;
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt32(context_, value)) == 0;
 	}
 
 	bool SetPropertyInt64(uint32_t key, int64_t value) {
@@ -662,11 +678,11 @@ public:
 
 	//执行普通函数，this_obj为JS_UNDEFINED
 	Value Call() const {
-		return Value(context_,JS_Call(context_, value_, JS_UNDEFINED, 0, nullptr));
+		return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, 0, nullptr));
 	}
 
 	template<typename ...Args>
-	Value Call(Args&&... args) const  {
+	Value Call(Args&&... args) const {
 		JSValue params[] = { std::forward<Args>(args)... };
 		return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, sizeof...(args), params));
 	}
@@ -675,23 +691,23 @@ public:
 	Value Invoke(const char* func_name) const {
 		auto atom = JS_NewAtom(context_, func_name);
 		JSValue rslt = JS_Invoke(context_, value_, atom, 0, nullptr);
-		JS_FreeAtom(context_,atom);
+		JS_FreeAtom(context_, atom);
 		return Value(context_, std::move(rslt));
 	}
 
 	template<typename ...Args>
-	Value Invoke(const char* func_name,Args&&... args) const {
+	Value Invoke(const char* func_name, Args&&... args) const {
 		JSValue params[] = { std::forward<Args>(args)... };
 		auto atom = JS_NewAtom(context_, func_name);
 		JSValue rslt = JS_Invoke(context_, value_, atom, sizeof...(args), params);
 		JS_FreeAtom(context_, atom);
 		return Value(context_, std::move(rslt));
 	}
-	
+
 
 	Value ExcuteBytecode() {
-		return Value(context_, 
-			JS_EvalFunction(context_, JS_DupValue(context_,value_)));
+		return Value(context_,
+			JS_EvalFunction(context_, JS_DupValue(context_, value_)));
 	}
 
 
@@ -700,7 +716,7 @@ public:
 	}
 
 	void* GetOpaque(JSClassID class_id) const {
-		return JS_GetOpaque2(context_,value_, class_id);
+		return JS_GetOpaque2(context_, value_, class_id);
 	}
 
 
@@ -721,7 +737,7 @@ public:
 	}
 
 protected:
-	Value(JSContext* ctx, const JSValueConst& value,int)
+	Value(JSContext* ctx, const JSValueConst& value, int)
 		:context_(ctx), value_(value)
 	{
 	}
@@ -751,7 +767,7 @@ public:
 	{
 	}
 
-	ArgList(JSContext* context, int argc, JSValueConst* argv) 
+	ArgList(JSContext* context, int argc, JSValueConst* argv)
 		:size_(argc)
 	{
 		assert(size_ < MaxArgCount);
@@ -792,45 +808,15 @@ private:
 };
 
 
-class ClassIdManager {
-public:
-	ClassIdManager() {
-	}
-
-	~ClassIdManager() {
-	}
-
-	//获取thread_local变量
-	static ClassIdManager* Instance();
-
-	//添加类
-	void AddClass(JSClassID classid, JSClassID parent_classid) {
-		if(parent_classid)
-			class_ids_.insert(std::make_pair(classid, parent_classid));
-	}
-
-	//获取该类的父类
-	JSClassID GetParent(JSClassID classid) {
-		auto find = class_ids_.find(classid);
-		if (find != class_ids_.end()) {
-			return find->second;
-		}
-		return 0;
-	}
-private:
-	//存储classid，及其父classid
-	std::unordered_map<JSClassID, JSClassID> class_ids_;
-};
 
 template<class T>
-bool GetThis(JSValueConst this_val, T** pThis, JSClassID cid = 0) {
+bool GetThis(Context* ctx,JSValueConst this_val, T** pThis, JSClassID cid) {
 	if (!JS_IsObject(this_val)) {
 		return false;
 	}
 
 	JSClassID id = JS_GetClassID(this_val);
 	if (cid) {
-		ClassIdManager* cmgr = ClassIdManager::Instance();
 		JSClassID pid = id;
 		while (pid) {
 			if (pid == cid) {
@@ -838,7 +824,7 @@ bool GetThis(JSValueConst this_val, T** pThis, JSClassID cid = 0) {
 				*pThis = reinterpret_cast<T*>(JS_GetOpaque(this_val, id));
 				return *pThis != nullptr;
 			}
-			pid = cmgr->GetParent(pid);
+			pid = ctx->GetParentClassId(pid);
 		}
 		return false;
 	}
@@ -846,46 +832,107 @@ bool GetThis(JSValueConst this_val, T** pThis, JSClassID cid = 0) {
 	return *pThis != nullptr;
 }
 
+class ClassBase {
+public:
+	ClassBase(JSContext* context, Module* module, const char* name)
+		:context_(context),
+		prototype_(context, JS_NewObject(context)),
+		module_(module), class_inited_(false), class_name_(name)
+	{
+	}
+
+	~ClassBase() {
+		assert(class_inited_);
+	}
+
+
+	//添加属性等
+	void AddValue(const char* name, const Value& value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, value.CopyValue(), 0);
+	}
+
+	void AddString(const char* name, const char* value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewString(context_, value), 0);
+	}
+
+	void AddString(const char* name, const char* value, size_t len) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewStringLen(context_, value, len), 0);
+	}
+
+	void AddInt32(const char* name, int32_t value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewInt32(context_, value), 0);
+	}
+
+	void AddInt64(const char* name, int32_t value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewInt64(context_, value), 0);
+	}
+
+	void AddFloat(const char* name, float value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewFloat64(context_, value), 0);
+	}
+
+	void AddFloat64(const char* name, double value) {
+		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewFloat64(context_, value), 0);
+	}
+
+protected:
+	JSContext* context_;
+	Value prototype_;
+	Module* module_;
+	bool class_inited_;
+	const char* class_name_;
+};
+
+
 template<class T>
-void SetThis(JSValueConst this_val,T* pThis) {
+bool GetThis(JSValueConst this_val, T** pThis) {
+	if (!JS_IsObject(this_val)) {
+		return false;
+	}
+	JSClassID id = JS_GetClassID(this_val);
+	*pThis = reinterpret_cast<T*>(JS_GetOpaque(this_val, id));
+	return *pThis != nullptr;
+}
+
+
+template<class T>
+void SetThis(JSValueConst this_val, T* pThis) {
 	JS_SetOpaque(this_val, pThis);
 }
 
 
 template<class T>
-class Class {
+class Class : public ClassBase {
 public:
-	Class(JSContext* context,Module* module, const char* name)
-		:context_(context),
-		prototype_(context,JS_NewObject(context)),
-		module_(module), class_inited_(false), class_name_(name)
+	Class(JSContext* context, Module* module, const char* name)
+		:ClassBase(context, module, name)
 	{
 		if (class_id_ == 0) {
 			JS_NewClassID(&class_id_);
 		}
 	}
 
-	~Class() {
-		assert(class_inited_);
-	}
-
 	//转为c
 	static T* ToC(const Value& v) {
+		auto context = v.context();
+		if (!context) {
+			return nullptr;
+		}
 		T* pThis = nullptr;
-		return GetThis(v,&pThis,class_id_)?pThis:nullptr;
+		return GetThis(context,v, &pThis, class_id_) ? pThis : nullptr;
 	}
 
 	//创建新的js对象，注意js对象释放时会调用dtor释放ptr
-	static Value ToJs(Context& context,T* ptr) {
+	static Value ToJs(Context& context, T* ptr) {
 		if (!ptr)
 			return null_value;
 
 		Value obj = context.NewＣlassObject(class_id_);
-		SetThis(obj,ptr);
+		SetThis(obj, ptr);
 		return obj;
 	}
 
-	static Value ToJsById(Context& context, T* ptr,JSClassID cid) {
+	static Value ToJsById(Context& context, T* ptr, JSClassID cid) {
 		if (!ptr)
 			return null_value;
 		//TODO:检测cid为class_id_的子类
@@ -895,7 +942,7 @@ public:
 	}
 
 
-	void Init(JSClassFinalizer* finalizer,JSClassID parent_id = 0) {
+	void Init(JSClassFinalizer* finalizer, JSClassID parent_id = 0) {
 		assert(!class_inited_);
 		JSClassDef class_def = {
 			class_name_,finalizer,nullptr,nullptr,nullptr
@@ -903,7 +950,7 @@ public:
 		NewClass(&class_def, parent_id);
 	}
 
-	void Init(JSClassFinalizer* finalizer, JSClassGCMark* gc_mark,JSClassID parent_id = 0) {
+	void Init(JSClassFinalizer* finalizer, JSClassGCMark* gc_mark, JSClassID parent_id = 0) {
 		assert(!class_inited_);
 		JSClassDef class_def = {
 			class_name_,finalizer,gc_mark,nullptr,nullptr
@@ -928,7 +975,7 @@ public:
 	}
 
 
-	template<void dtor(T*),void mark(T*, JS_MarkFunc* mark_func)>
+	template<void dtor(T*), void mark(T*, JS_MarkFunc* mark_func)>
 	void Init2(JSClassID parent_id = 0) {
 		assert(!class_inited_);
 
@@ -952,79 +999,79 @@ public:
 	}
 
 
-	template<T* ctor(Context& context,ArgList& args)>
+	template<T* ctor(Context& context, ArgList& args)>
 	void AddCtor() {
 		JSValue constructor = JS_NewCFunction2(context_, [](JSContext* ctx,
 			JSValueConst new_target,
 			int argc, JSValueConst* argv) {
 
-			Value proto(ctx,JS_GetPropertyStr(ctx, new_target, "prototype"));
-			if (proto.IsException()) {
-				return JS_EXCEPTION;
-			}
-			Context* context = Context::get(ctx);
-			ArgList arg_list(ctx, argc, argv);
-			T* pThis = ctor(*context,arg_list);
-			if (!pThis) {
-				return JS_ThrowInternalError(ctx, "ctor error");
-			}
+				Value proto(ctx, JS_GetPropertyStr(ctx, new_target, "prototype"));
+				if (proto.IsException()) {
+					return JS_EXCEPTION;
+				}
+				Context* context = Context::get(ctx);
+				ArgList arg_list(ctx, argc, argv);
+				T* pThis = ctor(*context, arg_list);
+				if (!pThis) {
+					return JS_ThrowInternalError(ctx, "ctor error");
+				}
 
-			Value obj(ctx,JS_NewObjectProtoClass(ctx, proto, class_id_));
+				Value obj(ctx, JS_NewObjectProtoClass(ctx, proto, class_id_));
 
-			if (obj.IsException()) {
-				return JS_EXCEPTION;
-			}
-			SetThis(obj,pThis);
-			return obj.Release();
-		},class_name_, 0, JS_CFUNC_constructor, 0);
+				if (obj.IsException()) {
+					return JS_EXCEPTION;
+				}
+				SetThis(obj, pThis);
+				return obj.Release();
+			}, class_name_, 0, JS_CFUNC_constructor, 0);
 		JS_SetConstructor(context_, constructor, prototype_);
 		module_->Export(class_name_, constructor);
 	}
 
-	template<T* ctor(Context& context,Value& this_obj, ArgList& args)>
+	template<T* ctor(Context& context, Value& this_obj, ArgList& args)>
 	void AddCtor2() {
 		JSValue constructor = JS_NewCFunction2(context_, [](JSContext* ctx,
 			JSValueConst new_target,
 			int argc, JSValueConst* argv) {
 
-			Value proto(ctx, JS_GetPropertyStr(ctx, new_target, "prototype"));
-			if (proto.IsException()) {
-				return JS_EXCEPTION;
-			}
-			Context* context = Context::get(ctx);
-			ArgList arg_list(ctx, argc, argv);
+				Value proto(ctx, JS_GetPropertyStr(ctx, new_target, "prototype"));
+				if (proto.IsException()) {
+					return JS_EXCEPTION;
+				}
+				Context* context = Context::get(ctx);
+				ArgList arg_list(ctx, argc, argv);
 
-			Value obj(ctx, JS_NewObjectProtoClass(ctx, proto, class_id_));
+				Value obj(ctx, JS_NewObjectProtoClass(ctx, proto, class_id_));
 
-			if (obj.IsException()) {
-				return JS_EXCEPTION;
-			}
+				if (obj.IsException()) {
+					return JS_EXCEPTION;
+				}
 
-			T* pThis = ctor(*context, obj, arg_list);
-			if (!pThis) {
-				return JS_ThrowInternalError(ctx, "ctor error");
-			}
+				T* pThis = ctor(*context, obj, arg_list);
+				if (!pThis) {
+					return JS_ThrowInternalError(ctx, "ctor error");
+				}
 
-			SetThis(obj, pThis);
-			return obj.Release();
-		}, class_name_, 0, JS_CFUNC_constructor, 0);
+				SetThis(obj, pThis);
+				return obj.Release();
+			}, class_name_, 0, JS_CFUNC_constructor, 0);
 		JS_SetConstructor(context_, constructor, prototype_);
 		module_->Export(class_name_, constructor);
 	}
 
-	template<Value func(T* pThis,Context& context,ArgList& args)>
+	template<Value func(T* pThis, Context& context, ArgList& args)>
 	void AddFunc(const char* name) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, 
-			JS_NewCFunction(context_, 
+		JS_DefinePropertyValueStr(context_, prototype_, name,
+			JS_NewCFunction(context_,
 				[](JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv) {
-			T* pThis = nullptr;
-			if (!GetThis(this_val,&pThis)) {
-				return JS_ThrowTypeError(ctx, "no this pointer exist");
-			}
-			Context* context = Context::get(ctx);
-			ArgList arg_list(ctx, argc, argv);
-			return func(pThis,*context,arg_list).Release();
-		}, name,0),0);
+					T* pThis = nullptr;
+					if (!GetThis(this_val, &pThis)) {
+						return JS_ThrowTypeError(ctx, "no this pointer exist");
+					}
+					Context* context = Context::get(ctx);
+					ArgList arg_list(ctx, argc, argv);
+					return func(pThis, *context, arg_list).Release();
+				}, name, 0), 0);
 	}
 
 	template<JSCFunction func>
@@ -1032,12 +1079,12 @@ public:
 		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewCFunction(context_, func, name, 0));
 	}
 
-	template<Value get(T* pThis, Context& context),void set(T* pThis, Value arg)>
+	template<Value get(T* pThis, Context& context), void set(T* pThis, Value arg)>
 	void AddGetSet(const char* name) {
 		JSCFunctionType get_func;
 		get_func.getter = [](JSContext* ctx, JSValueConst this_val) {
 			T* pThis = nullptr;
-			if (!GetThis(this_val,&pThis)) {
+			if (!GetThis(this_val, &pThis)) {
 				JS_ThrowTypeError(ctx, "no this pointer exist");
 				return JS_EXCEPTION;
 			}
@@ -1046,7 +1093,7 @@ public:
 			return get(pThis, *context).Release();
 		};
 
-		JSValue get_func_value = JS_NewCFunction2(context_, get_func.generic, name, 0, JS_CFUNC_getter,0);
+		JSValue get_func_value = JS_NewCFunction2(context_, get_func.generic, name, 0, JS_CFUNC_getter, 0);
 
 
 		JSCFunctionType set_func;
@@ -1087,8 +1134,8 @@ public:
 		auto atom = JS_NewAtom(context_, name);
 
 		JS_DefineProperty(context_, prototype_, atom, JS_UNDEFINED, get_func_value, JS_UNDEFINED,
-			JS_PROP_HAS_GET  | JS_PROP_HAS_CONFIGURABLE | JS_PROP_HAS_ENUMERABLE);
-		JS_FreeValue(context_,get_func_value);
+			JS_PROP_HAS_GET | JS_PROP_HAS_CONFIGURABLE | JS_PROP_HAS_ENUMERABLE);
+		JS_FreeValue(context_, get_func_value);
 		JS_FreeAtom(context_, atom);
 	}
 
@@ -1110,27 +1157,27 @@ public:
 		auto atom = JS_NewAtom(context_, name);
 		JS_DefineProperty(context_, prototype_, atom, JS_UNDEFINED, JS_UNDEFINED, set_func_value,
 			JS_PROP_HAS_SET | JS_PROP_HAS_CONFIGURABLE | JS_PROP_HAS_ENUMERABLE);
-		JS_FreeValue(context_,set_func_value);
+		JS_FreeValue(context_, set_func_value);
 		JS_FreeAtom(context_, atom);
 	}
 
-	template<Value itr(T* pThis, Context& context, ArgList& arglist,bool& finish)>
+	template<Value itr(T* pThis, Context& context, ArgList& arglist, bool& finish)>
 	void AddIterator(const char* name) {
 		JSCFunctionType itr_func;
 		itr_func.iterator_next = [](JSContext* ctx, JSValueConst this_val,
 			int argc, JSValueConst* argv, int* pdone, int magic) {
-			T* pThis = nullptr;
-			if (!GetThis(this_val,&pThis)) {
-				JS_ThrowTypeError(ctx, "no this pointer exist");
-				return JS_EXCEPTION;
-			}
+				T* pThis = nullptr;
+				if (!GetThis(this_val, &pThis)) {
+					JS_ThrowTypeError(ctx, "no this pointer exist");
+					return JS_EXCEPTION;
+				}
 
-			Context* context = Context::get(ctx);
-			ArgList arg_list(ctx, argc, argv);
-			bool finish = false;
-			Value result = itr(pThis,*context, arg_list, finish);
-			*pdone = finish;
-			return result.Release();
+				Context* context = Context::get(ctx);
+				ArgList arg_list(ctx, argc, argv);
+				bool finish = false;
+				Value result = itr(pThis, *context, arg_list, finish);
+				*pdone = finish;
+				return result.Release();
 		};
 
 		JSValue itr_func_value = JS_NewCFunction2(context_, itr_func.generic, name, 0, JS_CFUNC_iterator_next, 0);
@@ -1139,48 +1186,18 @@ public:
 		JS_FreeAtom(context_, atom);
 	}
 
-
-	//添加属性等
-	void AddValue(const char* name,const Value& value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, value.CopyValue(), 0);
-	}
-
-	void AddString(const char* name, const char* value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewString(context_,value), 0);
-	}
-
-	void AddString(const char* name, const char* value,size_t len) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewStringLen(context_,value,len), 0);
-	}
-
-	void AddInt32(const char* name, int32_t value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewInt32(context_, value), 0);
-	}
-
-	void AddInt64(const char* name, int32_t value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewInt64(context_, value), 0);
-	}
-
-	void AddFloat(const char* name, float value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewFloat64(context_, value), 0);
-	}
-
-	void AddFloat64(const char* name, double value) {
-		JS_DefinePropertyValueStr(context_, prototype_, name, JS_NewFloat64(context_, value), 0);
-	}
-
 	static JSClassID class_id() {
 		return class_id_;
 	}
 private:
-	void NewClass(JSClassDef* class_def,JSClassID parent_id = 0) {
+	void NewClass(JSClassDef* class_def, JSClassID parent_id = 0) {
 		assert(!class_inited_);
 		JS_NewClass(JS_GetRuntime(context_), class_id_, class_def);
 		JS_SetClassProto(context_, class_id_, prototype_.CopyValue());
 		class_inited_ = true;
 
 		if (parent_id) {
-			ClassIdManager::Instance()->AddClass(class_id_, parent_id);
+			Context::get(context_)->AddClassId(class_id_, parent_id);
 
 			JSValue parent = JS_GetClassProto(context_, parent_id);
 			if (JS_IsObject(parent)) {
@@ -1192,15 +1209,7 @@ private:
 			JS_FreeValue(context_, parent);
 		}
 	}
-
-
 	static JSClassID class_id_;
-
-	JSContext* context_;
-	Value prototype_;
-	Module* module_;
-	bool class_inited_;
-	const char* class_name_;
 };
 
 
@@ -1209,13 +1218,13 @@ JSClassID Class<T>::class_id_ = 0;
 
 template<class T>
 Class<T> Module::ExportClass(const char* name) {
-	return Class<T>(context_,this, name);
+	return Class<T>(context_, this, name);
 }
 
 
 class Promise {
 public:
-	Promise(JSContext* ctx) 
+	Promise(JSContext* ctx)
 		:ctx_(ctx)
 	{
 		JSValue rfuncs[2];
@@ -1223,13 +1232,14 @@ public:
 		if (JS_IsException(promise_)) {
 			rfuncs_[0] = JS_UNDEFINED;
 			rfuncs_[1] = JS_UNDEFINED;
-		} else {
+		}
+		else {
 			rfuncs_[0] = rfuncs[0];
 			rfuncs_[1] = rfuncs[1];
 		}
 	}
 
-	Promise(Context& ctx) 
+	Promise(Context& ctx)
 		:Promise(ctx.context())
 	{
 	}
@@ -1241,10 +1251,10 @@ public:
 	}
 
 	Value promise() {
-		return Value(ctx_,promise_);
+		return Value(ctx_, promise_);
 	}
 
-	enum Type{
+	enum Type {
 		kResolve,
 		kReject,
 	};

@@ -10,7 +10,7 @@ namespace DuiLib {
 
 	typedef CControlUI* (CALLBACK* FINDCONTROLPROC)(CControlUI*, LPVOID);
 
-	class UILIB_API CControlUI:public CWeakObject<CControlUI>
+	class UILIB_API CControlUI:public qjs::WeakObject<CControlUI>
 	{
 		DECLARE_DUICONTROL(CControlUI)
 	public:

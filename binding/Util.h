@@ -1,5 +1,6 @@
 #pragma once
 #include "quickjs/qjs.h"
+#include "quickjs/weak_class.h"
 #include "duilib/UIlib.h"
 
 namespace duijs {

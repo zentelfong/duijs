@@ -23,7 +23,7 @@ bool ImageData::Load(const char* file) {
 bool ImageData::SaveJpg(const char* file) {
 	if (!pixel_)
 		return false;
-	return stbi_write_jpg(file, x_, y_, comp_, pixel_, x_ * comp_);
+	return stbi_write_jpg(file, x_, y_, comp_, pixel_, 80);
 }
 
 bool ImageData::SavePng(const char* file) {

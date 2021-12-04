@@ -11,6 +11,7 @@
 
 
 using Task = std::function<void()>;
+using TaskHandler = std::function<void(Task)>;
 
 class Thread {
 public:
@@ -41,11 +42,13 @@ public:
 		kIO,		//文件io
 		kStorage,	//存储线程
 		kImage,     //图片加载解码线程
+		kUI,        //界面线程
 	};
 
 	static ThreadManager* Instance();
 	static void DestroyInstance();
 
+	void RegisterUITaskHandler(TaskHandler ui_task_handler);
 	void PostTask(TID tid,Task task);
 
 protected:
@@ -54,4 +57,5 @@ protected:
 
 	static ThreadManager* s_instance_;
 	std::array<Thread*, 3> threads_;
+	TaskHandler ui_task_handler_;
 };

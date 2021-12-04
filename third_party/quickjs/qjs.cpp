@@ -125,7 +125,18 @@ Context::~Context() {
 }
 
 
+void Context::AddClassId(JSClassID classid, JSClassID parent_classid) {
+	if (parent_classid)
+		class_ids_.insert(std::make_pair(classid, parent_classid));
+}
 
+JSClassID Context::GetParentClassId(JSClassID classid) {
+	auto find = class_ids_.find(classid);
+	if (find != class_ids_.end()) {
+		return find->second;
+	}
+	return 0;
+}
 
 void Context::Init(int argc, char** argv) {
 	JS_SetContextOpaque(context_, this);
@@ -295,13 +306,6 @@ uint8_t* Value::ToBuffer(size_t* psize) const {
 	*psize = size;
 	return buf;
 }
-
-thread_local ClassIdManager s_class_id_manager;
-
-ClassIdManager* ClassIdManager::Instance() {
-	return &s_class_id_manager;
-}
-
 
 }//namespace
 

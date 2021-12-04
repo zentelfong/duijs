@@ -1,4 +1,5 @@
 #include "thread.h"
+#include <assert.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -101,8 +102,17 @@ void ThreadManager::DestroyInstance() {
 	s_instance_ = nullptr;
 }
 
+void ThreadManager::RegisterUITaskHandler(TaskHandler ui_task_handler) {
+	ui_task_handler_ = ui_task_handler;
+}
+
 void ThreadManager::PostTask(TID tid, Task task) {
-	threads_[tid]->PostTask(task);
+	if (tid == kUI) {
+		assert(ui_task_handler_);
+		ui_task_handler_(task);
+	} else {
+		threads_[tid]->PostTask(task);
+	}
 }
 
 ThreadManager::ThreadManager() {
