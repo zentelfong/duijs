@@ -379,7 +379,7 @@ static void deleteWindow(JsWindow* w) {
 static Value createWindow(JsWindow* pThis, Context& context, ArgList& args) {
 	HWND hWnd = NULL;
 	if (args[0].IsObject()) {
-		JsWindow* parent = Class<JsWindow>::ToC(args[0]);
+		JsWindow* parent = WeakClass<JsWindow>::ToC(args[0]);
 		auto name = args[1].ToString();
 		hWnd = pThis->CreateDuiWindow(parent ? parent->GetHWND() : NULL,
 			CDuiString(name.str(), name.len()), args[2].ToUint32(), args[3].ToUint32());

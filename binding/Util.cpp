@@ -111,7 +111,7 @@ DuiLib::TPercentInfo toPercentInfo(const qjs::Value& value) {
 }
 
 DuiLib::CControlUI* toControl(const qjs::Value& value) {
-    return qjs::Class<DuiLib::CControlUI>::ToC(value);
+    return qjs::WeakClass<DuiLib::CControlUI>::ToC(value);
 }
 
 qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control) {
