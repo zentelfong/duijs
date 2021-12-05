@@ -236,7 +236,7 @@ static Value setDpi(CPaintManagerUI* pThis, Context& context, ArgList& args) {
 
 static Value getDPIObj(CPaintManagerUI* pThis, Context& context, ArgList& args) {
 	CDPI* dpi = pThis->GetDPIObj();
-	return Class<CDPI>::ToJs(context, dpi);
+	return WeakClass<CDPI>::ToJs(context, dpi);
 }
 
 void RegisterPaintManager(Module* module) {

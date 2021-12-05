@@ -83,7 +83,7 @@ static Value getCountChild(CTreeNodeUI* pThis, Context& context, ArgList& args) 
 
 
 static Value getChildNode(CTreeNodeUI* pThis, Context& context, ArgList& args) {
-	return Class<CTreeNodeUI>::ToJs(context, pThis->GetChildNode(args[0].ToInt32()));
+	return WeakClass<CTreeNodeUI>::ToJs(context, pThis->GetChildNode(args[0].ToInt32())->get_weak_ptr<CTreeNodeUI>());
 }
 
 static Value setVisibleFolderBtn(CTreeNodeUI* pThis, Context& context, ArgList& args) {

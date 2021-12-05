@@ -1,9 +1,10 @@
 #include "duilib/UIlib.h"
 #include "quickjs/qjs.h"
+#include "quickjs/weak_class.h"
 
 #define IMPLEMENT_GET_CLASS_ID(class_name)\
 	UINT class_name::GetClassId() const \
-	{ return qjs::Class<class_name>::class_id(); }
+	{ return qjs::WeakClass<class_name>::class_id(); }
 
 namespace DuiLib {
 	IMPLEMENT_GET_CLASS_ID(CControlUI);

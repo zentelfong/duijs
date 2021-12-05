@@ -11,10 +11,7 @@ public:
 	JsWindow(qjs::Context* context, qjs::Value& this_obj);
 	~JsWindow();
 
-	void Mark(JS_MarkFunc* mark_func);
-
 	qjs::Value js_this() { return this_; }
-	qjs::Value js_manager() { return paint_manager_; }
 
 	CPaintManagerUI* manager() { return &m_pm; }
 protected:
@@ -56,7 +53,6 @@ protected:
 private:
 	qjs::Context* context_;
 	qjs::Value this_;
-	qjs::Value paint_manager_;
 };
 
 }//namespace

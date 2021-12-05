@@ -108,7 +108,8 @@ public:
 	}
 
 	~WeakPtr() {
-		ptr_->Release();
+		if(ptr_)
+			ptr_->Release();
 	}
 
 	WeakPtr<T>& operator=(WeakImpl<T>* p) {

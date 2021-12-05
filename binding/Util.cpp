@@ -115,7 +115,7 @@ DuiLib::CControlUI* toControl(const qjs::Value& value) {
 }
 
 qjs::Value toValue(qjs::Context& ctx, DuiLib::CControlUI* control) {
-    return qjs::Class<DuiLib::CControlUI>::ToJsById(ctx, control, control->GetClassId());
+    return qjs::WeakClass<DuiLib::CControlUI>::ToJsById(ctx, control->get_weak_ptr<DuiLib::CControlUI>(), control->GetClassId());
 }
 
 SYSTEMTIME toSysTime(const qjs::Value& value) {

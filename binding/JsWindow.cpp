@@ -7,19 +7,13 @@ namespace duijs {
 JsWindow::JsWindow(Context* context, Value& this_obj)
 	:context_(context),this_(this_obj)
 {
-	paint_manager_ = Class<CPaintManagerUI>::ToJs(*context, &m_pm);
+	Value mgr = WeakClass<CPaintManagerUI>::ToJs(*context, m_pm.get_weak_ptr<CPaintManagerUI>());
+	this_.SetProperty("manager", mgr);
 }
 
 JsWindow::~JsWindow() {
 	this_.SetOpaque(nullptr);
-	paint_manager_.SetOpaque(nullptr);
 }
-
-
-void JsWindow::Mark(JS_MarkFunc* mark_func) {
-	paint_manager_.Mark(mark_func);
-}
-
 
 LPCTSTR JsWindow::GetWindowClassName(void) const {
 	return _T("DUIJS");
@@ -45,10 +39,6 @@ void JsWindow::InitResource() {
 
 void JsWindow::InitWindow() {
 	if (this_.HasProperty("initWindow")) {
-		Value func = this_.GetProperty("initWindow");
-		auto str = func.tag();
-
-
 		Value result = this_.Invoke("initWindow");
 		if (result.IsException()) {
 			context_->DumpError();
@@ -378,16 +368,12 @@ LRESULT JsWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
 //////////////////////////////////////////////////////////////////////
 
-static JsWindow* newWindow(Context& context,Value& this_obj, ArgList& args) {
-	return new JsWindow(&context, this_obj);
+static WeakPtr<JsWindow> newWindow(Context& context,Value& this_obj, ArgList& args) {
+	JsWindow* wnd = new JsWindow(&context, this_obj);
+	return wnd->get_weak_ptr<JsWindow>();
 }
 
 static void deleteWindow(JsWindow* w) {
-}
-
-static void markWindow(JsWindow* pThis, JS_MarkFunc* mark_func) {
-	if(pThis)
-		pThis->Mark(mark_func);
 }
 
 static Value createWindow(JsWindow* pThis, Context& context, ArgList& args) {
@@ -457,9 +443,6 @@ static Value postMessage(JsWindow* pThis, Context& context, ArgList& args) {
 	return context.NewInt64(result);
 }
 
-static Value manager(JsWindow* pThis, Context& context) {
-	return pThis->js_manager();
-}
 
 static Value dragAcceptFiles(JsWindow* pThis, Context& context, ArgList& args) {
 	DragAcceptFiles(*pThis, args[0].ToBool());
@@ -469,8 +452,8 @@ static Value dragAcceptFiles(JsWindow* pThis, Context& context, ArgList& args) {
 
 
 void RegisterWindow(qjs::Module* module) {
-	auto window = module->ExportClass<JsWindow>("Window");
-	window.Init2<deleteWindow, markWindow>();
+	auto window = module->ExportWeakClass<JsWindow>("Window");
+	window.Init();
 	window.AddCtor2<newWindow>();
 	window.AddFunc<createWindow>("create");
 	window.AddFunc<closeWindow>("close");
@@ -482,7 +465,6 @@ void RegisterWindow(qjs::Module* module) {
 	window.AddFunc<sendMessage>("sendMessage");
 	window.AddFunc<postMessage>("postMessage");
 	window.AddFunc<dragAcceptFiles>("dragAcceptFiles");
-	window.AddGet<manager>("manager");
 
 
 }

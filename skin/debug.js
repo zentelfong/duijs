@@ -8,6 +8,7 @@ class DebugWindow extends dui.Window {
     async initWindow() {
         let mgr = this.manager;
         this.dragAcceptFiles(true);
+        mgr.getName();
         this.editOut = mgr.findControl("editOut");
         this.editInput = mgr.findControl("editInput");
         this.config = new Config();
