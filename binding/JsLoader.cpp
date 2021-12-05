@@ -6,7 +6,7 @@ namespace duijs{
 
 using namespace DuiLib;
 
-int has_suffix(const char* str, const char* suffix)
+static int has_suffix(const char* str, const char* suffix)
 {
 	size_t len = strlen(str);
 	size_t slen = strlen(suffix);

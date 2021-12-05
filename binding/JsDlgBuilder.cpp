@@ -26,10 +26,6 @@ private:
 };
 
 
-static void deleteControl(CDialogBuilder* w) {
-	delete w;
-}
-
 static Value load(CDialogBuilder* pThis, Context& context, ArgList& args) {
 	bool rslt = false;
 	if (args[0].IsString()) {
