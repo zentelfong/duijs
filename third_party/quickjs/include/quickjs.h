@@ -1,8 +1,8 @@
 /*
  * QuickJS Javascript Engine
  *
- * Copyright (c) 2017-2021 Fabrice Bellard
- * Copyright (c) 2017-2021 Charlie Gordon
+ * Copyright (c) 2017-2020 Fabrice Bellard
+ * Copyright (c) 2017-2020 Charlie Gordon
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,19 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
+#include "quickjs-version.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define QJS_STATIC_LIB 1
+
 #if _WIN32
+
+#define JS_STRICT_NAN_BOXING 1
+
 #if defined(QJS_STATIC_LIB)
 #  define QJS_DLLPORT
 #elif defined(QJS_BUILD)
@@ -44,18 +51,29 @@ extern "C" {
 #define QJS_DLLPORT
 #endif
 
-
+#if _WIN32
+#if defined(QJS_STATIC_LIB)
+#  define QJS_DLLPORT
+#elif defined(QJS_BUILD_PLUGIN)
+#  define QJSPLUGIN_DLLPORT __declspec (dllexport)
+#else
+#  define QJSPLUGIN_DLLPORT __declspec (dllimport)
+#endif
+#else
+#define QJSPLUGIN_DLLPORT
+#endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#define js_likely(x)          __builtin_expect(!!(x), 1)
-#define js_unlikely(x)        __builtin_expect(!!(x), 0)
-#define js_force_inline       inline __attribute__((always_inline))
-#define __js_printf_like(f, a)   __attribute__((format(printf, f, a)))
+  #define js_likely(x)          __builtin_expect(!!(x), 1)
+  #define js_unlikely(x)        __builtin_expect(!!(x), 0)
+  #define js_force_inline       inline __attribute__((always_inline))
+  //#define __js_printf_like(A, B)   __attribute__((format(printf, (A), (B))))
+  #define __js_printf_like(A, B) /*doesn't work, why?*/
 #else
-#define js_likely(x)     (x)
-#define js_unlikely(x)   (x)
-#define js_force_inline  inline
-#define __js_printf_like(a, b)
+  #define js_likely(x)     (x)
+  #define js_unlikely(x)   (x)
+  #define js_force_inline  __forceinline
+  #define __js_printf_like(A, B) /* */
 #endif
 
 #define JS_BOOL int
@@ -67,6 +85,15 @@ typedef struct JSClass JSClass;
 typedef uint32_t JSClassID;
 typedef uint32_t JSAtom;
 
+#ifdef CONFIG_STORAGE
+typedef enum JS_PERSISTENT_STATUS {
+  JS_NOT_PERSISTENT = 0,
+  JS_PERSISTENT_DORMANT = 1,
+  JS_PERSISTENT_LOADED = 2,
+  JS_PERSISTENT_MODIFIED = 3
+} JS_PERSISTENT_STATUS;
+#endif
+
 #if INTPTR_MAX >= INT64_MAX
 #define JS_PTR64
 #define JS_PTR64_DEF(a) a
@@ -77,6 +104,123 @@ typedef uint32_t JSAtom;
 #ifndef JS_PTR64
 #define JS_NAN_BOXING
 #endif
+
+typedef struct JSRefCountHeader {
+    int ref_count;
+} JSRefCountHeader;
+
+#define JS_FLOAT64_NAN NAN
+
+#if defined(JS_STRICT_NAN_BOXING) 
+
+  // This schema defines strict NAN boxing for both 32 and 64 versions 
+
+  // This is a method of storing values in the IEEE 754 double-precision
+  // floating-point number. double type is 64-bit, comprised of 1 sign bit, 11
+  // exponent bits and 52 mantissa bits:
+  //    7         6        5        4        3        2        1        0
+  // seeeeeee|eeeemmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm
+  //
+
+  // s0000000|0000tttt|vvvvvvvv|vvvvvvvv|vvvvvvvv|vvvvvvvv|vvvvvvvv|vvvvvvvv
+  // NaN marker   |tag|  48-bit placeholder for values: pointers, strings
+  // all bits 0   | 4 |  
+  // for non float|bit|  
+
+  // Doubles contain non-zero in NaN marker field and are stored with bits inversed 
+
+  // JS_UNINITIALIZED is strictly uint64_t(0)
+
+  enum {
+
+    JS_TAG_UNINITIALIZED = 0,
+    JS_TAG_INT = 1,
+    JS_TAG_BOOL = 2,
+    JS_TAG_NULL = 3,
+    JS_TAG_UNDEFINED = 4,
+    JS_TAG_CATCH_OFFSET = 5,
+    JS_TAG_EXCEPTION = 6,
+    JS_TAG_FLOAT64 = 7,
+
+    /* all tags with a reference count have 0b1000 bit */
+    JS_TAG_OBJECT = 8,
+    JS_TAG_FUNCTION_BYTECODE = 9, /* used internally */
+    JS_TAG_MODULE = 10, /* used internally */
+    JS_TAG_STRING = 11,
+    JS_TAG_SYMBOL = 12,
+    JS_TAG_BIG_FLOAT = 13,
+    JS_TAG_BIG_INT = 14,
+    JS_TAG_BIG_DECIMAL = 15,
+
+  };
+
+  typedef uint64_t JSValue;
+
+  #define JSValueConst JSValue
+
+  #define JS_VALUE_GET_TAG(v) (((v)>0xFFFFFFFFFFFFFull)? (unsigned)JS_TAG_FLOAT64 : (unsigned)((v) >> 48))
+
+  #define JS_VALUE_GET_INT(v)  (int)(v)
+  #define JS_VALUE_GET_BOOL(v) (int)(v)
+  #ifdef JS_PTR64
+  #define JS_VALUE_GET_PTR(v)  ((void *)((intptr_t)(v) & 0x0000FFFFFFFFFFFFull))
+  #else
+  #define JS_VALUE_GET_PTR(v)  ((void *)(intptr_t)(v))
+  #endif
+
+  #define JS_MKVAL(tag, val) (((uint64_t)(0xF & tag) << 48) | (uint32_t)(val))
+  #define JS_MKPTR(tag, ptr) (((uint64_t)(0xF & tag) << 48) | ((uint64_t)(ptr) & 0x0000FFFFFFFFFFFFull))
+
+  #define JS_NAN JS_MKVAL(JS_TAG_FLOAT64,0)
+  #define JS_INFINITY_NEGATIVE JS_MKVAL(JS_TAG_FLOAT64,1)
+  #define JS_INFINITY_POSITIVE JS_MKVAL(JS_TAG_FLOAT64,2)
+
+  static inline double JS_VALUE_GET_FLOAT64(JSValue v)
+  {
+    if (v > 0xFFFFFFFFFFFFFull) {
+    union { JSValue v; double d; } u;
+    u.v = ~v;
+    return u.d;
+  }
+    else if (v == JS_NAN)
+      return JS_FLOAT64_NAN;
+    else if (v == JS_INFINITY_POSITIVE)
+      return INFINITY;
+    else 
+      return -INFINITY;
+  }
+
+  static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
+  {
+    union { double d; uint64_t u64; } u;
+    JSValue v;
+    u.d = d;
+    /* normalize NaN */
+    if (js_unlikely((u.u64 & 0x7ff0000000000000) == 0x7ff0000000000000)) {
+      if( isnan(d))
+      v = JS_NAN;
+      else if (d < 0.0)
+        v = JS_INFINITY_NEGATIVE;
+      else
+        v = JS_INFINITY_POSITIVE;
+    }
+    else
+      v = ~u.u64;
+    return v;
+  }
+
+  //#define JS_TAG_IS_FLOAT64(tag) ((tag & 0x7ff0) != 0)
+  #define JS_TAG_IS_FLOAT64(tag) (tag == JS_TAG_FLOAT64)
+
+  /* same as JS_VALUE_GET_TAG, but return JS_TAG_FLOAT64 with NaN boxing */
+  /* Note: JS_VALUE_GET_TAG already normalized in this packaging schema*/
+  #define JS_VALUE_GET_NORM_TAG(v) JS_VALUE_GET_TAG(v)
+
+  #define JS_VALUE_IS_NAN(v) (v == JS_NAN)
+
+  #define JS_VALUE_HAS_REF_COUNT(v) ((JS_VALUE_GET_TAG(v) & 0xFFF8) == 0x8)
+
+#else // !JS_STRICT_NAN_BOXING
 
 enum {
     /* all tags with a reference count are negative */
@@ -100,25 +244,6 @@ enum {
     JS_TAG_FLOAT64     = 7,
     /* any larger tag is FLOAT64 if JS_NAN_BOXING */
 };
-
-typedef enum JSErrorEnum {
-    JS_EVAL_ERROR,
-    JS_RANGE_ERROR,
-    JS_REFERENCE_ERROR,
-    JS_SYNTAX_ERROR,
-    JS_TYPE_ERROR,
-    JS_URI_ERROR,
-    JS_INTERNAL_ERROR,
-    JS_AGGREGATE_ERROR,
-
-    JS_NATIVE_ERROR_COUNT, /* number of different NativeError objects */
-} JSErrorEnum;
-
-typedef struct JSRefCountHeader {
-    int ref_count;
-} JSRefCountHeader;
-
-#define JS_FLOAT64_NAN NAN
 
 #ifdef CONFIG_CHECK_JSVALUE
 /* JSValue consistency : it is not possible to run the code in this
@@ -242,34 +367,12 @@ typedef struct JSValue {
 #define JS_VALUE_GET_FLOAT64(v) ((v).u.float64)
 #define JS_VALUE_GET_PTR(v) ((v).u.ptr)
 
-
-#if defined(__GNUC__) || defined(__clang__)
-
 #define JS_MKVAL(tag, val) (JSValue){ (JSValueUnion){ .int32 = val }, tag }
 #define JS_MKPTR(tag, p) (JSValue){ (JSValueUnion){ .ptr = p }, tag }
-#define JS_NAN (JSValue){ .u.float64 = JS_FLOAT64_NAN, JS_TAG_FLOAT64 }
-
-#else
-
-static inline JSValue JS_MKVAL(int64_t tag, int32_t val) {
-    JSValueUnion un;
-    un.int32 = val;
-    JSValue value = { un,tag };
-    return value;
-}
-
-static inline JSValue JS_MKPTR(int64_t tag, void* p) {
-    JSValueUnion un;
-    un.ptr = p;
-    JSValue value = { un,tag };
-    return value;
-}
-
-#endif
 
 #define JS_TAG_IS_FLOAT64(tag) ((unsigned)(tag) == JS_TAG_FLOAT64)
 
-
+#define JS_NAN (JSValue){ .u.float64 = JS_FLOAT64_NAN, JS_TAG_FLOAT64 }
 
 static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
 {
@@ -293,12 +396,16 @@ static inline JS_BOOL JS_VALUE_IS_NAN(JSValue v)
 
 #endif /* !JS_NAN_BOXING */
 
+  #define JS_VALUE_HAS_REF_COUNT(v) ((unsigned)JS_VALUE_GET_TAG(v) >= (unsigned)JS_TAG_FIRST)
+
+#endif /* !JS_STRICT_NAN_BOXING */
+
 #define JS_VALUE_IS_BOTH_INT(v1, v2) ((JS_VALUE_GET_TAG(v1) | JS_VALUE_GET_TAG(v2)) == 0)
 #define JS_VALUE_IS_BOTH_FLOAT(v1, v2) (JS_TAG_IS_FLOAT64(JS_VALUE_GET_TAG(v1)) && JS_TAG_IS_FLOAT64(JS_VALUE_GET_TAG(v2)))
 
 #define JS_VALUE_GET_OBJ(v) ((JSObject *)JS_VALUE_GET_PTR(v))
 #define JS_VALUE_GET_STRING(v) ((JSString *)JS_VALUE_GET_PTR(v))
-#define JS_VALUE_HAS_REF_COUNT(v) ((unsigned)JS_VALUE_GET_TAG(v) >= (unsigned)JS_TAG_FIRST)
+
 
 /* special values */
 #define JS_NULL      JS_MKVAL(JS_TAG_NULL, 0)
@@ -391,7 +498,7 @@ QJS_DLLPORT JSRuntime *JS_NewRuntime2(const JSMallocFunctions *mf, void *opaque)
 QJS_DLLPORT void JS_FreeRuntime(JSRuntime *rt);
 QJS_DLLPORT void *JS_GetRuntimeOpaque(JSRuntime *rt);
 QJS_DLLPORT void JS_SetRuntimeOpaque(JSRuntime *rt, void *opaque);
-typedef void JS_MarkFunc(JSRuntime *rt, JSGCObjectHeader *gp);
+QJS_DLLPORT typedef void JS_MarkFunc(JSRuntime *rt, JSGCObjectHeader *gp);
 QJS_DLLPORT void JS_MarkValue(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func);
 QJS_DLLPORT void JS_RunGC(JSRuntime *rt);
 QJS_DLLPORT JS_BOOL JS_IsLiveObject(JSRuntime *rt, JSValueConst obj);
@@ -404,6 +511,8 @@ QJS_DLLPORT void JS_SetContextOpaque(JSContext *ctx, void *opaque);
 QJS_DLLPORT JSRuntime *JS_GetRuntime(JSContext *ctx);
 QJS_DLLPORT void JS_SetClassProto(JSContext *ctx, JSClassID class_id, JSValue obj);
 QJS_DLLPORT JSValue JS_GetClassProto(JSContext *ctx, JSClassID class_id);
+QJS_DLLPORT JSValue JS_GetClassName(JSContext *ctx, JSClassID class_id);
+
 
 /* the following functions are used to select the intrinsic object to
    save memory */
@@ -470,13 +579,19 @@ QJS_DLLPORT void JS_DumpMemoryUsage(FILE *fp, const JSMemoryUsage *s, JSRuntime 
 QJS_DLLPORT JSAtom JS_NewAtomLen(JSContext *ctx, const char *str, size_t len);
 QJS_DLLPORT JSAtom JS_NewAtom(JSContext *ctx, const char *str);
 QJS_DLLPORT JSAtom JS_NewAtomUInt32(JSContext *ctx, uint32_t n);
+QJS_DLLPORT JSAtom JS_NewAtomLenRT(JSRuntime *rt, const char *str, int len);
+QJS_DLLPORT JSAtom JS_NewAtomSymbolLenRT(JSRuntime *rt, const char *str, int len);
+QJS_DLLPORT const char *JS_AtomGetStr(JSContext *ctx, char *buf, int buf_size, JSAtom atom);
+QJS_DLLPORT const char *JS_AtomGetStrRT(JSRuntime *rt, char *buf, int buf_size, JSAtom atom);
 QJS_DLLPORT JSAtom JS_DupAtom(JSContext *ctx, JSAtom v);
+QJS_DLLPORT JSAtom JS_DupAtomRT(JSRuntime *rt, JSAtom v);
 QJS_DLLPORT void JS_FreeAtom(JSContext *ctx, JSAtom v);
 QJS_DLLPORT void JS_FreeAtomRT(JSRuntime *rt, JSAtom v);
 QJS_DLLPORT JSValue JS_AtomToValue(JSContext *ctx, JSAtom atom);
 QJS_DLLPORT JSValue JS_AtomToString(JSContext *ctx, JSAtom atom);
 QJS_DLLPORT const char *JS_AtomToCString(JSContext *ctx, JSAtom atom);
 QJS_DLLPORT JSAtom JS_ValueToAtom(JSContext *ctx, JSValueConst val);
+QJS_DLLPORT int    JS_AtomIsArrayIndex(JSContext *ctx, uint32_t *pval, JSAtom atom);
 
 /* object class support */
 
@@ -485,12 +600,16 @@ typedef struct JSPropertyEnum {
     JSAtom atom;
 } JSPropertyEnum;
 
+QJS_DLLPORT void js_free_prop_enum(JSContext *ctx, JSPropertyEnum *tab, uint32_t len);
+
 typedef struct JSPropertyDescriptor {
     int flags;
     JSValue value;
     JSValue getter;
     JSValue setter;
 } JSPropertyDescriptor;
+
+#define JS_PROCEED_WITH_DEFAULT 12345
 
 typedef struct JSClassExoticMethods {
     /* Return -1 if exception (can only happen in case of Proxy object),
@@ -513,7 +632,7 @@ typedef struct JSClassExoticMethods {
                                int flags);
     /* The following methods can be emulated with the previous ones,
        so they are usually not needed */
-    /* return < 0 if exception or TRUE/FALSE */
+    /* return < 0 if exception or TRUE/FALSE or JS_PROCEED_WITH_DEFAULT */
     int (*has_property)(JSContext *ctx, JSValueConst obj, JSAtom atom);
     JSValue (*get_property)(JSContext *ctx, JSValueConst obj, JSAtom atom,
                             JSValueConst receiver);
@@ -546,7 +665,6 @@ typedef struct JSClassDef {
 } JSClassDef;
 
 QJS_DLLPORT JSClassID JS_NewClassID(JSClassID *pclass_id);
-QJS_DLLPORT JSClassID JS_GetClassID(JSValueConst v);
 QJS_DLLPORT int JS_NewClass(JSRuntime *rt, JSClassID class_id, const JSClassDef *class_def);
 QJS_DLLPORT int JS_IsRegisteredClass(JSRuntime *rt, JSClassID class_id);
 
@@ -571,9 +689,9 @@ static js_force_inline JSValue JS_NewInt64(JSContext *ctx, int64_t val)
 {
     JSValue v;
     if (val == (int32_t)val) {
-        v = JS_NewInt32(ctx, val);
+        v = JS_NewInt32(ctx, (int32_t)val);
     } else {
-        v = __JS_NewFloat64(ctx, val);
+        v = __JS_NewFloat64(ctx, (double)val);
     }
     return v;
 }
@@ -612,6 +730,9 @@ static js_force_inline JSValue JS_NewFloat64(JSContext *ctx, double d)
     }
     return v;
 }
+
+QJS_DLLPORT JSValue JS_NewDate(JSContext* ctx, double ms_1970);
+QJS_DLLPORT JS_BOOL JS_IsDate(JSContext *ctx, JSValueConst obj, double* ms_since_1970);
 
 static inline JS_BOOL JS_IsNumber(JSValueConst v)
 {
@@ -677,6 +798,8 @@ static inline JS_BOOL JS_IsObject(JSValueConst v)
     return JS_VALUE_GET_TAG(v) == JS_TAG_OBJECT;
 }
 
+QJS_DLLPORT int JS_IsObjectPlain(JSContext *ctx, JSValueConst val); /* plain JS object, that is not function nor array nor anything else */
+
 QJS_DLLPORT JSValue JS_Throw(JSContext *ctx, JSValue obj);
 QJS_DLLPORT JSValue JS_GetException(JSContext *ctx);
 QJS_DLLPORT JS_BOOL JS_IsError(JSContext *ctx, JSValueConst val);
@@ -687,13 +810,25 @@ QJS_DLLPORT JSValue __js_printf_like(2, 3) JS_ThrowTypeError(JSContext *ctx, con
 QJS_DLLPORT JSValue __js_printf_like(2, 3) JS_ThrowReferenceError(JSContext *ctx, const char *fmt, ...);
 QJS_DLLPORT JSValue __js_printf_like(2, 3) JS_ThrowRangeError(JSContext *ctx, const char *fmt, ...);
 QJS_DLLPORT JSValue __js_printf_like(2, 3) JS_ThrowInternalError(JSContext *ctx, const char *fmt, ...);
+QJS_DLLPORT JSValue JS_ThrowOutOfMemory(JSContext *ctx);
 
+
+typedef enum JSErrorEnum {
+    JS_EVAL_ERROR,
+    JS_RANGE_ERROR,
+    JS_REFERENCE_ERROR,
+    JS_SYNTAX_ERROR,
+    JS_TYPE_ERROR,
+    JS_URI_ERROR,
+    JS_INTERNAL_ERROR,
+    JS_AGGREGATE_ERROR,
+
+    JS_NATIVE_ERROR_COUNT, /* number of different NativeError objects */
+} JSErrorEnum;
 
 QJS_DLLPORT JSValue JS_ThrowError(JSContext* ctx, JSErrorEnum error_num,
     const char* fmt, va_list ap);
 
-
-QJS_DLLPORT JSValue JS_ThrowOutOfMemory(JSContext *ctx);
 
 QJS_DLLPORT void __JS_FreeValue(JSContext *ctx, JSValue v);
 static inline void JS_FreeValue(JSContext *ctx, JSValue v)
@@ -705,7 +840,6 @@ static inline void JS_FreeValue(JSContext *ctx, JSValue v)
         }
     }
 }
-
 QJS_DLLPORT void __JS_FreeValueRT(JSRuntime *rt, JSValue v);
 static inline void JS_FreeValueRT(JSRuntime *rt, JSValue v)
 {
@@ -773,9 +907,21 @@ QJS_DLLPORT JSValue JS_NewObject(JSContext *ctx);
 QJS_DLLPORT JS_BOOL JS_IsFunction(JSContext* ctx, JSValueConst val);
 QJS_DLLPORT JS_BOOL JS_IsConstructor(JSContext* ctx, JSValueConst val);
 QJS_DLLPORT JS_BOOL JS_SetConstructorBit(JSContext *ctx, JSValueConst func_obj, JS_BOOL val);
+QJS_DLLPORT JS_BOOL JS_IsFunctionOfThisRealm(JSContext *ctx, JSValueConst val);
+
+QJS_DLLPORT JS_BOOL JS_AreFunctionsOfSameOrigin(JSContext *ctx, JSValue f1, JSValue f2);
+
+QJS_DLLPORT JSValue JS_GetUserClassName(JSContext *ctx, JSValueConst obj);
 
 QJS_DLLPORT JSValue JS_NewArray(JSContext *ctx);
 QJS_DLLPORT int JS_IsArray(JSContext *ctx, JSValueConst val);
+/* isArray and has 'tag' property */
+QJS_DLLPORT int     JS_IsTuple(JSContext *ctx, JSValueConst val);
+QJS_DLLPORT JSValue JS_GetTupleTag(JSContext *ctx, JSValueConst val);
+
+QJS_DLLPORT JSValue JS_NewFastArray(JSContext *ctx, int argc, JSValueConst *argv);
+/* Access an Array's internal JSValue array if available */
+QJS_DLLPORT int     JS_GetFastArray(JSContext *ctx, JSValueConst obj, JSValue **arrpp, uint32_t *countp);
 
 QJS_DLLPORT JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
                                JSAtom prop, JSValueConst receiver,
@@ -789,6 +935,9 @@ QJS_DLLPORT JSValue JS_GetPropertyStr(JSContext *ctx, JSValueConst this_obj,
                           const char *prop);
 QJS_DLLPORT JSValue JS_GetPropertyUint32(JSContext *ctx, JSValueConst this_obj,
                              uint32_t idx);
+
+/* get .length property */
+QJS_DLLPORT int JS_GetPropertyLength(JSContext *ctx, int64_t *plength, JSValueConst obj);
 
 QJS_DLLPORT int JS_SetPropertyInternal(JSContext *ctx, JSValueConst this_obj,
                            JSAtom prop, JSValue val,
@@ -810,6 +959,9 @@ QJS_DLLPORT int JS_PreventExtensions(JSContext *ctx, JSValueConst obj);
 QJS_DLLPORT int JS_DeleteProperty(JSContext *ctx, JSValueConst obj, JSAtom prop, int flags);
 QJS_DLLPORT int JS_SetPrototype(JSContext *ctx, JSValueConst obj, JSValueConst proto_val);
 QJS_DLLPORT JSValue JS_GetPrototype(JSContext *ctx, JSValueConst val);
+QJS_DLLPORT JSValue JS_GetPrototypeOfDate(JSContext *ctx);
+
+QJS_DLLPORT int JS_CopyDataProperties(JSContext *ctx, JSValueConst target, JSValueConst source, JSValueConst excluded, int setprop);
 
 #define JS_GPN_STRING_MASK  (1 << 0)
 #define JS_GPN_SYMBOL_MASK  (1 << 1)
@@ -837,6 +989,10 @@ QJS_DLLPORT JS_BOOL JS_DetectModule(const char *input, size_t input_len);
 /* 'input' must be zero terminated i.e. input[input_len] = '\0'. */
 QJS_DLLPORT JSValue JS_Eval(JSContext *ctx, const char *input, size_t input_len,
                 const char *filename, int eval_flags);
+QJS_DLLPORT JSValue JS_Eval2(JSContext *ctx, const char *input, size_t input_len,
+                const char *filename, int eval_flags, int line_no);
+
+QJS_DLLPORT JSValue JS_EvalFunction(JSContext *ctx, JSValue fun_obj);
 /* same as JS_Eval() but with an explicit 'this_obj' parameter */
 QJS_DLLPORT JSValue JS_EvalThis(JSContext *ctx, JSValueConst this_obj,
                     const char *input, size_t input_len,
@@ -858,6 +1014,7 @@ QJS_DLLPORT int JS_DefinePropertyGetSet(JSContext *ctx, JSValueConst this_obj,
 QJS_DLLPORT void JS_SetOpaque(JSValue obj, void *opaque);
 QJS_DLLPORT void *JS_GetOpaque(JSValueConst obj, JSClassID class_id);
 QJS_DLLPORT void *JS_GetOpaque2(JSContext *ctx, JSValueConst obj, JSClassID class_id);
+QJS_DLLPORT JSClassID JS_GetClassID(JSValueConst obj);
 
 /* 'buf' must be zero terminated i.e. buf[buf_len] = '\0'. */
 QJS_DLLPORT JSValue JS_ParseJSON(JSContext *ctx, const char *buf, size_t buf_len,
@@ -947,11 +1104,9 @@ QJS_DLLPORT uint8_t *JS_WriteObject2(JSContext *ctx, size_t *psize, JSValueConst
 #define JS_READ_OBJ_ROM_DATA  (1 << 1) /* avoid duplicating 'buf' data */
 #define JS_READ_OBJ_SAB       (1 << 2) /* allow SharedArrayBuffer */
 #define JS_READ_OBJ_REFERENCE (1 << 3) /* allow object references */
-QJS_DLLPORT JSValue JS_ReadObject(JSContext *ctx, const uint8_t *buf, size_t buf_len,
-                      int flags);
-/* instantiate and evaluate a bytecode function. Only used when
-   reading a script or module with JS_ReadObject() */
-QJS_DLLPORT JSValue JS_EvalFunction(JSContext *ctx, JSValue fun_obj);
+QJS_DLLPORT JSValue JS_ReadObject(JSContext *ctx, const uint8_t *buf, size_t buf_len, int flags);
+QJS_DLLPORT JSValue JS_ReadObject2(JSContext *ctx, const uint8_t *buf, size_t buf_len, int flags, size_t* remnants_len);
+
 /* load the dependencies of the module 'obj'. Useful when JS_ReadObject()
    returns a module. */
 QJS_DLLPORT int JS_ResolveModule(JSContext *ctx, JSValueConst obj);
@@ -961,6 +1116,9 @@ QJS_DLLPORT JSAtom JS_GetScriptOrModuleName(JSContext *ctx, int n_stack_levels);
 /* only exported for os.Worker() */
 QJS_DLLPORT JSModuleDef *JS_RunModule(JSContext *ctx, const char *basename,
                           const char *filename);
+
+QJS_DLLPORT JSValue JS_GetModuleExportItemStr(JSContext *ctx, JSModuleDef *m, const char *name);
+QJS_DLLPORT JSValue JS_GetModuleExportItem(JSContext *ctx, JSModuleDef *m, JSAtom atom);
 
 /* C function definition */
 typedef enum JSCFunctionEnum {  /* XXX: should rename for namespace isolation */
@@ -1095,6 +1253,22 @@ QJS_DLLPORT int JS_SetModuleExport(JSContext *ctx, JSModuleDef *m, const char *e
                        JSValue val);
 QJS_DLLPORT int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
                            const JSCFunctionListEntry *tab, int len);
+
+#ifdef CONFIG_DEBUGGER
+
+typedef JS_BOOL JSDebuggerCheckLineNoF(JSContext *ctx, JSAtom file_name, uint32_t line_no, const uint8_t *pc);
+
+QJS_DLLPORT void JS_SetBreakpointHandler(JSContext *ctx, JSDebuggerCheckLineNoF* line_hit_handler);
+QJS_DLLPORT void JS_SetDebuggerMode(JSContext *ctx, int onoff);
+
+QJS_DLLPORT uint32_t js_debugger_stack_depth(JSContext *ctx);
+QJS_DLLPORT JSValue  js_debugger_build_backtrace(JSContext *ctx, const uint8_t *cur_pc);
+QJS_DLLPORT JSValue  js_debugger_closure_variables(JSContext *ctx, int stack_index);
+QJS_DLLPORT JSValue  js_debugger_local_variables(JSContext *ctx, int stack_index);
+
+#endif
+
+QJS_DLLPORT void*    js_debugger_get_object_id(JSValue val);
 
 #undef js_unlikely
 #undef js_force_inline

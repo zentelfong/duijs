@@ -71,4 +71,22 @@ project "gtest"
 		"gtest/*.cc",
 	}
 	
+project "quickjs"
+	language "C++"
+	kind "StaticLib"
+	defines{
+		"CONFIG_BIGNUM"
+	}
+	includedirs{
+		"quickjs/include",
+	}
+	files{
+		"quickjs/include/*.h",
+		"quickjs/src/*.c",
+		"quickjs/*.h",
+		"quickjs/*.cpp"
+	}	
+	
+	
+	
 --include "libcef"

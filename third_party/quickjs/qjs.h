@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "quickjs.h"
-#include "quickjs-libc.h"
+#include "include/quickjs.h"
+#include "include/quickjs-libc.h"
 #include <utility>
 #include <memory>
 #include <map>
