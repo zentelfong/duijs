@@ -82,6 +82,7 @@ project "quickjs"
 	}
 	files{
 		"quickjs/include/*.h",
+		"quickjs/src/*.h",
 		"quickjs/src/*.c",
 		"quickjs/*.h",
 		"quickjs/*.cpp"
