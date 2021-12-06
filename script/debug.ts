@@ -6,6 +6,7 @@ class DebugWindow extends dui.Window{
 	editOut:dui.RichEdit;
 	editInput:dui.Edit;
 	config:Config;
+	lastInput?:string;
 
 	constructor(){
 		super();
@@ -32,6 +33,9 @@ class DebugWindow extends dui.Window{
 	}
 	
 	async onDestroy(){
+		if(this.lastInput){
+			await this.config.set("Debug.lastInput",this.lastInput);
+		}
 		await this.config.close();
 		dui.postQuitMessage(0);
 	}
@@ -40,7 +44,7 @@ class DebugWindow extends dui.Window{
 		let text = edit.getText();
 		try{
 			dui.exec(text);
-			this.config.set("Debug.lastInput",text);
+			this.lastInput = text;
 		}catch(e){
 			this.print(e);
 		}
@@ -73,7 +77,7 @@ class DebugWindow extends dui.Window{
 let debugWindow = new DebugWindow();
 
 debugWindow.create("DuiJs调试窗口",dui.WS_OVERLAPPEDWINDOW);
-debugWindow.manager.setDpi(144);
+//debugWindow.manager.setDpi(144);
 debugWindow.centerWindow();
 debugWindow.showWindow();
 
