@@ -4,6 +4,33 @@
 #include "Utils/CrashDump.h"
 #include "duilib/UIlib.h"
 
+BOOL FileExist(const TCHAR* pszFileName)
+{
+	BOOL bExist = FALSE;
+	HANDLE hFile;
+
+	if (NULL != pszFileName)
+	{
+		// Use the preferred Win32 API call and not the older OpenFile.
+		hFile = CreateFile(
+			pszFileName,
+			GENERIC_READ,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			OPEN_EXISTING,
+			0,
+			0);
+
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			// If the handle is valid then the file exists.
+			CloseHandle(hFile);
+			bExist = TRUE;
+		}
+	}
+
+	return (bExist);
+}
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow){
 	CrashDump crash_dump;
@@ -19,7 +46,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 	if (nArgs == 2) {
 		DuiLib::CPaintManagerUI::SetResourceZip(szArglist[1], true);
 	} else {
-		DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
+		//º”‘ÿskin.zip
+		DuiLib::CDuiString path = DuiLib::CPaintManagerUI::GetInstancePath() + _T("skin.zip");
+		if (FileExist(path)) {
+			DuiLib::CPaintManagerUI::SetResourceZip(path, true);
+		} else {
+			DuiLib::CPaintManagerUI::SetResourcePath(_T("../skin/"));
+		}
 	}
 
 	LocalFree(szArglist);

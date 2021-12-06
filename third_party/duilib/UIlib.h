@@ -48,7 +48,11 @@
 
 #include "quickjs/weak_ptr.h"
 
-using qjs::WeakObject;
+namespace DuiLib {
+	using qjs::WeakObject;
+	using qjs::WeakPtr;
+}
+
 
 #include "Utils/CssSheet.h"
 #include "Utils/Utils.h"
