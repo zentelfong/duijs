@@ -108,4 +108,5 @@ filter { "platforms:Win64" }
 	libdirs{
 		"quickjs/lib64",
 		"third_party/libcurl/lib64"
-	}	
+	}
+	
