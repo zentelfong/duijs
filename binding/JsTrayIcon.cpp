@@ -17,7 +17,7 @@ static Value createTrayIcon(CTrayIcon* pThis, Context& context, ArgList& args) {
 		return context.ThrowTypeError("arg0 need window");
 	}
 
-	pThis->CreateTrayIcon(*window,args[1].ToInt32(),JsString(args[2]), args[3].ToInt32());
+	pThis->CreateTrayIcon(window->GetHWND(),args[1].ToInt32(),JsString(args[2]), args[3].ToInt32());
 	return undefined_value;
 }
 
