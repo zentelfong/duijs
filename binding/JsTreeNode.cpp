@@ -3,7 +3,7 @@
 namespace duijs {
 
 static inline DuiLib::CTreeNodeUI* toTreeNode(const qjs::Value& value) {
-	return qjs::Class<DuiLib::CTreeNodeUI>::ToC(value);
+	return qjs::WeakClass<DuiLib::CTreeNodeUI>::ToC(value);
 }
 
 

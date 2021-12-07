@@ -49,7 +49,7 @@ static Value load(CDialogBuilder* pThis, Context& context, ArgList& args) {
 static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 	CControlUI* control = nullptr;
 	IDialogBuilderCallback* callback = nullptr;
-	CPaintManagerUI* manager = nullptr;
+	WeakPtr<CPaintManagerUI> manager;
 	CControlUI* parent = nullptr;
 
 	if (args[0].IsString()) {
@@ -59,7 +59,7 @@ static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 			callback = new JsDialogBuilderCallback(context, args[2]);
 		}
 
-		manager = Class<CPaintManagerUI>::ToC(args[3]);
+		manager = WeakClass<CPaintManagerUI>::ToC(args[3]);
 		parent = toControl(args[4]);
 
 		control = pThis->Create(STRINGorID(name), type, callback, manager, parent);
@@ -71,7 +71,7 @@ static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 			callback = new JsDialogBuilderCallback(context, args[2]);
 		}
 
-		manager = Class<CPaintManagerUI>::ToC(args[3]);
+		manager = WeakClass<CPaintManagerUI>::ToC(args[3]);
 		parent = toControl(args[4]);
 
 		control = pThis->Create(STRINGorID(id), type, callback, manager, parent);
@@ -80,7 +80,7 @@ static Value create(CDialogBuilder* pThis, Context& context, ArgList& args) {
 		if (args[0].IsFunction()) {
 			callback = new JsDialogBuilderCallback(context, args[0]);
 		}
-		manager = Class<CPaintManagerUI>::ToC(args[1]);
+		manager = WeakClass<CPaintManagerUI>::ToC(args[1]);
 		parent = toControl(args[2]);
 
 		control = pThis->Create(callback, manager, parent);

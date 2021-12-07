@@ -6,7 +6,7 @@ namespace duijs {
 
 
 static Value create(CMenuWnd* pThis, Context& context, ArgList& args) {
-	JsWindow* mainWnd = Class<JsWindow>::ToC(args[0]);
+	auto mainWnd = WeakClass<JsWindow>::ToC(args[0]);
 	if (!mainWnd) {
 		return context.ThrowTypeError("arg0 needs window");
 	}

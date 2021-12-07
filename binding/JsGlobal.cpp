@@ -97,7 +97,7 @@ static Value runGC(Context& context, ArgList& args) {
 static Value messageBox(Context& context, ArgList& args) {
 	int rslt = 0;
 	if (args[0].IsObject()) {
-		JsWindow* wnd = Class<JsWindow>::ToC(args[0]);
+		auto wnd = WeakClass<JsWindow>::ToC(args[0]);
 		JsString text(args[1]);
 		JsString caption(args[2]);
 		rslt = MessageBox(wnd?wnd->GetHWND():nullptr, text,caption,args[3].ToUint32());

@@ -12,7 +12,7 @@ static void deleteTray(CTrayIcon* w) {
 }
 
 static Value createTrayIcon(CTrayIcon* pThis, Context& context, ArgList& args) {
-	JsWindow* window = Class<JsWindow>::ToC(args[0]);
+	auto window = WeakClass<JsWindow>::ToC(args[0]);
 	if (!window) {
 		return context.ThrowTypeError("arg0 need window");
 	}
