@@ -225,7 +225,7 @@ LRESULT JsWindow::OnKeyUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandle
 			context_->DumpError();
 		}
 	}
-	return WindowImplBase::OnKeyDown(uMsg, wParam, lParam, bHandled);
+	return WindowImplBase::OnKeyUp(uMsg, wParam, lParam, bHandled);
 }
 
 LRESULT JsWindow::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
