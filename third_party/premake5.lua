@@ -21,6 +21,9 @@ project "cjsonpp"
 project "network"
 	language "C++"
 	kind "StaticLib"
+	defines{
+		"CURL_STATICLIB"
+	}
 	includedirs{
 		"./libcurl/include",
 	}
@@ -88,6 +91,6 @@ project "quickjs"
 		"quickjs/*.cpp"
 	}	
 	
-	
+include "libcurl"
 	
 --include "libcef"

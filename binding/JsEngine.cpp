@@ -1,7 +1,7 @@
 #include "duilib/UIlib.h"
 #include "JsEngine.h"
 #include "JsTaskManager.h"
-
+#include "async/thread.h"
 
 namespace duijs {
 using namespace qjs;
@@ -144,6 +144,10 @@ bool JsEngine::Init() {
 
 	context_->SetLogFunc([this](const std::string& msg) {
 		Print(msg.c_str(), msg.length());
+		});
+
+	ThreadManager::Instance()->RegisterUITaskHandler([this](std::function<void()> task) {
+		manager_->PostTask(task);
 		});
 	return true;
 }

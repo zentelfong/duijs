@@ -63,11 +63,11 @@ void ImageLoader::Load(const std::string& path,
 	std::string path_(path);
 	thread_mgr_->PostTask(ThreadManager::kImage, [path_,ptr,finish]() {
 		auto img_data = MakeRefCounted<ImageData>();
-		img_data->Load(path_.c_str());
+		bool rslt = img_data->Load(path_.c_str());
 
 		auto pThis = ptr.Lock();
 		if(pThis)
-			finish(img_data);
+			finish(rslt?img_data:nullptr);
 		ptr.Unlock();
 	});
 }
