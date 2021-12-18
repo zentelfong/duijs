@@ -56,6 +56,7 @@ extern void RegisterStorage(qjs::Module* module);
 extern void RegisterQrControl(qjs::Module* module);
 
 extern void RegisterHttpClient(Module* module);
+extern void RegisterFileDownload(qjs::Module* module);
 
 extern JSModuleDef* jsModuleLoader(JSContext* ctx,
 	const char* module_name, void* opaque);
@@ -141,6 +142,7 @@ bool JsEngine::Init() {
 	RegisterTreeView(module);
 
 	RegisterStorage(module);
+	RegisterFileDownload(module);
 
 	context_->SetLogFunc([this](const std::string& msg) {
 		Print(msg.c_str(), msg.length());

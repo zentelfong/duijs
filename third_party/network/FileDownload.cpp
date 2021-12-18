@@ -297,6 +297,12 @@ std::string CurlDownload::getUrl() const
     return m_url;
 }
 
+std::string CurlDownload::getDestination() const
+{
+    LockHolder locker(m_mutex);
+    return m_destination;
+}
+
 void CurlDownload::closeFile()
 {
     LockHolder locker(m_mutex);
@@ -375,8 +381,6 @@ void CurlDownload::didReceiveHeader(const std::string& header)
 void CurlDownload::didReceiveData(void* data, int size)
 {
     LockHolder locker(m_mutex);
-
-    RefCountedPtr<CurlDownload> protectedThis(this);
     didReceiveDataOfLength(size);
     writeDataToFile(static_cast<const char*>(data), size);
 }
@@ -386,7 +390,7 @@ void CurlDownload::didReceiveDataOfLength(int size)
     m_download += size;
     m_rateTracker.AddSamples(size);
     if (m_listener)
-        m_listener->didReceiveDataOfLength(size);
+        m_listener->didProgress(m_fileSize,m_download);
 }
 
 void CurlDownload::didFinish()
@@ -414,7 +418,7 @@ void CurlDownload::didFail()
 size_t CurlDownload::writeCallback(void* ptr, size_t size, size_t nmemb, void* data)
 {
     size_t totalSize = size * nmemb;
-    CurlDownload* download = reinterpret_cast<CurlDownload*>(data);
+    RefCountedPtr<CurlDownload> download = reinterpret_cast<CurlDownload*>(data);
 
     if (download)
         download->didReceiveData(ptr, totalSize);
@@ -425,7 +429,7 @@ size_t CurlDownload::writeCallback(void* ptr, size_t size, size_t nmemb, void* d
 size_t CurlDownload::headerCallback(char* ptr, size_t size, size_t nmemb, void* data)
 {
     size_t totalSize = size * nmemb;
-    CurlDownload* download = reinterpret_cast<CurlDownload*>(data);
+    RefCountedPtr<CurlDownload> download = reinterpret_cast<CurlDownload*>(data);
 
     std::string header(static_cast<const char*>(ptr), totalSize);
 
@@ -447,11 +451,5 @@ void CurlDownload::downloadFailedCallback(CurlDownload* download)
         download->didFail();
 }
 
-void CurlDownload::receivedDataCallback(CurlDownload* download, int size)
-{
-    if (download)
-        download->didReceiveDataOfLength(size);
-}
-
-}
+}//namespace
 

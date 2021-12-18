@@ -56,7 +56,7 @@ private:
 
 class CurlDownloadListener {
 public:
-    virtual void didReceiveDataOfLength(int size) { }
+    virtual void didProgress(int total,int size) { }
     virtual void didFinish() { }
     virtual void didFail() { }
 };
@@ -80,12 +80,10 @@ public:
 
     std::string getTempPath() const;
     std::string getUrl() const;
+    std::string getDestination() const;
 
     bool deletesFileUponFailure() const { return m_deletesFileUponFailure; }
     void setDeletesFileUponFailure(bool deletesFileUponFailure) { m_deletesFileUponFailure = deletesFileUponFailure; }
-
-    //设置目标文件路径
-    void setDestination(const std::string& destination) { m_destination = destination; }
 
 private:
     void closeFile();
@@ -108,7 +106,6 @@ private:
 
     static void downloadFinishedCallback(CurlDownload*);
     static void downloadFailedCallback(CurlDownload*);
-    static void receivedDataCallback(CurlDownload*, int size);
 
     CURL* m_curlHandle;
     curl_slist* m_customHeaders;

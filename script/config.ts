@@ -17,7 +17,7 @@ export class Config extends Storage {
 
     async get(key:string){
         let data = await this.exec(`SELECT * FROM Config WHERE key = '${this.escape(key)}'`);
-        if(data.code == 0){
+        if(data.code == 0 && data.data.length > 0){
             return data.data[0].value;
         }
         return null;

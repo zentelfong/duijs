@@ -80,17 +80,7 @@ project "test"
 		"sqlite3",
 		"cjsonpp",
 		"network",
-		"libcurl.lib",
+		"libcurl",
 		"Gdiplus.lib",	
-	}
-	
-filter { "platforms:Win32" }
-	libdirs{
-		"third_party/libcurl/lib"
-	}
-
-filter { "platforms:Win64" }
-	libdirs{
-		"third_party/libcurl/lib64"
 	}
 	
