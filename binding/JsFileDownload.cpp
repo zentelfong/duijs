@@ -25,9 +25,12 @@ public:
     void didProgress(int total, int size) override { 
         RefCountedPtr<JsFileDownload> pThis(this);
         if (pThis->this_) {
-            task_mgr_->PostTask([pThis]() {
+            task_mgr_->PostTask([pThis, total,size]() {
                 if (pThis->this_ && pThis->this_->HasProperty("progress")) {
-                    pThis->this_->Invoke("progress");
+                    auto context = pThis->this_->context();
+                    pThis->this_->Invoke("progress", 
+                        context->NewInt32(total),
+                        context->NewInt32(size));
                 }
             });
         }
@@ -38,7 +41,8 @@ public:
         if (pThis->this_) {
             task_mgr_->PostTask([pThis]() {
                 if (pThis->this_ && pThis->this_->HasProperty("finish")) {
-                    pThis->this_->Invoke("finish");
+                    auto context = pThis->this_->context();
+                    pThis->this_->Invoke("finish", context->NewString(pThis->getDestination().c_str()));
                 }
                 delete pThis->this_;
                 pThis->this_ = nullptr;
@@ -84,10 +88,12 @@ static void deleteDownload(JsFileDownload* w) {
 
 static Value start(JsFileDownload* pThis, Context& context, ArgList& args) {
     pThis->start();
+    return undefined_value;
 }
 
 static Value cancel(JsFileDownload* pThis, Context& context, ArgList& args) {
     pThis->cancel();
+    return undefined_value;
 }
 
 
