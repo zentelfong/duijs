@@ -9,6 +9,7 @@
 #include <map>
 #include "RefCount.h"
 #include "FileUtil.h"
+#include "RateTracker.h"
 
 typedef void CURLM;
 typedef void CURL;
@@ -55,7 +56,6 @@ private:
 
 class CurlDownloadListener {
 public:
-    virtual void didReceiveResponse() { }
     virtual void didReceiveDataOfLength(int size) { }
     virtual void didFinish() { }
     virtual void didFail() { }
@@ -98,8 +98,7 @@ private:
     void didReceiveHeader(const std::string& header);
     void didReceiveData(void* data, int size);
 
-    // Called on main thread.
-    void didReceiveResponse();
+
     void didReceiveDataOfLength(int size);
     void didFinish();
     void didFail();
@@ -110,7 +109,6 @@ private:
     static void downloadFinishedCallback(CurlDownload*);
     static void downloadFailedCallback(CurlDownload*);
     static void receivedDataCallback(CurlDownload*, int size);
-    static void receivedResponseCallback(CurlDownload*);
 
     CURL* m_curlHandle;
     curl_slist* m_customHeaders;
@@ -121,6 +119,9 @@ private:
     bool m_deletesFileUponFailure;
     mutable std::mutex m_mutex;
     CurlDownloadListener *m_listener;
+    int m_fileSize;
+    int m_download;
+    RateTracker m_rateTracker;
 
     static CurlDownloadManager m_downloadManager;
 

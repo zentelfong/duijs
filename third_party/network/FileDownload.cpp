@@ -216,6 +216,9 @@ CurlDownload::CurlDownload()
     , m_tempHandle(nullptr)
     , m_deletesFileUponFailure(false)
     , m_listener(nullptr)
+    , m_fileSize(-1)
+    , m_download(0)
+    , m_rateTracker(100,10)
 {
 }
 
@@ -244,7 +247,7 @@ void CurlDownload::init(CurlDownloadListener* listener, const std::string& url,c
     m_url = url;
     m_destination = path;
 
-    //https验证
+    //取消https证书验证
     curl_easy_setopt(m_curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(m_curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
 
@@ -271,6 +274,8 @@ void CurlDownload::init(CurlDownloadListener* listener, const std::string& url,c
 
 bool CurlDownload::start()
 {
+    m_download = 0;
+    m_fileSize = -1;
     AddRef(); // CurlDownloadManager::downloadThread will call deref when the download has finished.
     return m_downloadManager.add(m_curlHandle);
 }
@@ -351,7 +356,20 @@ void CurlDownload::addHeaders(const HeaderMap& header)
 
 void CurlDownload::didReceiveHeader(const std::string& header)
 {
+    if (header == "\r\n" || header == "\n") {
+        return;
+    }
 
+    size_t splitPos = header.find(":");
+    if (splitPos != std::string::npos) {
+        auto key = header.substr(0, splitPos);
+        auto value = header.substr(splitPos + 1);
+
+        //从header里获取文件大小
+        if (stricmp(key.c_str(), "Content-Length") == 0) {
+            m_fileSize = strtol(value.c_str(),nullptr,10);
+        }
+    }
 }
 
 void CurlDownload::didReceiveData(void* data, int size)
@@ -363,14 +381,10 @@ void CurlDownload::didReceiveData(void* data, int size)
     writeDataToFile(static_cast<const char*>(data), size);
 }
 
-void CurlDownload::didReceiveResponse()
-{
-    if (m_listener)
-        m_listener->didReceiveResponse();
-}
-
 void CurlDownload::didReceiveDataOfLength(int size)
 {
+    m_download += size;
+    m_rateTracker.AddSamples(size);
     if (m_listener)
         m_listener->didReceiveDataOfLength(size);
 }
@@ -437,12 +451,6 @@ void CurlDownload::receivedDataCallback(CurlDownload* download, int size)
 {
     if (download)
         download->didReceiveDataOfLength(size);
-}
-
-void CurlDownload::receivedResponseCallback(CurlDownload* download)
-{
-    if (download)
-        download->didReceiveResponse();
 }
 
 }
