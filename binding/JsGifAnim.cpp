@@ -26,18 +26,18 @@ static Value isAutoSize(CGifAnimUI* pThis, Context& context, ArgList& args) {
 
 
 static Value playGif(CGifAnimUI* pThis, Context& context, ArgList& args) {
-	pThis->PlayGif();
+	pThis->Play();
 	return null_value;
 }
 
 
 static Value pauseGif(CGifAnimUI* pThis, Context& context, ArgList& args) {
-	pThis->PauseGif();
+	pThis->Pause();
 	return null_value;
 }
 
 static Value stopGif(CGifAnimUI* pThis, Context& context, ArgList& args) {
-	pThis->StopGif();
+	pThis->Stop();
 	return null_value;
 }
 

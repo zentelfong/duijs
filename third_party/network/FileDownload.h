@@ -72,6 +72,7 @@ public:
         const std::string& url, const std::string& path);
 
     void init(CurlDownloadListener*, const std::string& url, const std::string& path);
+    void addHeaders(const HeaderMap&);
 
     void setListener(CurlDownloadListener* listener) { m_listener = listener; }
 
@@ -89,8 +90,6 @@ private:
     void closeFile();
     void moveFileToDestination();
     void writeDataToFile(const char* data, int size);
-
-    void addHeaders(const HeaderMap&);
 
     // Called on download thread.
     void didReceiveHeader(const std::string& header);

@@ -16,7 +16,7 @@
       <Button name="closebtn"/>
     </HorizontalLayout>
     
-    <VerticalLayout bkcolor="#EEFFFFFF">
+    <VerticalLayout bkcolor="#EEFFFFFF" vscrollbar="true">
       <QrControl name="qrcode" text="1234567" width="100" height="100"/>
       <HorizontalLayout height="20" childpadding="20">
         <Button name="homepage_btn" cursor="hand" text="hometext" resourcetext="true" showhtml="true" autocalcwidth="true" valign="vcenter" align="left" textcolor="#FFEEEEEE" hottextcolor="#FFFF00FF" font="1" tooltip="官网" click="gotoWeb"/>
@@ -32,6 +32,7 @@
 
       </HorizontalLayout>
       <Control />
+	  <GifAnim bkimage="test.gif" autosize="true"/>
     </VerticalLayout>
   </VerticalLayout>
 </Window>

@@ -93,7 +93,6 @@ namespace DuiLib {
 #include "Control/UIText.h"
 #include "Control/UIEdit.h"
 #include "Control/UIGifAnim.h"
-#include "Control/UIGifAnimEx.h"
 
 #include "Control/UIAnimation.h"
 #include "Layout/UIAnimationTabLayout.h"
