@@ -812,7 +812,12 @@ namespace DuiLib {
 
 	void CControlUI::DoInit()
 	{
-
+		//BUG:在此处应用样式会覆盖已设置的属性
+		CDuiString cls = GetClass();
+		if (cls.Right(2) == _T("UI")) {
+			cls.SetAt(cls.GetLength() - 2,_T('\0'));
+		}
+		m_pManager->ApplyCss(this, cls, GetCssClass(),GetName());
 	}
 
 	void CControlUI::Event(TEventUI& event)
@@ -885,6 +890,10 @@ namespace DuiLib {
 		return str;
 	}
 
+	const CDuiString& CControlUI::GetCssClass() const {
+		return m_sCssClass;
+	}
+
 	void CControlUI::AddCustomAttribute(LPCTSTR pstrName, LPCTSTR pstrAttr)
 	{
 		if( pstrName == NULL || pstrName[0] == _T('\0') || pstrAttr == NULL || pstrAttr[0] == _T('\0') ) return;
@@ -930,13 +939,14 @@ namespace DuiLib {
 	void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
 		// 是否样式表
-		if(m_pManager != NULL) {
+		if (m_pManager != NULL && _tcsicmp(pstrName, _T("style")) == 0) {
 			LPCTSTR pStyle = m_pManager->GetStyle(pstrValue);
 			if( pStyle != NULL) {
 				ApplyAttributeList(pStyle);
 				return;
 			}
 		}
+
 		if( _tcsicmp(pstrName, _T("pos")) == 0 ) {
 			RECT rcPos = { 0 };
 			LPTSTR pstr = NULL;
@@ -951,6 +961,9 @@ namespace DuiLib {
 		}
 		else if (_tcsicmp(pstrName, _T("flex")) == 0) {
 			m_nFlex = _ttoi(pstrValue);
+		}
+		else if (_tcsicmp(pstrName, _T("class")) == 0) {
+			m_sCssClass = pstrValue;
 		}
 		else if( _tcsicmp(pstrName, _T("float")) == 0 ) {
 			CDuiString nValue = pstrValue;

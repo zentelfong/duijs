@@ -78,7 +78,8 @@ project "quickjs"
 	language "C++"
 	kind "StaticLib"
 	defines{
-		"CONFIG_BIGNUM"
+		"CONFIG_BIGNUM",
+		"CONFIG_JSX"
 	}
 	includedirs{
 		"quickjs/include",

@@ -202,6 +202,7 @@ namespace DuiLib {
 		void SetVirtualWnd(LPCTSTR pstrValue);
 		CDuiString GetVirtualWnd() const;
 
+		const CDuiString& GetCssClass() const;
 	public:
 		CEventSource OnInit;
 		CEventSource OnDestroy;
@@ -214,6 +215,7 @@ namespace DuiLib {
 		CControlUI* m_pParent;
 		CDuiString m_sVirtualWnd;
 		CDuiString m_sName;
+		CDuiString m_sCssClass;
 		bool m_bUpdateNeeded;
 		bool m_bMenuUsed;
 		RECT m_rcItem;

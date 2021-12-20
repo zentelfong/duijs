@@ -1,5 +1,6 @@
 #include "FileDownload.h"
 #include <curl/curl.h>
+#include <functional>
 
 namespace network {
 

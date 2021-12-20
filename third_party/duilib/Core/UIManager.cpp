@@ -3888,17 +3888,17 @@ namespace DuiLib {
 	{
 		std::shared_ptr<CssStyles> sheets;
 		
-		if (pStrElement) {
+		if (pStrElement && pStrElement[0]) {
 			sheets = m_cssSheet.GetStylesByElement(pStrElement);
 			ApplyControlCss(pControl, sheets);
 		}
 
-		if (pStrClass) {
+		if (pStrClass && pStrClass[0]) {
 			sheets = m_cssSheet.GetStylesByClass(pStrClass);
 			ApplyControlCss(pControl, sheets);
 		}
 
-		if (pStrName) {
+		if (pStrName && pStrName[0]) {
 			sheets = m_cssSheet.GetStylesById(pStrName);
 			ApplyControlCss(pControl, sheets);
 		}
@@ -3919,12 +3919,12 @@ namespace DuiLib {
 	{
 		std::shared_ptr<CssStyles> sheets;
 
-		if (pStrElement) {
+		if (pStrElement && pStrElement[0]) {
 			sheets = m_cssSheet.GetStylesByElement(pStrElement);
 			ApplyManagerCss(this, sheets);
 		}
 
-		if (pStrClass) {
+		if (pStrClass && pStrClass[0]) {
 			sheets = m_cssSheet.GetStylesByClass(pStrClass);
 			ApplyManagerCss(this, sheets);
 		}

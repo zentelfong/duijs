@@ -7,6 +7,7 @@ namespace duijs {
 using namespace qjs;
 using namespace DuiLib;
 
+extern void RegisterJSX(qjs::Context* context);
 extern void RegisterDPI(Module* module);
 extern void RegisterString(qjs::Module* module);
 extern void RegisterGlobal(Module* module);
@@ -91,6 +92,8 @@ bool JsEngine::Init() {
 	context_->SetUserData(this);
 
 	JS_SetModuleLoaderFunc(runtime_->runtime(), NULL, jsModuleLoader, NULL);
+
+	RegisterJSX(context_);
 
 	auto module = context_->NewModule("DuiLib");
 	RegisterConst(module);
