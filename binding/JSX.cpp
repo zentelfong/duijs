@@ -18,14 +18,14 @@ static Value jsxFunc(Context& context, ArgList& args) {
 		return undefined_value;
 	}
 
-	//处理属性值
+	//保存属性值，控件init时应用
 	auto attrs = args[1];
 	if (attrs.IsObject()) {
 		auto attrsMap = attrs.GetProperties();
 		for (auto itr = attrsMap.begin(); itr != attrsMap.end(); ++itr) {
 			CDuiString name(itr->first.c_str());
 			CDuiString value(itr->second.ToStdString().c_str());
-			pControl->SetAttribute(name, value);
+			pControl->AddCustomAttribute(name, value);
 		}
 	}
 

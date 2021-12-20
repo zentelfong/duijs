@@ -813,11 +813,11 @@ namespace DuiLib {
 	void CControlUI::DoInit()
 	{
 		//BUG:在此处应用样式会覆盖已设置的属性
-		CDuiString cls = GetClass();
-		if (cls.Right(2) == _T("UI")) {
-			cls.SetAt(cls.GetLength() - 2,_T('\0'));
-		}
-		m_pManager->ApplyCss(this, cls, GetCssClass(),GetName());
+		//CDuiString cls = GetClass();
+		//if (cls.Right(2) == _T("UI")) {
+		//	cls.SetAt(cls.GetLength() - 2,_T('\0'));
+		//}
+		//m_pManager->ApplyCss(this, cls, GetCssClass(),GetName());
 	}
 
 	void CControlUI::Event(TEventUI& event)

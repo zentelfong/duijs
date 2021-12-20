@@ -384,8 +384,8 @@ namespace DuiLib {
 				}
 
 				// Process css style
-				//pManager->ApplyCss(pControl, pstrClass,node.GetAttributeValue(_T("class")), 
-				//	node.GetAttributeValue(_T("name")));
+				pManager->ApplyCss(pControl, pstrClass,node.GetAttributeValue(_T("class")), 
+					node.GetAttributeValue(_T("name")));
 			}
 
 			// Process attributes
