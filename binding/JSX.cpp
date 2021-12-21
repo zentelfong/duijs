@@ -25,7 +25,7 @@ static Value jsxFunc(Context& context, ArgList& args) {
 		for (auto itr = attrsMap.begin(); itr != attrsMap.end(); ++itr) {
 			CDuiString name(itr->first.c_str());
 			CDuiString value(itr->second.ToStdString().c_str());
-			pControl->AddCustomAttribute(name, value);
+			pControl->SaveAttribute(name, value);
 		}
 	}
 
@@ -33,7 +33,8 @@ static Value jsxFunc(Context& context, ArgList& args) {
 	auto child = toControl(args[2]);
 	if (child) {
 		auto pContainer = static_cast<IContainerUI*>(pControl->GetInterface(_T("IContainer")));
-		pContainer->Add(child);
+		if(pContainer)
+			pContainer->Add(child);
 	}
 	return toValue(context, pControl);
 }

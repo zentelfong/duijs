@@ -3,7 +3,17 @@
 namespace DuiLib {
 	IMPLEMENT_DUICONTROL(CControlUI)
 
-		CControlUI::CControlUI()
+
+	struct Attribute {
+		Attribute(LPCTSTR n,LPCTSTR v) 
+			:name(n),value(v)
+		{
+		}
+		CDuiString name;
+		CDuiString value;
+	};
+
+	CControlUI::CControlUI()
 		:m_pManager(NULL), 
 		m_pParent(NULL), 
 		m_bUpdateNeeded(true),
@@ -53,6 +63,7 @@ namespace DuiLib {
 	{
 		if( OnDestroy ) OnDestroy(this);
 		RemoveAllCustomAttribute();	
+		RemoveAllSaveAttribute();
 		if( m_pManager != NULL ) m_pManager->ReapObjects(this);
 	}
 
@@ -806,19 +817,16 @@ namespace DuiLib {
 
 	void CControlUI::Init()
 	{
+		ApplySaveAttributeList();
 		DoInit();
 		if( OnInit ) OnInit(this);
 	}
 
 	void CControlUI::DoInit()
 	{
-		//BUG:在此处应用样式会覆盖已设置的属性
-		//CDuiString cls = GetClass();
-		//if (cls.Right(2) == _T("UI")) {
-		//	cls.SetAt(cls.GetLength() - 2,_T('\0'));
-		//}
-		//m_pManager->ApplyCss(this, cls, GetCssClass(),GetName());
+
 	}
+
 
 	void CControlUI::Event(TEventUI& event)
 	{
@@ -890,10 +898,6 @@ namespace DuiLib {
 		return str;
 	}
 
-	const CDuiString& CControlUI::GetCssClass() const {
-		return m_sCssClass;
-	}
-
 	void CControlUI::AddCustomAttribute(LPCTSTR pstrName, LPCTSTR pstrAttr)
 	{
 		if( pstrName == NULL || pstrName[0] == _T('\0') || pstrAttr == NULL || pstrAttr[0] == _T('\0') ) return;
@@ -936,6 +940,64 @@ namespace DuiLib {
 		m_mCustomAttrHash.Resize();
 	}
 
+	void CControlUI::SaveAttribute(LPCTSTR pstrName, LPCTSTR pstrAttr) {
+		//保存属性值，init时应用该属性
+		m_mSaveAttrList.Add(new Attribute(pstrName,pstrAttr));
+	}
+
+	LPCTSTR CControlUI::GetSaveAttribute(LPCTSTR pstrName) const {
+		for (int i = 0; i < m_mSaveAttrList.GetSize(); ++i) {
+			Attribute* attr = (Attribute*)m_mSaveAttrList.GetAt(i);
+			if (attr->name == pstrName) {
+				return attr->value;
+			}
+		}
+		return NULL;
+	}
+
+	bool CControlUI::RemoveSaveAttribute(LPCTSTR pstrName) {
+		for (int i = 0; i < m_mSaveAttrList.GetSize(); ++i) {
+			Attribute* attr = (Attribute*)m_mSaveAttrList.GetAt(i);
+			if (attr->name == pstrName) {
+				m_mSaveAttrList.Remove(i);
+				delete attr;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void CControlUI::RemoveAllSaveAttribute() {
+		for (int i = 0; i < m_mSaveAttrList.GetSize(); ++i) {
+			Attribute* attr = (Attribute*)m_mSaveAttrList.GetAt(i);
+			delete attr;
+		}
+		m_mSaveAttrList.Empty();
+	}
+
+	void CControlUI::ApplySaveAttributeList() {
+		if (m_mSaveAttrList.IsEmpty()) {
+			return;
+		}
+
+		CDuiString cls = GetClass();
+		if (cls.Right(2) == _T("UI")) {
+			cls.SetAt(cls.GetLength() - 2, _T('\0'));
+		}
+
+		//先应用css样式
+		LPCTSTR cssClass = GetSaveAttribute(_T("class"));
+		LPCTSTR name = GetSaveAttribute(_T("name"));
+		m_pManager->ApplyCss(this, cls, cssClass, name);
+
+		//再应用保存的属性
+		for (int i = 0; i < m_mSaveAttrList.GetSize(); ++i) {
+			Attribute* attr = (Attribute*)m_mSaveAttrList.GetAt(i);
+			SetAttribute(attr->name, attr->value);
+		}
+		RemoveAllSaveAttribute();
+	}
+
 	void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
 		// 是否样式表
@@ -961,9 +1023,6 @@ namespace DuiLib {
 		}
 		else if (_tcsicmp(pstrName, _T("flex")) == 0) {
 			m_nFlex = _ttoi(pstrValue);
-		}
-		else if (_tcsicmp(pstrName, _T("class")) == 0) {
-			m_sCssClass = pstrValue;
 		}
 		else if( _tcsicmp(pstrName, _T("float")) == 0 ) {
 			CDuiString nValue = pstrValue;

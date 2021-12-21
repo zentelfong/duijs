@@ -182,6 +182,13 @@ namespace DuiLib {
 		bool RemoveCustomAttribute(LPCTSTR pstrName);
 		void RemoveAllCustomAttribute();
 
+		// 保存属性值
+		void SaveAttribute(LPCTSTR pstrName, LPCTSTR pstrAttr);
+		LPCTSTR GetSaveAttribute(LPCTSTR pstrName) const;
+		bool RemoveSaveAttribute(LPCTSTR pstrName);
+		void RemoveAllSaveAttribute();
+		void ApplySaveAttributeList();
+
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 		CControlUI* ApplyAttributeList(LPCTSTR pstrList);
 
@@ -202,7 +209,6 @@ namespace DuiLib {
 		void SetVirtualWnd(LPCTSTR pstrValue);
 		CDuiString GetVirtualWnd() const;
 
-		const CDuiString& GetCssClass() const;
 	public:
 		CEventSource OnInit;
 		CEventSource OnDestroy;
@@ -215,7 +221,6 @@ namespace DuiLib {
 		CControlUI* m_pParent;
 		CDuiString m_sVirtualWnd;
 		CDuiString m_sName;
-		CDuiString m_sCssClass;
 		bool m_bUpdateNeeded;
 		bool m_bMenuUsed;
 		RECT m_rcItem;
@@ -266,6 +271,7 @@ namespace DuiLib {
 	    HINSTANCE m_instance;
 
 		CStdStringPtrMap m_mCustomAttrHash;
+		CStdPtrArray m_mSaveAttrList;
 	};
 
 } // namespace DuiLib
