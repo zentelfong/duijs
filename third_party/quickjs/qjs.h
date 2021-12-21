@@ -509,7 +509,11 @@ public:
 
 	String ToString() const {
 		if (!IsString()) {
-			return String("", 0);
+			JSValue value = JS_ToString(context_, value_);
+			size_t len;
+			const char* str = JS_ToCStringLen(context_, &len, value);
+			JS_FreeValue(context_,value);
+			return String(context_, str, len);
 		}
 
 		size_t len;
@@ -520,12 +524,7 @@ public:
 	uint8_t* ToBuffer(size_t* psize) const;
 
 	std::string ToStdString() const {
-		if (!IsString()) {
-			return "";
-		}
-		size_t len;
-		const char* str = JS_ToCStringLen(context_, &len, value_);
-		String ss(context_, str, len);
+		String ss = ToString();
 		return std::string(ss.str(), ss.len());
 	}
 

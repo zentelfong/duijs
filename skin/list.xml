@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Window caption="0,0,0,97">
+  <Font name="微软雅黑" id="0" size="12" default="true"/>
+
+  <Style css="css/common.css"/>
+  <VerticalLayout name="root" bkcolor="#EE202223">
+    <HorizontalLayout name="appbar" height="32" >
+      <HorizontalLayout inset="6,6,0,0">
+        <Label name="title_lb" text="List测试窗口" valign="vcenter" align="left" wordbreak="true" textcolor="#FFEEEEEE" font="0"/>
+      </HorizontalLayout>
+      <Button name="minbtn"/>
+      <Button name="closebtn"/>
+    </HorizontalLayout>
+    
+    <List name="list" itemselect="selectItem" bkcolor="#EEFFFFFF" vscrollbar="true" header="hidden" itemtextpadding="10,0,0,0" itemfont="0">
+    </List>
+  </VerticalLayout>
+</Window>

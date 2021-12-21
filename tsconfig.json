@@ -17,5 +17,6 @@
     "declaration": false,
     "importHelpers": false,
     "removeComments": true,
+    "jsx": "preserve",
   }
 }
