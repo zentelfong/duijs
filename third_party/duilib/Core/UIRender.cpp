@@ -477,7 +477,7 @@ namespace DuiLib {
 		LPBYTE pData = NULL;
 		DWORD dwSize = 0;
 
-		
+		UINT dpi = 0;
 		pData = ReadImageData(bitmap, type, instance, dwSize);
 
 		if (!pData) {
@@ -485,7 +485,7 @@ namespace DuiLib {
 			LPCTSTR find = _tcschr(bitmap.m_lpstr, _T('@'));
 			if (find) {
 				//加载原图再进行缩放
-				UINT dpi = _ttoi(find + 1);
+				dpi = _ttoi(find + 1);
 
 				CDuiString sScale;
 				sScale.SmallFormat(_T("@%d."), dpi);
@@ -494,28 +494,32 @@ namespace DuiLib {
 				imgFile.Replace(sScale, _T("."));
 
 				pData = ReadImageData(STRINGorID(imgFile), type, instance, dwSize);
-				if (pData) {
-					Gdiplus::Image* image = GdiplusLoadImage(pData, dwSize);
-					delete[] pData;
 
-					if (image) {
-						UINT w = image->GetWidth() * dpi / 100;
-						UINT h = image->GetHeight() * dpi / 100;
-						HBITMAP hBitmap = ToBitmap(image, w,h);
-						delete image;
-
-						TImageInfo* data = new TImageInfo;
-						data->pBits = NULL;
-						data->pSrcBits = NULL;
-						data->hBitmap = hBitmap;
-						data->nX = w;
-						data->nY = h;
-						data->bAlpha = true;
-						return data;
-					}
+				if (!pData) {
+					return NULL;
 				}
+
+				//if (pData) {
+				//	Gdiplus::Image* image = GdiplusLoadImage(pData, dwSize);
+				//	delete[] pData;
+				//	if (image) {
+				//		UINT w = image->GetWidth() * dpi / 100;
+				//		UINT h = image->GetHeight() * dpi / 100;
+				//		HBITMAP hBitmap = ToBitmap(image, w,h);
+				//		delete image;
+				//		TImageInfo* data = new TImageInfo;
+				//		data->pBits = NULL;
+				//		data->pSrcBits = NULL;
+				//		data->hBitmap = hBitmap;
+				//		data->nX = w;
+				//		data->nY = h;
+				//		data->bAlpha = true;
+				//		return data;
+				//	}
+				//}
+			} else {
+				return NULL;
 			}
-			return NULL;
 		}
 
 		LPBYTE pImage = NULL;
@@ -524,6 +528,24 @@ namespace DuiLib {
 		delete[] pData;
 		if( !pImage ) {
 			return NULL;
+		}
+
+		if (dpi > 0 && dpi < 800) {
+			//进行缩放
+			int newx = x * dpi/100;
+			int newy = y * dpi/100;
+
+			uint8_t* pixel_out = (uint8_t*)stbi_image_malloc(newx * newy * n);
+
+			//stbir_resize_uint8_generic(pImage, x, y, 0, pixel_out, newx, newy, 0, n, -1, 0, 
+			//	STBIR_EDGE_CLAMP, STBIR_FILTER_CUBICBSPLINE, STBIR_COLORSPACE_LINEAR, NULL);
+
+			stbir_resize_uint8(pImage, x, y, 0, pixel_out, newx, newy, 0, n);
+
+			stbi_image_free(pImage);
+			pImage = pixel_out;
+			x = newx;
+			y = newy;
 		}
 
 		BITMAPINFO bmi;
