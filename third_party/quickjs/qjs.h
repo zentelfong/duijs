@@ -187,7 +187,7 @@ public:
 	Value NewArray();
 
 	//创建class的对象
-	Value NewＣlassObject(JSClassID class_id);
+	Value NewClassObject(JSClassID class_id);
 
 	Value NewArrayBuffer(const uint8_t* buf, size_t len);
 
@@ -926,7 +926,7 @@ public:
 		if (!ptr)
 			return null_value;
 
-		Value obj = context.NewＣlassObject(class_id_);
+		Value obj = context.NewClassObject(class_id_);
 		SetThis(obj, ptr);
 		return obj;
 	}
@@ -935,7 +935,7 @@ public:
 		if (!ptr)
 			return null_value;
 		//TODO:检测cid为class_id_的子类
-		Value obj = context.NewＣlassObject(cid);
+		Value obj = context.NewClassObject(cid);
 		SetThis(obj, ptr);
 		return obj;
 	}

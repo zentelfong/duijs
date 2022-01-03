@@ -28,7 +28,11 @@
 
 12. 支持编写typescript后编译为javascript运行；
 
+13. jsx支持，当添加list的element时，可以直接在js代码中使用xml的写法生成element。（注意标签的首字母需要小写）
+
     
 
+#### JSX
 
+在typescript中使用jsx时，需要将ts后缀名改为tsx，tsc编译后会生成后缀名为jsx的文件，import时需注意后缀名。
 
