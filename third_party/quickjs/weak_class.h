@@ -73,7 +73,7 @@ public:
 		if (!ptr)
 			return null_value;
 
-		Value obj = context.NewＣlassObject(class_id_);
+		Value obj = context.NewClassObject(class_id_);
 		SetSafeThis(obj, ptr);
 		return obj;
 	}
@@ -83,7 +83,7 @@ public:
 		if (!ptr)
 			return null_value;
 		//TODO:检测cid为class_id_的子类
-		Value obj = context.NewＣlassObject(cid);
+		Value obj = context.NewClassObject(cid);
 		SetSafeThis(obj, ptr);
 		return obj;
 	}
