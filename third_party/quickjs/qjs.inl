@@ -60,7 +60,7 @@ inline Value Context::NewArray() {
 	return Value(context_, JS_NewArray(context_));
 }
 
-inline Value Context::NewＣlassObject(JSClassID class_id) {
+inline Value Context::NewClassObject(JSClassID class_id) {
 	return Value(context_, JS_NewObjectClass(context_, class_id));
 }
 

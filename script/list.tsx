@@ -23,4 +23,4 @@ class ListWindow extends dui.Window {
 let listWindow = new ListWindow();
 listWindow.create("List测试窗口", dui.WS_OVERLAPPEDWINDOW);
 listWindow.centerWindow();
-listWindow.showWindow();
+listWindow.showWindow(true,true);

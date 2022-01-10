@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Window caption="0,0,0,97">
+  <Font name="微软雅黑" id="0" size="12" default="true"/>
+  <Style css="css/common.css"/>
+
+  <VerticalLayout name="root" bkcolor="#EE202223">
+    <HorizontalLayout name="appbar" height="32" >
+      <Control/>
+      <Button name="minbtn"/>
+      <Button name="closebtn"/>
+    </HorizontalLayout>
+    <VerticalLayout bkcolor="#ffffffff">
+      <Label text="Hello World!"/>
+    </VerticalLayout>
+  </VerticalLayout>
+</Window>
