@@ -14,7 +14,7 @@ public:
 	JsEngine();
 	~JsEngine();
 
-	bool Init();
+	bool Init(wchar_t** argv,int argc);
 	void RunLoop();
 
 	bool Excute(const char* input, const char* filename);

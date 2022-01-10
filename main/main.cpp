@@ -55,10 +55,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 		}
 	}
 
-	LocalFree(szArglist);
 
 	duijs::JsEngine engine;
-	engine.Init();
+	engine.Init(szArglist, nArgs);
+	LocalFree(szArglist);
+
 
 	bool rslt = engine.Excute("import {} from 'debug.js'", "<eval>");
 	if (!rslt) {

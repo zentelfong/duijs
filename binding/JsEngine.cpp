@@ -1,5 +1,6 @@
 #include "duilib/UIlib.h"
 #include "JsEngine.h"
+#include "Util.h"
 #include "JsTaskManager.h"
 #include "async/thread.h"
 
@@ -80,7 +81,17 @@ JsEngine::~JsEngine() {
 
 }
 
-bool JsEngine::Init() {
+//解析命令行参数
+void RegisterArgs(qjs::Context* ctx, wchar_t** argv, int argc) {
+	qjs::Value args = ctx->NewObject();
+	for (int i = 0; i < argc; ++i) {
+		args.SetPropertyString(i, Wide2UTF8(argv[i]).c_str());
+	}
+	ctx->Global().SetProperty("args", args);
+}
+
+
+bool JsEngine::Init(wchar_t** argv, int argc) {
 	assert(!runtime_);
 	assert(!context_);
 
@@ -96,6 +107,7 @@ bool JsEngine::Init() {
 	RegisterJSX(context_);
 
 	auto module = context_->NewModule("DuiLib");
+	RegisterArgs(context_, argv, argc);
 	RegisterConst(module);
 	RegisterGlobal(module);
 	RegisterString(module);
