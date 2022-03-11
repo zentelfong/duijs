@@ -214,6 +214,12 @@ static Value reloadText(Context& context, ArgList& args) {
 	return undefined_value;
 }
 
+static Value getTickCount(Context& context, ArgList& args) {
+	return context.NewInt64(GetTickCount64());
+}
+
+
+
 #define ADD_GLOBAL_FUNCTION(name) module->ExportFunc<name>(#name);
 
 
@@ -244,7 +250,7 @@ void RegisterGlobal(Module* module) {
 	ADD_GLOBAL_FUNCTION(resetTextMap);
 	ADD_GLOBAL_FUNCTION(reloadText);
 	ADD_GLOBAL_FUNCTION(setAllDPI);
-	
+	ADD_GLOBAL_FUNCTION(getTickCount);
 
 }
 

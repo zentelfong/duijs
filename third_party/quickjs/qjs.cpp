@@ -286,7 +286,7 @@ void Context::DumpError() {
 }
 
 
-uint8_t* Value::ToBuffer(size_t* psize) const {
+uint8_t* WeakValue::ToBuffer(size_t* psize) const {
 	size_t aoffset, asize, size;
 	JSValue abuf = JS_GetTypedArrayBuffer(context_, value_, &aoffset, &asize, NULL);
 	if (JS_IsException(abuf)) {
@@ -305,6 +305,70 @@ uint8_t* Value::ToBuffer(size_t* psize) const {
 
 	*psize = size;
 	return buf;
+}
+
+
+Value WeakValue::GetProperty(const char* prop) const {
+	return Value(context_, JS_GetPropertyStr(context_, value_, prop));
+}
+
+Value WeakValue::GetProperty(uint32_t idx) const {
+	return Value(context_, JS_GetPropertyUint32(context_, value_, idx));
+}
+
+size_t WeakValue::length() const {
+	if (!IsObject()) {
+		return 0;
+	}
+
+	Value val = GetProperty("length");
+	return val.ToUint32();
+}
+
+std::map<std::string, Value> WeakValue::GetProperties(int flags) {
+	std::map<std::string, Value> properties;
+	if (!IsObject() || !context_) {
+		return properties;
+	}
+
+	uint32_t len;
+	JSPropertyEnum* property;
+	if (JS_GetOwnPropertyNames(context_, &property, &len, value_, flags) == 0) {
+		for (uint32_t i = 0; i < len; ++i) {
+			const char* name = JS_AtomToCString(context_, property[i].atom);
+			properties[name] = Value(context_, JS_GetProperty(context_, value_, property[i].atom));
+			JS_FreeCString(context_, name);
+		}
+	}
+	return properties;
+}
+
+bool WeakValue::SetPrototype(const Value& value) {
+	return JS_SetPrototype(context_, value_, value.value_) == 0;
+}
+
+
+Value WeakValue::GetPrototype() {
+	return Value(context_, JS_GetPrototype(context_, value_));
+}
+
+
+Value WeakValue::Call() const {
+	return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, 0, nullptr));
+}
+
+
+Value WeakValue::Invoke(const char* func_name) const {
+	auto atom = JS_NewAtom(context_, func_name);
+	JSValue rslt = JS_Invoke(context_, value_, atom, 0, nullptr);
+	JS_FreeAtom(context_, atom);
+	return Value(context_, std::move(rslt));
+}
+
+
+Value WeakValue::ExcuteBytecode() {
+	return Value(context_,
+		JS_EvalFunction(context_, JS_DupValue(context_, value_)));
 }
 
 }//namespace

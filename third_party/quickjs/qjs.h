@@ -318,54 +318,35 @@ private:
 	size_t len_;
 };
 
+class Value;
 
-class Value {
+//弱引用值
+class WeakValue{
 public:
-	Value()
+	WeakValue()
 		:context_(nullptr), value_(JS_UNDEFINED)
 	{
 	}
 
-
-	Value(JSContext* ctx)
+	WeakValue(JSContext* ctx)
 		:context_(ctx), value_(JS_UNDEFINED)
 	{
 	}
 
-	Value(JSContext* ctx, JSValue&& value)
+	WeakValue(JSContext* ctx, const JSValueConst& value)
 		:context_(ctx), value_(value)
 	{
-		value = JS_UNDEFINED;
 	}
 
-	Value(JSContext* ctx, const JSValueConst& value)
-		:context_(ctx), value_(JS_DupValue(ctx, value))
-	{
-	}
-
-	Value(const Value& value)
+	WeakValue(const WeakValue& value)
 		:context_(value.context_),
-		value_(JS_DupValue(context_, value.value_))
+		value_(value.value_)
 	{
 	}
 
-	Value(Value&& value) noexcept {
+	WeakValue& operator=(const WeakValue& value) {
 		context_ = value.context_;
 		value_ = value.value_;
-		value.value_ = JS_UNDEFINED;
-	}
-
-	~Value() {
-		if (context_) {
-			JS_FreeValue(context_, value_);
-		}
-	}
-
-	Value& operator=(const Value& value) {
-		JSValue temp = JS_DupValue(context_, value.value_);
-		JS_FreeValue(context_, value_);
-		context_ = value.context_;
-		value_ = temp;
 		return *this;
 	}
 
@@ -377,15 +358,6 @@ public:
 		return JS_VALUE_GET_TAG(value_);
 	}
 
-	JSValue CopyValue() const {
-		return JS_DupValue(context_, value_);
-	}
-
-	JSValue Release() {
-		JSValue value = value_;
-		value_ = JS_UNDEFINED;
-		return value;
-	}
 
 	Context* context() const {
 		return reinterpret_cast<Context*>(
@@ -512,7 +484,7 @@ public:
 			JSValue value = JS_ToString(context_, value_);
 			size_t len;
 			const char* str = JS_ToCStringLen(context_, &len, value);
-			JS_FreeValue(context_,value);
+			JS_FreeValue(context_, value);
 			return String(context_, str, len);
 		}
 
@@ -527,188 +499,6 @@ public:
 		String ss = ToString();
 		return std::string(ss.str(), ss.len());
 	}
-
-	Value GetProperty(const char* prop) const {
-		return Value(context_, JS_GetPropertyStr(context_, value_, prop));
-	}
-
-	Value GetProperty(uint32_t idx) const {
-		return Value(context_, JS_GetPropertyUint32(context_, value_, idx));
-	}
-
-	//获取数组的长度
-	size_t length() const {
-		if (!IsObject()) {
-			return 0;
-		}
-
-		Value val = GetProperty("length");
-		return val.ToUint32();
-	}
-
-	std::map<std::string, Value> GetProperties(int flags = JS_GPN_STRING_MASK | JS_GPN_SYMBOL_MASK) {
-		std::map<std::string, Value> properties;
-		if (!IsObject() || !context_) {
-			return properties;
-		}
-
-		uint32_t len;
-		JSPropertyEnum* property;
-		if (JS_GetOwnPropertyNames(context_, &property, &len, value_, flags) == 0) {
-			for (uint32_t i = 0; i < len; ++i) {
-				const char* name = JS_AtomToCString(context_, property[i].atom);
-				properties[name] = Value(context_, JS_GetProperty(context_, value_, property[i].atom));
-				JS_FreeCString(context_, name);
-			}
-		}
-		return properties;
-	}
-
-	bool HasProperty(const char* prop) const {
-		auto atom = JS_NewAtom(context_, prop);
-		bool has = JS_HasProperty(context_, value_, atom);
-		JS_FreeAtom(context_, atom);
-		return has;
-	}
-
-	bool HasProperty(uint32_t idx) const {
-		auto atom = JS_NewAtomUInt32(context_, idx);
-		bool has = JS_HasProperty(context_, value_, atom);
-		JS_FreeAtom(context_, atom);
-		return has;
-	}
-
-	bool DeleteProperty(const char* prop) {
-		auto atom = JS_NewAtom(context_, prop);
-		int rslt = JS_DeleteProperty(context_, value_, atom, 0);
-		JS_FreeAtom(context_, atom);
-		return rslt == 1;
-	}
-
-	bool DeleteProperty(uint32_t idx) {
-		auto atom = JS_NewAtomUInt32(context_, idx);
-		int rslt = JS_DeleteProperty(context_, value_, atom, 0);
-		JS_FreeAtom(context_, atom);
-		return rslt == 1;
-	}
-
-	bool SetProperty(const char* key, const Value& value) {
-		return JS_SetPropertyStr(context_, value_, key,
-			JS_DupValue(context_, value.value_)) == 0;
-	}
-
-
-	bool SetProperty(const char* key, Value&& value) {
-		JSValue temp = value.value_;
-		value.value_ = JS_UNDEFINED;
-		return JS_SetPropertyStr(context_, value_, key, temp) == 0;
-	}
-
-	bool SetProperty(uint32_t key, const Value& value) {
-		return JS_SetPropertyUint32(context_, value_, key,
-			JS_DupValue(context_, value.value_)) == 0;
-	}
-
-	bool SetProperty(uint32_t key, Value&& value) {
-		JSValue temp = value.value_;
-		value.value_ = JS_UNDEFINED;
-		return JS_SetPropertyUint32(context_, value_, key, temp) == 0;
-	}
-
-	bool SetPropertyString(uint32_t key, const char* value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewString(context_, value)) == 0;
-	}
-
-	bool SetPropertyString(uint32_t key, const char* value, size_t len) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
-	}
-
-	bool SetPropertyInt32(uint32_t key, int32_t value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt32(context_, value)) == 0;
-	}
-
-	bool SetPropertyInt64(uint32_t key, int64_t value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt64(context_, value)) == 0;
-	}
-
-	bool SetPropertyFloat32(uint32_t key, float value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
-	}
-
-	bool SetPropertyFloat64(uint32_t key, double value) {
-		return JS_SetPropertyUint32(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
-	}
-
-	bool SetPropertyString(const char* key, const char* value) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewString(context_, value)) == 0;
-	}
-
-	bool SetPropertyString(const char* key, const char* value, size_t len) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
-	}
-
-	bool SetPropertyInt32(const char* key, int32_t value) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewInt32(context_, value)) == 0;
-	}
-
-	bool SetPropertyInt64(const char* key, int64_t value) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewInt64(context_, value)) == 0;
-	}
-
-	bool SetPropertyFloat32(const char* key, float value) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
-	}
-
-	bool SetPropertyFloat64(const char* key, double value) {
-		return JS_SetPropertyStr(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
-	}
-
-	bool SetPrototype(const Value& value) {
-		return JS_SetPrototype(context_, value_, value.value_) == 0;
-	}
-
-	Value GetPrototype() {
-		return Value(context_, JS_GetPrototype(context_, value_));
-	}
-
-	uint8_t* GetArrayBuffer(size_t* psize) {
-		return JS_GetArrayBuffer(context_, psize, value_);
-	}
-
-	//执行普通函数，this_obj为JS_UNDEFINED
-	Value Call() const {
-		return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, 0, nullptr));
-	}
-
-	template<typename ...Args>
-	Value Call(Args&&... args) const {
-		JSValue params[] = { std::forward<Args>(args)... };
-		return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, sizeof...(args), params));
-	}
-
-	//执行对象的函数
-	Value Invoke(const char* func_name) const {
-		auto atom = JS_NewAtom(context_, func_name);
-		JSValue rslt = JS_Invoke(context_, value_, atom, 0, nullptr);
-		JS_FreeAtom(context_, atom);
-		return Value(context_, std::move(rslt));
-	}
-
-	template<typename ...Args>
-	Value Invoke(const char* func_name, Args&&... args) const {
-		JSValue params[] = { std::forward<Args>(args)... };
-		auto atom = JS_NewAtom(context_, func_name);
-		JSValue rslt = JS_Invoke(context_, value_, atom, sizeof...(args), params);
-		JS_FreeAtom(context_, atom);
-		return Value(context_, std::move(rslt));
-	}
-
-
-	Value ExcuteBytecode() {
-		return Value(context_,
-			JS_EvalFunction(context_, JS_DupValue(context_, value_)));
-	}
-
 
 	void SetOpaque(void* opaque) {
 		JS_SetOpaque(value_, opaque);
@@ -735,16 +525,279 @@ public:
 		JS_MarkValue(JS_GetRuntime(context_), value_, mark_func);
 	}
 
-protected:
-	Value(JSContext* ctx, const JSValueConst& value, int)
-		:context_(ctx), value_(value)
-	{
+	//获取属性
+	Value GetProperty(const char* prop) const;
+	Value GetProperty(uint32_t idx) const;
+
+	//获取数组的长度
+	size_t length() const;
+
+	std::map<std::string, Value> 
+		GetProperties(int flags = JS_GPN_STRING_MASK | JS_GPN_SYMBOL_MASK);
+
+	bool HasProperty(const char* prop) const {
+		if (!context_) {
+			return false;
+		}
+		auto atom = JS_NewAtom(context_, prop);
+		bool has = JS_HasProperty(context_, value_, atom);
+		JS_FreeAtom(context_, atom);
+		return has;
 	}
 
+	bool HasProperty(uint32_t idx) const {
+		if (!context_) {
+			return false;
+		}
+		auto atom = JS_NewAtomUInt32(context_, idx);
+		bool has = JS_HasProperty(context_, value_, atom);
+		JS_FreeAtom(context_, atom);
+		return has;
+	}
+
+	bool DeleteProperty(const char* prop) {
+		if (!context_) {
+			return false;
+		}
+		auto atom = JS_NewAtom(context_, prop);
+		int rslt = JS_DeleteProperty(context_, value_, atom, 0);
+		JS_FreeAtom(context_, atom);
+		return rslt == 1;
+	}
+
+	bool DeleteProperty(uint32_t idx) {
+		if (!context_) {
+			return false;
+		}
+		auto atom = JS_NewAtomUInt32(context_, idx);
+		int rslt = JS_DeleteProperty(context_, value_, atom, 0);
+		JS_FreeAtom(context_, atom);
+		return rslt == 1;
+	}
+
+	bool SetProperty(const char* key, const WeakValue& value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key,
+			JS_DupValue(context_, value.value_)) == 0;
+	}
+
+
+	bool SetPropertyString(uint32_t key, const char* value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewString(context_, value)) == 0;
+	}
+
+	bool SetPropertyString(uint32_t key, const char* value, size_t len) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
+	}
+
+	bool SetPropertyInt32(uint32_t key, int32_t value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt32(context_, value)) == 0;
+	}
+
+	bool SetPropertyInt64(uint32_t key, int64_t value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewInt64(context_, value)) == 0;
+	}
+
+	bool SetPropertyFloat32(uint32_t key, float value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
+	}
+
+	bool SetPropertyFloat64(uint32_t key, double value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyUint32(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
+	}
+
+	bool SetPropertyString(const char* key, const char* value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewString(context_, value)) == 0;
+	}
+
+	bool SetPropertyString(const char* key, const char* value, size_t len) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewStringLen(context_, value, len)) == 0;
+	}
+
+	bool SetPropertyInt32(const char* key, int32_t value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewInt32(context_, value)) == 0;
+	}
+
+	bool SetPropertyInt64(const char* key, int64_t value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewInt64(context_, value)) == 0;
+	}
+
+	bool SetPropertyFloat32(const char* key, float value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
+	}
+
+	bool SetPropertyFloat64(const char* key, double value) {
+		if (!context_) {
+			return false;
+		}
+		return JS_SetPropertyStr(context_, value_, key, JS_NewFloat64(context_, value)) == 0;
+	}
+
+	bool SetPrototype(const Value& value);
+	Value GetPrototype();
+
+	uint8_t* GetArrayBuffer(size_t* psize) {
+		return JS_GetArrayBuffer(context_, psize, value_);
+	}
+
+	//执行普通函数，this_obj为JS_UNDEFINED
+	Value Call() const;
+
+	template<typename ...Args>
+	Value Call(Args&&... args) const;
+
+	//执行对象的函数
+	Value Invoke(const char* func_name) const;
+
+	template<typename ...Args>
+	Value Invoke(const char* func_name, Args&&... args) const;
+
+	Value ExcuteBytecode();
+protected:
 	friend class ConstValue;
 	JSContext* context_;
 	JSValue value_;
 };
+
+//强引用值
+class Value:public WeakValue{
+public:
+	Value()
+		:WeakValue()
+	{
+	}
+
+	Value(JSContext* ctx)
+		:WeakValue(ctx)
+	{
+	}
+
+	Value(JSContext* ctx, JSValue&& value)
+		:WeakValue(ctx,value)
+	{
+		value = JS_UNDEFINED;
+	}
+
+	Value(JSContext* ctx, const JSValueConst& value)
+		:WeakValue(ctx,JS_DupValue(ctx, value))
+	{
+	}
+
+	Value(const Value& value)
+		:WeakValue(value.context_, JS_DupValue(context_, value.value_))
+	{
+	}
+
+	Value(Value&& value) noexcept 
+		:WeakValue(value.context_, value.value_)
+	{
+		value.value_ = JS_UNDEFINED;
+	}
+
+	~Value() {
+		if (context_) {
+			JS_FreeValue(context_, value_);
+		}
+	}
+
+	Value& operator=(const Value& value) {
+		JSValue temp = JS_DupValue(context_, value.value_);
+		JS_FreeValue(context_, value_);
+		context_ = value.context_;
+		value_ = temp;
+		return *this;
+	}
+
+	JSValue CopyValue() const {
+		return JS_DupValue(context_, value_);
+	}
+
+	JSValue Release() {
+		JSValue value = value_;
+		value_ = JS_UNDEFINED;
+		return value;
+	}
+
+
+	bool SetProperty(const char* key, const Value& value) {
+		return JS_SetPropertyStr(context_, value_, key,
+			JS_DupValue(context_, value.value_)) == 0;
+	}
+
+
+	bool SetProperty(const char* key, Value&& value) {
+		JSValue temp = value.value_;
+		value.value_ = JS_UNDEFINED;
+		return JS_SetPropertyStr(context_, value_, key, temp) == 0;
+	}
+
+	bool SetProperty(uint32_t key, const Value& value) {
+		return JS_SetPropertyUint32(context_, value_, key,
+			JS_DupValue(context_, value.value_)) == 0;
+	}
+
+	bool SetProperty(uint32_t key, Value&& value) {
+		JSValue temp = value.value_;
+		value.value_ = JS_UNDEFINED;
+		return JS_SetPropertyUint32(context_, value_, key, temp) == 0;
+	}
+
+
+};
+
+
+
+template<typename ...Args>
+Value WeakValue::Call(Args&&... args) const {
+	JSValue params[] = { std::forward<Args>(args)... };
+	return Value(context_, JS_Call(context_, value_, JS_UNDEFINED, sizeof...(args), params));
+}
+
+template<typename ...Args>
+Value WeakValue::Invoke(const char* func_name, Args&&... args) const {
+	JSValue params[] = { std::forward<Args>(args)... };
+	auto atom = JS_NewAtom(context_, func_name);
+	JSValue rslt = JS_Invoke(context_, value_, atom, sizeof...(args), params);
+	JS_FreeAtom(context_, atom);
+	return Value(context_, std::move(rslt));
+}
+
+
 
 extern const Value undefined_value;
 extern const Value null_value;

@@ -122,5 +122,9 @@ bool Module::ExportFunc(const char* name) {
 		}, name, 0));
 }
 
+
+
+
+
 }//namespace
 

@@ -14,6 +14,8 @@ public:
 	qjs::Value js_this() { return this_; }
 
 	CPaintManagerUI* manager() { return &m_pm; }
+
+	void SetTop();
 protected:
 	LPCTSTR GetWindowClassName(void) const override;
 	void InitResource() override;
@@ -49,7 +51,7 @@ protected:
 	LRESULT OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
 	LRESULT OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) override;
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-
+	
 private:
 	qjs::Context* context_;
 	qjs::Value this_;

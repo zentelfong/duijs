@@ -13,6 +13,7 @@ JsWindow::JsWindow(Context* context, Value& this_obj)
 
 JsWindow::~JsWindow() {
 	this_.SetOpaque(nullptr);
+	this_ = undefined_value;
 }
 
 LPCTSTR JsWindow::GetWindowClassName(void) const {
@@ -365,6 +366,29 @@ LRESULT JsWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	return WindowImplBase::HandleCustomMessage(uMsg, wParam, lParam, bHandled);
 }
 
+void JsWindow::SetTop()
+{
+	HWND hForeWnd = NULL;
+	HWND hWnd = m_hWnd;
+	DWORD dwForeID;
+	DWORD dwCurID;
+
+	hForeWnd = GetForegroundWindow();
+	dwCurID = GetCurrentThreadId();
+	dwForeID = GetWindowThreadProcessId(hForeWnd, NULL);
+	AttachThreadInput(dwCurID, dwForeID, TRUE);
+	if (IsIconic(hWnd) || IsWindowVisible(hWnd) == FALSE)
+		::ShowWindow(hWnd, SW_SHOWNORMAL);
+
+	if ((GetWindowLong(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) == 0)
+	{
+		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	}
+
+	SetForegroundWindow(hWnd);
+	AttachThreadInput(dwCurID, dwForeID, FALSE);
+}
 
 //////////////////////////////////////////////////////////////////////
 
@@ -404,6 +428,12 @@ static Value showWindow(JsWindow* pThis, Context& context, ArgList& args) {
 		pThis->ShowWindow(args[0].ToBool());
 	else
 		pThis->ShowWindow();
+	return undefined_value;
+}
+
+static Value setTop(JsWindow* pThis, Context& context, ArgList& args) {
+
+	pThis->SetTop();
 	return undefined_value;
 }
 
@@ -455,6 +485,7 @@ void RegisterWindow(qjs::Module* module) {
 	window.AddFunc<createWindow>("create");
 	window.AddFunc<closeWindow>("close");
 	window.AddFunc<showWindow>("showWindow");
+	window.AddFunc<setTop>("setTop");
 	window.AddFunc<centerWindow>("centerWindow");
 	window.AddFunc<showModal>("showModal");
 	window.AddFunc<setIcon>("setIcon");
