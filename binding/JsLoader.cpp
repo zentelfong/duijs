@@ -99,6 +99,9 @@ JSModuleDef* jsModuleLoader(JSContext* ctx,
 			//º”‘ÿjs bytecode
 
 			func_val = JS_ReadObject(ctx, buf, buf_len, JS_READ_OBJ_BYTECODE);
+			
+			delete[] buf;
+			
 			if (JS_IsException(func_val))
 				return NULL;
 			js_module_set_import_meta(ctx, func_val, TRUE, FALSE);
